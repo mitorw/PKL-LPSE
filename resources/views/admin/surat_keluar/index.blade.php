@@ -38,11 +38,11 @@
                     <button class="btn btn-sm btn-info"
                         data-bs-toggle="modal"
                         data-bs-target="#pdfModal"
-                        data-file="{{ asset('storage/' . $surat->file_surat) }}">
+                        data-file="{{ asset('storage/' . $surat->isi_surat) }}">
                         Preview
                     </button>
                     <!-- Download -->
-                    <a href="{{ asset('storage/' . $surat->file_surat) }}" class="btn btn-sm btn-success" download>
+                    <a href="{{ asset('storage/' . $surat->isi_surat) }}" class="btn btn-sm btn-success" download>
                         Download
                     </a>
                 @else
@@ -61,36 +61,40 @@
             @endforeach
         </tbody>
     </table>
-</div>
-<!-- Modal Preview PDF -->
-<div class="modal fade" id="pdfModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
+
+<div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl" style="max-width:90vw;">
+    <div class="modal-content" style="height: 90vh;">
       <div class="modal-header">
-        <h5 class="modal-title">Preview Surat</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <h5 class="modal-title" id="pdfModalLabel">Preview Surat</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <iframe id="pdfViewer" src="" width="100%" height="600px" style="border:none;"></iframe>
+      <div class="modal-body p-0" style="height: 80vh;">
+        <iframe id="pdfFrame" src="" frameborder="0" style="width:100%; height:100%;"></iframe>
       </div>
     </div>
   </div>
 </div>
 
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const pdfModal = document.getElementById('pdfModal');
-    const pdfViewer = document.getElementById('pdfViewer');
+    var pdfModal = document.getElementById('pdfModal');
 
     pdfModal.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-        const fileUrl = button.getAttribute('data-file');
-        pdfViewer.src = fileUrl;
+        var button = event.relatedTarget;
+        var fileUrl = button.getAttribute('data-file');
+
+        var iframe = pdfModal.querySelector('#pdfFrame');
+        iframe.src = fileUrl;
     });
 
     pdfModal.addEventListener('hidden.bs.modal', function () {
-        pdfViewer.src = "";
+        var iframe = pdfModal.querySelector('#pdfFrame');
+        iframe.src = '';
     });
 });
 </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 @endsection
