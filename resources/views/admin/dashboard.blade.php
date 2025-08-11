@@ -14,6 +14,9 @@
             <h5>SURAT KELUAR</h5>
             <h2 class="text-success">{{ $suratKeluar }}</h2>
             <i class="fa fa-briefcase fa-2x text-success"></i>
+                    <a href="{{ route('surat_keluar.index') }}"
+           class="btn btn-success btn-sm mt-3">
+            Lihat </a>
         </div>
     </div>
     <div class="col-md-3">

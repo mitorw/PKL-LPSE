@@ -33,7 +33,7 @@
 
     <a href="#"><i class="fa fa-inbox" style="padding-top: 10px; padding-block: 10px">
         </i> Surat Masuk</a>
-    <a href="#"><i class="fa fa-paper-plane" style="padding-top: 10px; padding-block: 10px">
+    <a href="{{ route('surat_keluar.index') }}"><i class="fa fa-paper-plane" style="padding-top: 10px; padding-block: 10px">
         </i> Surat Keluar</a>
     <a href="#"><i class="fa fa-file-alt" style="padding-top: 10px; padding-block: 10px">
         </i> Laporan</a>
