@@ -4,6 +4,7 @@
     <title>Sistem Manajemen Surat</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         body { background-color: #f5f5f5; }
         .sidebar {
@@ -31,9 +32,9 @@
 <div class="sidebar">
     <h4 class="text-center mb-4">Sistem Manajemen Surat</h4>
 
-    <a href="#"><i class="fa fa-inbox" style="padding-top: 10px; padding-block: 10px">
+    <a href="{{ route('surat_masuk.index') }}"><i class="fa fa-inbox" style="padding-top: 10px; padding-block: 10px">
         </i> Surat Masuk</a>
-    <a href="#"><i class="fa fa-paper-plane" style="padding-top: 10px; padding-block: 10px">
+    <a href="{{ route('dashboard') }}"><i class="fa fa-paper-plane" style="padding-top: 10px; padding-block: 10px">
         </i> Surat Keluar</a>
     <a href="#"><i class="fa fa-file-alt" style="padding-top: 10px; padding-block: 10px">
         </i> Laporan</a>
@@ -55,6 +56,8 @@
      style="padding-top: 20px;">
     @yield('content')
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

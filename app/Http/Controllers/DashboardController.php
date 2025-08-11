@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\SuratMasuk;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $suratMasuk = 8;
+        $suratMasuk = SuratMasuk::count();
         $suratKeluar = 3;
         $pengguna = 2;
         $disposisi = 5;
