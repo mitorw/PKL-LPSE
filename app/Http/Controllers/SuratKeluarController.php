@@ -6,40 +6,41 @@ use App\Models\SuratKeluar;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-class SuratKeluarController extends Controller{
-public function index(Request $request)
+class SuratKeluarController extends Controller
 {
-    $query = SuratKeluar::query();
+    public function index(Request $request)
+    {
+        $query = SuratKeluar::query();
 
-    // Search global (nomor surat, perihal, tujuan, dll)
-    if ($request->filled('search')) {
-        $keyword = $request->search;
-        $query->where(function ($q) use ($keyword) {
-            $q->where('nomor_surat', 'like', "%{$keyword}%")
-              ->orWhere('perihal', 'like', "%{$keyword}%")
-              ->orWhere('tujuan', 'like', "%{$keyword}%")
-              ->orWhere('dibuat_oleh', 'like', "%{$keyword}%")
-              ->orWhere('keterangan', 'like', "%{$keyword}%");
-        });
+        // Search global (nomor surat, perihal, tujuan, dll)
+        if ($request->filled('search')) {
+            $keyword = $request->search;
+            $query->where(function ($q) use ($keyword) {
+                $q->where('nomor_surat', 'like', "%{$keyword}%")
+                    ->orWhere('perihal', 'like', "%{$keyword}%")
+                    ->orWhere('tujuan', 'like', "%{$keyword}%")
+                    ->orWhere('dibuat_oleh', 'like', "%{$keyword}%")
+                    ->orWhere('keterangan', 'like', "%{$keyword}%");
+            });
+        }
+
+        // Filter klasifikasi
+        if ($request->filled('klasifikasi')) {
+            $query->where('klasifikasi', $request->klasifikasi);
+        }
+
+        // Filter tanggal
+        if ($request->filled('tanggal_awal') && $request->filled('tanggal_akhir')) {
+            $query->whereBetween('tanggal', [$request->tanggal_awal, $request->tanggal_akhir]);
+        }
+
+        $suratKeluar = $query->latest()->paginate(10);
+
+        return view('admin.surat_keluar.index', [
+            'pageTitle' => 'Surat Keluar',
+            'suratKeluar' => $suratKeluar
+        ]);
     }
-
-    // Filter klasifikasi
-    if ($request->filled('klasifikasi')) {
-        $query->where('klasifikasi', $request->klasifikasi);
-    }
-
-    // Filter tanggal
-    if ($request->filled('tanggal_awal') && $request->filled('tanggal_akhir')) {
-        $query->whereBetween('tanggal', [$request->tanggal_awal, $request->tanggal_akhir]);
-    }
-
-    $suratKeluar = $query->latest()->paginate(10);
-
-    return view('admin.surat_keluar.index', [
-        'pageTitle' => 'Surat Keluar',
-        'suratKeluar' => $suratKeluar
-    ]);
-}
 
 
     public function create()
@@ -78,7 +79,7 @@ public function index(Request $request)
         return redirect()->route('surat_keluar.index')->with('success', 'Surat keluar berhasil disimpan.');
     }
 
-        public function edit($id)
+    public function edit($id)
     {
         $surat = SuratKeluar::findOrFail($id);
 
@@ -86,10 +87,9 @@ public function index(Request $request)
             'pageTitle' => 'Edit Surat Keluar',
             'surat' => $surat,
         ]);
-
     }
 
-        public function update(Request $request, $id)
+    public function update(Request $request, $id)
     {
         $request->validate([
             'nomor_surat' => 'required|max:50',
@@ -111,7 +111,7 @@ public function index(Request $request)
 
         // Update surat masuk
         $surat->update([
-             'nomor_surat' => $request->nomor_surat,
+            'nomor_surat' => $request->nomor_surat,
             'perihal' => $request->perihal,
             'tujuan' => $request->tujuan,
             'tanggal' => $request->tanggal,
@@ -126,16 +126,16 @@ public function index(Request $request)
 
 
     public function destroy($id)
-{
-    $surat = SuratKeluar::findOrFail($id);
-    // Jika ada file isi_surat, hapus file-nya dari storage
-    if ($surat->isi_surat && Storage::disk('public')->exists($surat->isi_surat)) {
-        Storage::disk('public')->delete($surat->isi_surat);
-    }
-    $surat->delete();
+    {
+        $surat = SuratKeluar::findOrFail($id);
+        // Jika ada file isi_surat, hapus file-nya dari storage
+        if ($surat->isi_surat && Storage::disk('public')->exists($surat->isi_surat)) {
+            Storage::disk('public')->delete($surat->isi_surat);
+        }
+        $surat->delete();
 
-    return redirect()->route('surat_keluar.index')->with('success', 'Surat keluar berhasil dihapus.');
-}
+        return redirect()->route('surat_keluar.index')->with('success', 'Surat keluar berhasil dihapus.');
+    }
 
 
     public function show($id)
