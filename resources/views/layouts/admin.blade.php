@@ -34,7 +34,7 @@ text-decoration: none;
 <h4 class="text-center mb-4">Sistem Manajemen Surat</h4>
 <a href="#"><i class="fa fa-inbox" style="padding-top: 10px; padding-block: 10px">
 </i> Surat Masuk</a>
-<a href="#"><i class="fa fa-paper-plane" style="padding-top: 10px; padding-block: 10px">
+<a href="{{ route('surat_keluar.index') }}"><i class="fa fa-paper-plane" style="padding-top: 10px; padding-block: 10px">
 </i> Surat Keluar</a>
 <a href="/laporan"><i class="fa fa-file-alt" style="padding-top: 10px; padding-block: 10px">
 </i> Laporan</a>
@@ -69,7 +69,7 @@ style="padding-top: 20px;">
 </div>
 
 
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 
 </body>
