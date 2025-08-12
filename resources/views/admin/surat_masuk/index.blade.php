@@ -7,6 +7,51 @@
 </div>
 @endif
 
+    <form action="{{ route('surat_masuk.search') }}" method="GET" class="mb-3">
+
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Cari Surat" name="search" value="{{ request('search') }}">
+                <div class="input-group-append">
+                    <button class="btn mx-2 btn-primary" type="submit">Cari</button>
+                </div>
+        </div>
+
+    </form>
+
+
+
+    <form action="{{ route('surat_masuk.search') }}" method="GET" class="mb-3">
+
+        <div class="input-group">
+
+            <input type="date" class="form-control ml-2" name="start_date" value="{{ request('start_date') }}">
+            <input type="date" class="form-control ml-2" name="end_date" value="{{ request('end_date') }}">
+
+            <select class="form-control ml-2" name="klasifikasi">
+
+                <option value="">Semua Klasifikasi</option>
+                <option value="Rahasia" {{ request('klasifikasi') == 'Rahasia' ? 'selected' : '' }}>Rahasia</option>
+                <option value="Penting" {{ request('klasifikasi') == 'Penting' ? 'selected' : '' }}>Penting</option>
+                <option value="Biasa" {{ request('klasifikasi') == 'Biasa' ? 'selected' : '' }}>Biasa</option>
+
+            </select>
+            <select class="form-control ml-2" name="disposisi_status">
+                <option value="">Semua Disposisi</option>
+                <option value="ada" {{ request('disposisi_status') == 'ada' ? 'selected' : '' }}>Ada Disposisi</option>
+                <option value="tidak_ada" {{ request('disposisi_status') == 'tidak_ada' ? 'selected' : '' }}>Belum Disposisi</option>
+            </select>
+
+            <div class="input-group-append">
+
+                <button class="btn btn-primary mx-2" type="submit">Filter</button>
+                <a href="{{ route('surat_masuk.index') }}" class="btn btn-secondary mr-2">Reset</a>
+
+            </div>
+
+        </div>
+
+    </form>
+
 <a href="{{ route('surat_masuk.create') }}" class="btn btn-primary mb-3">+ Tambah Surat Masuk</a>
 
 <table class="table table-bordered table-striped">
@@ -36,7 +81,7 @@
             <td>
                 @if($surat->file_surat)
                     <!-- Preview -->
-                    <button class="btn btn-sm btn-info"
+                    <button class="btn btn-sm btn-info my-2"
                         data-bs-toggle="modal"
                         data-bs-target="#pdfModal"
                         data-file="{{ asset('storage/' . $surat->file_surat) }}">
@@ -50,18 +95,35 @@
                     -
                 @endif
             </td>
+
             <td>
+                {{-- Button View --}}
+                <button
+                    type="button"
+                    class="btn btn-sm btn-info my-2"
+                    data-bs-toggle="modal"
+                    data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
+                    View
+                </button>
+
+                {{-- Button Edit --}}
                 <a href="{{ route('surat_masuk.edit', $surat->id_surat_masuk) }}" class="btn btn-sm btn-warning">Edit</a>
-                <form action="{{ route('surat_masuk.destroy', $surat->id_surat_masuk) }}" method="POST" style="display:inline;">
+
+                {{-- Button Delete --}}
+                <form action="{{ route('surat_masuk.destroy', $surat->id_surat_masuk) }}" method="POST" style="display:inline;" >
                     @csrf
                     @method('DELETE')
                     <button type="submit" onclick="return confirm('Yakin hapus data ini?')" class="btn btn-sm btn-danger">Delete</button>
                 </form>
             </td>
+
         </tr>
+
         @endforeach
     </tbody>
 </table>
+
+
 
 <!-- Modal Preview PDF -->
 <div class="modal fade" id="pdfModal" tabindex="-1" aria-hidden="true">
@@ -77,6 +139,84 @@
     </div>
   </div>
 </div>
+
+@foreach($suratMasuk as $surat)
+<div class="modal fade" id="detailSuratModal{{ $surat->id_surat_masuk }}" tabindex="-1" aria-labelledby="detailSuratLabel{{ $surat->id_surat_masuk }}" aria-hidden="true">
+    <style>
+        .surat-detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: Arial, sans-serif;
+        }
+        .surat-detail-table th, .surat-detail-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        .surat-detail-table th {
+            background-color: #f2f2f2;
+            width: 30%; /* Adjust as needed */
+        }
+    </style>
+
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+                <h5 class="modal-title" id="detailSuratLabel{{ $surat->id_surat_masuk }}">Detail Surat Masuk</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="surat-container">
+                <table class="surat-detail-table">
+                    <tbody>
+                        <tr>
+                            <th>No Surat</th>
+                            <td>{{ $surat->no_surat }}</td>
+                        </tr>
+                        <tr>
+                            <th>Asal Surat</th>
+                            <td>{{ $surat->asal_surat }}</td>
+                        </tr>
+                        <tr>
+                            <th>Tanggal Terima</th>
+                            <td>{{ $surat->tanggal_terima }}</td>
+                        </tr>
+                        <tr>
+                            <th>Perihal</th>
+                            <td>{{ $surat->perihal }}</td>
+                        </tr>
+                        <tr>
+                            <th>Klasifikasi</th>
+                            <td>{{ $surat->klasifikasi }}</td>
+                        </tr>
+                        <tr>
+                            <th>Keterangan</th>
+                            <td>{{ $surat->keterangan }}</td>
+                        </tr>
+                        <tr>
+                            <th>Disposisi</th>
+                            <td>
+                                @if($surat->disposisi)
+                                    <strong>Bagian:</strong> {{ $surat->disposisi->dis_bagian }} <br>
+                                    <strong>Catatan:</strong> {{ $surat->disposisi->catatan }} <br>
+                                    <strong>Instruksi:</strong> {{ $surat->disposisi->instruksi }}
+                                @else
+                                    Tidak ada disposisi
+                                @endif
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+      </div>
+    </div>
+  </div>
+</div>
+@endforeach
+
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -94,4 +234,5 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+
 @endsection

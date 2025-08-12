@@ -10,6 +10,53 @@ use Illuminate\Support\Facades\Storage;
 
 class SuratMasukController extends Controller
 {
+    public function search(Request $request)
+    {
+        // Mulai query Eloquent untuk model SuratMasuk
+        $query = SuratMasuk::with('disposisi');
+
+        // Cek apakah ada input pencarian
+        if ($request->has('search')) {
+            $searchTerm = $request->input('search');
+
+            // Tambahkan kondisi where untuk pencarian
+            $query->where('no_surat', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('asal_surat', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('perihal', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('tanggal_terima', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('keterangan', 'LIKE', "%{$searchTerm}%");
+        }
+
+        if ($request->has('start_date') && !empty($request->start_date)) {
+        $query->whereDate('tanggal_terima', '>=', $request->start_date);
+        }
+
+        if ($request->has('end_date') && !empty($request->end_date)) {
+            $query->whereDate('tanggal_terima', '<=', $request->end_date);
+        }
+
+        // Tambahkan logika untuk filter klasifikasi
+        if ($request->has('klasifikasi') && !empty($request->klasifikasi)) {
+            $query->where('klasifikasi', $request->klasifikasi);
+        }
+
+        if ($request->has('disposisi_status') && !empty($request->disposisi_status)) {
+        if ($request->disposisi_status === 'ada') {
+            $query->whereNotNull('id_disposisi'); // Hanya tampilkan surat yang id_disposisi-nya tidak kosong
+        } elseif ($request->disposisi_status === 'tidak_ada') {
+            $query->whereNull('id_disposisi'); // Hanya tampilkan surat yang id_disposisi-nya kosong
+        }
+    }
+
+        // Dapatkan data surat masuk yang sudah difilter dan/atau dicari
+        $data = $query->get();
+
+        return view('admin.surat_masuk.index', [
+            'pageTitle' => 'Surat Masuk',
+            'suratMasuk' => $data
+        ]);
+    }
+
     public function index()
     {
         $data = SuratMasuk::with('disposisi')->get();
@@ -147,7 +194,7 @@ class SuratMasukController extends Controller
             'surat' => $surat
         ]);
     }
-    
+
     public function destroy($id)
     {
         $surat = SuratMasuk::findOrFail($id);
