@@ -6,16 +6,41 @@ use App\Models\SuratKeluar;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-class SuratKeluarController extends Controller
+class SuratKeluarController extends Controller{
+public function index(Request $request)
 {
-    public function index()
-    {
-        $data = SuratKeluar::latest()->get();
-        return view('admin.surat_keluar.index',[
-            'pageTitle' => 'Surat Keluar',
-            'suratKeluar' => $data
-        ]);
+    $query = SuratKeluar::query();
+
+    // Search global (nomor surat, perihal, tujuan, dll)
+    if ($request->filled('search')) {
+        $keyword = $request->search;
+        $query->where(function ($q) use ($keyword) {
+            $q->where('nomor_surat', 'like', "%{$keyword}%")
+              ->orWhere('perihal', 'like', "%{$keyword}%")
+              ->orWhere('tujuan', 'like', "%{$keyword}%")
+              ->orWhere('dibuat_oleh', 'like', "%{$keyword}%")
+              ->orWhere('keterangan', 'like', "%{$keyword}%");
+        });
     }
+
+    // Filter klasifikasi
+    if ($request->filled('klasifikasi')) {
+        $query->where('klasifikasi', $request->klasifikasi);
+    }
+
+    // Filter tanggal
+    if ($request->filled('tanggal_awal') && $request->filled('tanggal_akhir')) {
+        $query->whereBetween('tanggal', [$request->tanggal_awal, $request->tanggal_akhir]);
+    }
+
+    $suratKeluar = $query->latest()->paginate(10);
+
+    return view('admin.surat_keluar.index', [
+        'pageTitle' => 'Surat Keluar',
+        'suratKeluar' => $suratKeluar
+    ]);
+}
+
 
     public function create()
     {

@@ -9,6 +9,41 @@
     @endif
 
     <a href="{{ route('surat_keluar.create') }}" class="btn btn-primary mb-3">Tambah Surat Keluar</a>
+<form method="GET" action="{{ route('surat_keluar.index') }}" class="row g-2 mb-3">
+    {{-- Search --}}
+    <div class="col-md-3">
+        <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Cari...">
+    </div>
+
+    {{-- Filter Klasifikasi --}}
+    <div class="col-md-2">
+        <select name="klasifikasi" class="form-control">
+            <option value="">-- Semua Klasifikasi --</option>
+            <option value="biasa" {{ request('klasifikasi') == 'biasa' ? 'selected' : '' }}>Biasa</option>
+            <option value="penting" {{ request('klasifikasi') == 'penting' ? 'selected' : '' }}>Penting</option>
+            <option value="rahasia" {{ request('klasifikasi') == 'rahasia' ? 'selected' : '' }}>Rahasia</option>
+        </select>
+    </div>
+
+    {{-- Filter Tanggal --}}
+    <div class="col-md-2">
+        <input type="date" name="tanggal_awal" value="{{ request('tanggal_awal') }}" class="form-control">
+    </div>
+    <div class="col-md-2">
+        <input type="date" name="tanggal_akhir" value="{{ request('tanggal_akhir') }}" class="form-control">
+    </div>
+
+    {{-- Tombol Submit --}}
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Filter</button>
+    </div>
+
+    {{-- Tombol Reset --}}
+    <div class="col-md-1">
+        <a href="{{ route('surat_keluar.index') }}" class="btn btn-secondary w-100">Reset</a>
+    </div>
+</form>
+
 
     <table class="table table-bordered">
         <thead>
@@ -76,6 +111,9 @@
   </div>
 </div>
 
+
+{{-- Pagination --}}
+{{ $suratKeluar->appends(request()->all())->links() }}
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
