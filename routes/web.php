@@ -15,5 +15,4 @@ Route::resource('surat_keluar', SuratKeluarController::class);
 
 Route::get('/laporan', [LaporanController::class, 'laporan'])->name('laporan.surat');
 Route::get('/laporan/cetak', [LaporanController::class, 'cetakLaporan'])->name('laporan.cetak');
-=======
 
