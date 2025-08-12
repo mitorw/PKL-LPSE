@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Controllers\SuratController;
+use App\Http\Controllers\LaporanController;
 use Illuminate\Support\Facades\Route;
 
 // ... (rute lainnya)
 
-Route::get('/dashboard', [SuratController::class, 'dashboard'])->name('dashboard');
-Route::get('/laporan', [SuratController::class, 'laporan'])->name('laporan.surat');
+Route::get('/laporan', [LaporanController::class, 'laporan'])->name('laporan.surat');
+Route::get('/laporan/cetak', [LaporanController::class, 'cetakLaporan'])->name('laporan.cetak');
