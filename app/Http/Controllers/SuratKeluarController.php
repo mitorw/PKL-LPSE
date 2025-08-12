@@ -61,7 +61,44 @@ class SuratKeluarController extends Controller
             'pageTitle' => 'Edit Surat Keluar',
             'surat' => $surat,
         ]);
+
     }
+
+        public function update(Request $request, $id)
+    {
+        $request->validate([
+            'nomor_surat' => 'required|max:50',
+            'perihal' => 'required|max:255',
+            'tujuan' => 'required|max:255',
+            'tanggal' => 'required|date',
+            'dibuat_oleh' => 'required|max:50',
+            'klasifikasi' => 'required|in:biasa,penting,rahasia',
+            'isi_surat' => 'nullable|mimes:pdf,png,jpg,jpeg|max:2048'
+        ]);
+
+        $surat = SuratKeluar::findOrFail($id);
+
+        // Update file kalau ada upload baru
+        $filePath = $surat->isi_surat;
+        if ($request->hasFile('isi_surat')) {
+            $filePath = $request->file('isi_surat')->store('surat_keluar', 'public');
+        }
+
+        // Update surat masuk
+        $surat->update([
+             'nomor_surat' => $request->nomor_surat,
+            'perihal' => $request->perihal,
+            'tujuan' => $request->tujuan,
+            'tanggal' => $request->tanggal,
+            'dibuat_oleh' => $request->dibuat_oleh,
+            'keterangan' => $request->keterangan,
+            'klasifikasi' => $request->klasifikasi,
+            'isi_surat' => $filePath
+        ]);
+
+        return redirect()->route('surat_keluar.index')->with('success', 'Surat masuk berhasil diperbarui');
+    }
+
 
     public function destroy($id)
 {

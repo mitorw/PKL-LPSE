@@ -57,11 +57,11 @@
         </div>
     <!-- File Surat -->
     <div class="mb-3">
-        <label>File Surat (PDF)</label>
-        @if($surat->file_surat)
-            <p>File sekarang: <a href="{{ asset('storage/' . $surat->file_surat) }}" target="_blank">Lihat PDF</a></p>
+        <label>Isi Surat (PDF)</label>
+        @if($surat->isi_surat)
+            <p>File sekarang: <a href="{{ asset('storage/' . $surat->isi_surat) }}" target="_blank">Lihat PDF</a></p>
         @endif
-        <input type="file" name="file_surat" class="form-control">
+        <input type="file" name="isi_surat" class="form-control">
     </div>
 
     <button class="btn btn-success" type="submit">Simpan</button>
