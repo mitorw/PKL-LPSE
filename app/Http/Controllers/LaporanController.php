@@ -2,81 +2,165 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Laporan;
-use App\Models\Surat;
+use App\Models\SuratMasuk;
+use App\Models\SuratKeluar;
 use Illuminate\Http\Request;
-use Barryvdh\DomPDF\Facade\Pdf; // Tambahkan ini untuk PDF
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
+use Illuminate\Pagination\Paginator;
 
 class LaporanController extends Controller
 {
-    // ... (Method dashboard) ...
-
     public function laporan(Request $request)
     {
         $pageTitle = 'Laporan Inventarisasi Surat';
 
-        // Mulai query ke tabel surat
-        $query = Laporan::query();
+        // Query dasar untuk Surat Masuk dan Surat Keluar
+        $suratMasuk = SuratMasuk::query();
+        $suratKeluar = SuratKeluar::query();
 
-        // Logika Filter
+        // --- Logika Filter ---
+
+        // Filter Berdasarkan 'nomor_surat'
         if ($request->filled('nomor_surat')) {
-            $query->where('nomor_surat', 'like', '%' . $request->nomor_surat . '%');
+            $nomorSurat = $request->nomor_surat;
+            $suratMasuk->where('no_surat', 'like', '%' . $nomorSurat . '%');
+            $suratKeluar->where('nomor_surat', 'like', '%' . $nomorSurat . '%');
         }
 
+        // Filter Berdasarkan 'tanggal'
         if ($request->filled('dari_tanggal')) {
-            $query->whereDate('tanggal_mulai', '>=', $request->dari_tanggal);
+            $suratMasuk->whereDate('tanggal_terima', '>=', $request->dari_tanggal);
+            $suratKeluar->whereDate('tanggal', '>=', $request->dari_tanggal);
         }
 
         if ($request->filled('sampai_tanggal')) {
-            $query->whereDate('tanggal_mulai', '<=', $request->sampai_tanggal);
+            $suratMasuk->whereDate('tanggal_terima', '<=', $request->sampai_tanggal);
+            $suratKeluar->whereDate('tanggal', '<=', $request->sampai_tanggal);
         }
 
-        if ($request->filled('jenis_surat') && $request->jenis_surat !== 'all') {
-            $query->where('jenis_surat', $request->jenis_surat);
-        }
-
+        // Filter Berdasarkan 'status' (klasifikasi)
         if ($request->filled('status') && $request->status !== 'all') {
-            $query->where('status', $request->status);
+            $status = $request->status;
+            $suratMasuk->where('klasifikasi', $status);
+            $suratKeluar->where('klasifikasi', $status);
         }
 
-        // Sorting
-        $sortColumn = $request->get('sort', 'tanggal_mulai');
-        $sortDirection = $request->get('direction', 'asc');
-        $query->orderBy($sortColumn, $sortDirection);
+        // --- Perbaikan filter jenis_surat di sini ---
+        if ($request->filled('jenis_surat') && $request->jenis_surat !== 'all') {
+            $jenisSurat = $request->jenis_surat;
+            // Jika filter adalah 'masuk', hanya ambil dari tabel surat_masuk
+            if ($jenisSurat == 'masuk') {
+                $suratKeluar->whereRaw('1=0'); // Query akan selalu false, jadi hasilnya kosong
+            } 
+            // Jika filter adalah 'keluar', hanya ambil dari tabel surat_keluar
+            else if ($jenisSurat == 'keluar') {
+                $suratMasuk->whereRaw('1=0'); // Query akan selalu false, jadi hasilnya kosong
+            }
+        }
+        
+        // --- Proses SELECT dan UNION ---
+        $suratMasukQuery = $suratMasuk->select(
+            'no_surat as nomor_surat', 
+            'tanggal_terima as tanggal', 
+            'perihal', 
+            'klasifikasi as status',
+            'id_surat_masuk as id' 
+        )->selectRaw("'masuk' as jenis_surat");
 
-        // Ambil data dengan pagination
-        $laporanSurat = $query->paginate(10);
+        $suratKeluarQuery = $suratKeluar->select(
+            'nomor_surat', 
+            'tanggal', 
+            'perihal', 
+            'klasifikasi as status',
+            'id'
+        )->selectRaw("'keluar' as jenis_surat");
+        
+        // Menggabungkan kedua query
+        $query = $suratMasukQuery->unionAll($suratKeluarQuery);
+        
+        // ... (Logika Sorting dan Paginasi) ...
+        $sortColumn = $request->get('sort', 'tanggal');
+        $sortDirection = $request->get('direction', 'desc');
+
+        $data = $query->orderBy($sortColumn, $sortDirection)->get();
+        $laporanSurat = $this->paginateCollection($data, 10, $request->page);
 
         return view('admin.Surat.laporan', compact('laporanSurat', 'pageTitle'));
     }
 
     public function cetakLaporan(Request $request)
     {
-        // Logika filter yang sama seperti di atas
-        $query = Laporan::query();
+        $suratMasuk = SuratMasuk::query();
+        $suratKeluar = SuratKeluar::query();
+
+        // --- Logika Filter yang sama persis untuk cetak ---
         if ($request->filled('nomor_surat')) {
-            $query->where('nomor_surat', 'like', '%' . $request->nomor_surat . '%');
+            $nomorSurat = $request->nomor_surat;
+            $suratMasuk->where('no_surat', 'like', '%' . $nomorSurat . '%');
+            $suratKeluar->where('nomor_surat', 'like', '%' . $nomorSurat . '%');
         }
+
         if ($request->filled('dari_tanggal')) {
-            $query->whereDate('tanggal_mulai', '>=', $request->dari_tanggal);
+            $suratMasuk->whereDate('tanggal_terima', '>=', $request->dari_tanggal);
+            $suratKeluar->whereDate('tanggal', '>=', $request->dari_tanggal);
         }
+
         if ($request->filled('sampai_tanggal')) {
-            $query->whereDate('tanggal_mulai', '<=', $request->sampai_tanggal);
+            $suratMasuk->whereDate('tanggal_terima', '<=', $request->sampai_tanggal);
+            $suratKeluar->whereDate('tanggal', '<=', $request->sampai_tanggal);
         }
-        if ($request->filled('jenis_surat') && $request->jenis_surat !== 'all') {
-            $query->where('jenis_surat', $request->jenis_surat);
-        }
+
         if ($request->filled('status') && $request->status !== 'all') {
-            $query->where('status', $request->status);
+            $status = $request->status;
+            $suratMasuk->where('klasifikasi', $status);
+            $suratKeluar->where('klasifikasi', $status);
         }
+        
+        // --- Perbaikan filter jenis_surat di sini juga ---
+        if ($request->filled('jenis_surat') && $request->jenis_surat !== 'all') {
+            $jenisSurat = $request->jenis_surat;
+            if ($jenisSurat == 'masuk') {
+                $suratKeluar->whereRaw('1=0');
+            } else if ($jenisSurat == 'keluar') {
+                $suratMasuk->whereRaw('1=0');
+            }
+        }
+        
+        // ... (Proses SELECT, UNION, dan lainnya sama) ...
+        $suratMasukQuery = $suratMasuk->select(
+            'no_surat as nomor_surat', 
+            'tanggal_terima as tanggal', 
+            'perihal', 
+            'klasifikasi as status',
+            'id_surat_masuk as id'
+        )->selectRaw("'masuk' as jenis_surat");
 
-        // Ambil semua data tanpa pagination
-        $dataSurat = $query->get();
+        $suratKeluarQuery = $suratKeluar->select(
+            'nomor_surat', 
+            'tanggal', 
+            'perihal', 
+            'klasifikasi as status',
+            'id'
+        )->selectRaw("'keluar' as jenis_surat");
+        
+        $query = $suratMasukQuery->unionAll($suratKeluarQuery);
+        
+        $sortColumn = $request->get('sort', 'tanggal');
+        $sortDirection = $request->get('direction', 'desc');
+        $dataSurat = $query->orderBy($sortColumn, $sortDirection)->get();
 
-        // Render data ke dalam view PDF
         $pdf = Pdf::loadView('admin.Surat.laporan-pdf', compact('dataSurat'));
-
-        // Unduh file PDF
         return $pdf->download('Laporan-Surat-' . now()->format('Y-m-d') . '.pdf');
+    }
+
+    protected function paginateCollection($items, $perPage, $page = null)
+    {
+        $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
+        $items = $items instanceof Collection ? $items : Collection::make($items);
+        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, [
+            'path' => Paginator::resolveCurrentPath(),
+        ]);
     }
 }
