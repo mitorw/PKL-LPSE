@@ -25,7 +25,7 @@
                 <h5>PENGGUNA</h5>
                 <h2 class="text-secondary">{{ $pengguna }}</h2>
                 <i class="fa fa-user fa-2x text-secondary"></i>
-                <a href="{{ route('laporan.surat') }}" class="btn btn-success btn-sm mt-3">
+                <a href="{{ route('manajemen_akun.index') }}" class="btn btn-success btn-sm mt-3">
                     Lihat </a>
             </div>
         </div>
