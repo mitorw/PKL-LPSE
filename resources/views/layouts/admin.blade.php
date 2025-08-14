@@ -48,19 +48,24 @@
             margin-left: 240px;
             display: flex;
             align-items: center;
-            justify-content: space-between; /* Menjaga agar konten terbagi rata */
+            justify-content: space-between;
+            /* Menjaga agar konten terbagi rata */
             padding: 0 20px;
         }
-        
+
         /* Gaya untuk tautan profil */
         .profile-link {
-            color: white; /* Mengatur warna ikon */
-            text-decoration: none; /* Menghapus garis bawah */
-            transition: color 0.3s; /* Efek transisi saat hover */
+            color: white;
+            /* Mengatur warna ikon */
+            text-decoration: none;
+            /* Menghapus garis bawah */
+            transition: color 0.3s;
+            /* Efek transisi saat hover */
         }
 
         .profile-link:hover {
-            color: #f1f1f1; /* Mengubah warna saat di-hover */
+            color: #f1f1f1;
+            /* Mengubah warna saat di-hover */
         }
     </style>
 </head>
@@ -68,16 +73,21 @@
 <body>
     {{-- Side Bar --}}
     <div class="sidebar">
-        <a href="{{ route('dashboard') }}" class="text-center mb-4">Sistem Manajemen Surat</a>
+        <a href="{{ route('dashboard') }}" class="mb-4 text-center">Sistem Manajemen Surat</a>
         <a href="{{ route('surat_masuk.index') }}"><i class="fa fa-inbox"
                 style="padding-top: 10px; padding-block: 10px"></i> Surat Masuk</a>
         <a href="{{ route('surat_keluar.index') }}"><i class="fa fa-paper-plane"
                 style="padding-top: 10px; padding-block: 10px"></i> Surat Keluar</a>
         <a href="{{ route('laporan.surat') }}"><i class="fa fa-file-alt"
                 style="padding-top: 10px; padding-block: 10px"></i> Laporan</a>
-        <a href="{{ route('manajemen_akun.index') }}"><i class="fa fa-users-cog"
-                style="padding-top: 10px; padding-block: 10px"></i> Manajemen
-            Akun</a>
+        @auth
+            @if (Auth::user()->role === 'admin')
+                <a href="{{ route('manajemen_akun.index') }}"><i class="fa fa-users-cog"
+                        style="padding-top: 10px; padding-block: 10px"></i> Manajemen
+                    Akun</a>
+            @endif
+        @endauth
+
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();">
@@ -89,7 +99,7 @@
     {{-- Header bar --}}
     <div class="header-bar">
         <h2 class="mb-0">{{ $pageTitle ?? 'Halaman' }}</h2>
-        
+
         {{-- Ini adalah kode yang dimodifikasi --}}
         <a href="{{ route('profile.edit') }}" class="profile-link">
             <i class="fa fa-user-circle fa-2x"></i>

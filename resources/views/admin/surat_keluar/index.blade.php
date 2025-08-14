@@ -7,9 +7,14 @@
         @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
+        @auth
+            @if (Auth::user()->role === 'admin')
+                <a href="{{ route('surat_keluar.create') }}" class="mb-3 btn btn-primary">Tambah Surat Keluar</a>
+            @endif
+        @endauth
 
-        <a href="{{ route('surat_keluar.create') }}" class="btn btn-primary mb-3">Tambah Surat Keluar</a>
-        <form method="GET" action="{{ route('surat_keluar.index') }}" class="row g-2 mb-3">
+
+        <form method="GET" action="{{ route('surat_keluar.index') }}" class="mb-3 row g-2">
             {{-- Search --}}
             <div class="col-md-3">
                 <input type="text" name="search" value="{{ request('search') }}" class="form-control"
@@ -56,7 +61,12 @@
                     <th>Dibuat Oleh</th>
                     <th>Klasifikasi</th>
                     <th>File</th>
-                    <th>Action</th>
+                    @auth
+                        @if (Auth::user()->role === 'admin')
+                            <th>Action</th>
+                        @endif
+                    @endauth
+
                 </tr>
             </thead>
             <tbody>
@@ -84,16 +94,24 @@
                                 -
                             @endif
                         </td>
-                        <td>
-                            <a href="{{ route('surat_keluar.edit', $surat->id) }}" class="btn btn-sm btn-warning">Edit</a>
-                            <form action="{{ route('surat_keluar.destroy', $surat->id) }}" method="POST"
-                                style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" onclick="return confirm('Yakin hapus data ini?')"
-                                    class="btn btn-sm btn-danger">Delete</button>
-                            </form>
-                        </td>
+                        @auth
+                            @if (Auth::user()->role === 'admin')
+                                <td>
+
+                                    <a href="{{ route('surat_keluar.edit', $surat->id) }}"
+                                        class="btn btn-sm btn-warning">Edit</a>
+                                    <form action="{{ route('surat_keluar.destroy', $surat->id) }}" method="POST"
+                                        style="display:inline;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" onclick="return confirm('Yakin hapus data ini?')"
+                                            class="btn btn-sm btn-danger">Delete</button>
+                                    </form>
+
+                                </td>
+                            @endif
+                        @endauth
+
                     </tr>
                 @endforeach
             </tbody>
@@ -106,7 +124,7 @@
                         <h5 class="modal-title" id="pdfModalLabel">Preview Surat</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body p-0" style="height: 80vh;">
+                    <div class="p-0 modal-body" style="height: 80vh;">
                         <iframe id="pdfFrame" src="" frameborder="0" style="width:100%; height:100%;"></iframe>
                     </div>
                 </div>

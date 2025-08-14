@@ -43,12 +43,12 @@
         </div>
         <div>
             <h4 class="mb-1">{{ Auth::user()->name ?? 'Nama Pengguna' }}</h4>
-            <p class="text-muted mb-0">{{ Auth::user()->email ?? 'email@example.com' }}</p>
+            <p class="mb-0 text-muted">{{ Auth::user()->email ?? 'email@example.com' }}</p>
         </div>
     </div>
 
     <!-- Update Profile Information -->
-    <div class="card card-custom mb-4">
+    <div class="mb-4 card card-custom">
         <div class="card-header">
             <i class="fa fa-id-card me-2"></i> Update Profil
         </div>
@@ -81,7 +81,7 @@
     </div>
 
     <!-- Update Password -->
-    <div class="card card-custom mb-4">
+    <div class="mb-4 card card-custom">
         <div class="card-header">
             <i class="fa fa-lock me-2"></i> Ubah Password
         </div>
@@ -118,23 +118,5 @@
         </div>
     </div>
 
-    <!-- Delete User Account -->
-    <div class="card card-custom">
-        <div class="card-header text-danger">
-            <i class="fa fa-trash me-2"></i> Hapus Akun
-        </div>
-        <div class="card-body">
-            <form method="POST" action="{{ route('profile.destroy') }}">
-                @csrf
-                @method('DELETE')
-
-                <p class="mb-3">Apakah Anda yakin ingin menghapus akun ini? Tindakan ini tidak dapat dibatalkan.</p>
-
-                <div class="text-end">
-                    <button type="submit" class="btn btn-danger">Hapus Akun</button>
-                </div>
-            </form>
-        </div>
-    </div>
 </div>
 @endsection
