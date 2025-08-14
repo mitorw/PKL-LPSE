@@ -90,70 +90,73 @@ class LaporanController extends Controller
         return view('admin.Surat.laporan', compact('laporanSurat', 'pageTitle'));
     }
 
-    public function cetakLaporan(Request $request)
-    {
-        $suratMasuk = SuratMasuk::query();
-        $suratKeluar = SuratKeluar::query();
+public function cetakLaporan(Request $request)
+{
+    $suratMasuk = SuratMasuk::query();
+    $suratKeluar = SuratKeluar::query();
 
-        // --- Logika Filter yang sama persis untuk cetak ---
-        if ($request->filled('nomor_surat')) {
-            $nomorSurat = $request->nomor_surat;
-            $suratMasuk->where('no_surat', 'like', '%' . $nomorSurat . '%');
-            $suratKeluar->where('nomor_surat', 'like', '%' . $nomorSurat . '%');
-        }
-
-        if ($request->filled('dari_tanggal')) {
-            $suratMasuk->whereDate('tanggal_terima', '>=', $request->dari_tanggal);
-            $suratKeluar->whereDate('tanggal', '>=', $request->dari_tanggal);
-        }
-
-        if ($request->filled('sampai_tanggal')) {
-            $suratMasuk->whereDate('tanggal_terima', '<=', $request->sampai_tanggal);
-            $suratKeluar->whereDate('tanggal', '<=', $request->sampai_tanggal);
-        }
-
-        if ($request->filled('status') && $request->status !== 'all') {
-            $status = $request->status;
-            $suratMasuk->where('klasifikasi', $status);
-            $suratKeluar->where('klasifikasi', $status);
-        }
-        
-        // --- Perbaikan filter jenis_surat di sini juga ---
-        if ($request->filled('jenis_surat') && $request->jenis_surat !== 'all') {
-            $jenisSurat = $request->jenis_surat;
-            if ($jenisSurat == 'masuk') {
-                $suratKeluar->whereRaw('1=0');
-            } else if ($jenisSurat == 'keluar') {
-                $suratMasuk->whereRaw('1=0');
-            }
-        }
-        
-        // ... (Proses SELECT, UNION, dan lainnya sama) ...
-        $suratMasukQuery = $suratMasuk->select(
-            'no_surat as nomor_surat', 
-            'tanggal_terima as tanggal', 
-            'perihal', 
-            'klasifikasi as status',
-            'id_surat_masuk as id'
-        )->selectRaw("'masuk' as jenis_surat");
-
-        $suratKeluarQuery = $suratKeluar->select(
-            'nomor_surat', 
-            'tanggal', 
-            'perihal', 
-            'klasifikasi as status',
-            'id'
-        )->selectRaw("'keluar' as jenis_surat");
-        
-        $query = $suratMasukQuery->unionAll($suratKeluarQuery);
-        
-        $sortColumn = $request->get('sort', 'tanggal');
-        $sortDirection = $request->get('direction', 'desc');
-        $dataSurat = $query->orderBy($sortColumn, $sortDirection)->get();
-
-        $pdf = Pdf::loadView('admin.Surat.laporan-pdf', compact('dataSurat'));
-        return $pdf->download('Laporan-Surat-' . now()->format('Y-m-d') . '.pdf');
+    // --- Logika Filter ---
+    if ($request->filled('nomor_surat')) {
+        $nomorSurat = $request->nomor_surat;
+        $suratMasuk->where('no_surat', 'like', '%' . $nomorSurat . '%');
+        $suratKeluar->where('nomor_surat', 'like', '%' . $nomorSurat . '%');
     }
+
+    if ($request->filled('dari_tanggal')) {
+        $suratMasuk->whereDate('tanggal_terima', '>=', $request->dari_tanggal);
+        $suratKeluar->whereDate('tanggal', '>=', $request->dari_tanggal);
+    }
+
+    if ($request->filled('sampai_tanggal')) {
+        $suratMasuk->whereDate('tanggal_terima', '<=', $request->sampai_tanggal);
+        $suratKeluar->whereDate('tanggal', '<=', $request->sampai_tanggal);
+    }
+
+    if ($request->filled('status') && $request->status !== 'all') {
+        $status = $request->status;
+        $suratMasuk->where('klasifikasi', $status);
+        $suratKeluar->where('klasifikasi', $status);
+    }
+
+    if ($request->filled('jenis_surat') && $request->jenis_surat !== 'all') {
+        $jenisSurat = $request->jenis_surat;
+        if ($jenisSurat == 'masuk') {
+            $suratKeluar->whereRaw('1=0');
+        } else if ($jenisSurat == 'keluar') {
+            $suratMasuk->whereRaw('1=0');
+        }
+    }
+
+    // --- Gabungkan Query ---
+    $suratMasukQuery = $suratMasuk->select(
+        'no_surat as nomor_surat', 
+        'tanggal_terima as tanggal', 
+        'perihal', 
+        'klasifikasi as status',
+        'id_surat_masuk as id'
+    )->selectRaw("'masuk' as jenis_surat");
+
+    $suratKeluarQuery = $suratKeluar->select(
+        'nomor_surat', 
+        'tanggal', 
+        'perihal', 
+        'klasifikasi as status',
+        'id'
+    )->selectRaw("'keluar' as jenis_surat");
+
+    $query = $suratMasukQuery->unionAll($suratKeluarQuery);
+
+    $sortColumn = $request->get('sort', 'tanggal');
+    $sortDirection = $request->get('direction', 'desc');
+    $dataSurat = $query->orderBy($sortColumn, $sortDirection)->get();
+
+    // --- Gunakan stream() untuk preview ---
+    $pdf = Pdf::loadView('admin.Surat.laporan-pdf', compact('dataSurat'))
+              ->setPaper('A4', 'portrait');
+
+    return $pdf->stream('Laporan-Surat-' . now()->format('Y-m-d') . '.pdf');
+}
+
 
     protected function paginateCollection($items, $perPage, $page = null)
     {
