@@ -163,14 +163,14 @@
 
                 .surat-detail-table th,
                 .surat-detail-table td {
-                    padding: 8px;
+                    padding: 10px;
                     border: 1px solid #ddd;
                     text-align: left;
                 }
 
                 .surat-detail-table th {
                     background-color: #f2f2f2;
-                    width: 30%;
+                    width: 20%;
                     /* Adjust as needed */
                 }
             </style>
@@ -213,9 +213,26 @@
                                         <th>Disposisi</th>
                                         <td>
                                             @if ($surat->disposisi)
-                                                <strong>Bagian:</strong> {{ $surat->disposisi->dis_bagian }} <br>
-                                                <strong>Catatan:</strong> {{ $surat->disposisi->catatan }} <br>
-                                                <strong>Instruksi:</strong> {{ $surat->disposisi->instruksi }}
+                                                <table class="surat-detail-table">
+                                                    <tr>
+                                                        <th>Bagian</th>
+                                                        <td>
+                                                            {{ $surat->disposisi->dis_bagian }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Catatan</th>
+                                                        <td>
+                                                            {{ $surat->disposisi->catatan }} <br>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Instruksi</th>
+                                                        <td>
+                                                            {{ $surat->disposisi->instruksi }}
+                                                        </td>
+                                                    </tr>
+                                                </table>
                                             @else
                                                 Tidak ada disposisi
                                             @endif
