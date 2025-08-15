@@ -1,6 +1,8 @@
 @extends('layouts.admin')
 
 @section('content')
+
+    <h2>Profil Pengguna</h2>
 <style>
     .profile-header {
         display: flex;

@@ -14,7 +14,7 @@ class LaporanController extends Controller
 {
     public function laporan(Request $request)
     {
-        $pageTitle = 'Laporan Inventarisasi Surat';
+        $pageTitle = 'Laporan';
 
         // Query dasar untuk Surat Masuk dan Surat Keluar
         $suratMasuk = SuratMasuk::query();
@@ -53,33 +53,33 @@ class LaporanController extends Controller
             // Jika filter adalah 'masuk', hanya ambil dari tabel surat_masuk
             if ($jenisSurat == 'masuk') {
                 $suratKeluar->whereRaw('1=0'); // Query akan selalu false, jadi hasilnya kosong
-            } 
+            }
             // Jika filter adalah 'keluar', hanya ambil dari tabel surat_keluar
             else if ($jenisSurat == 'keluar') {
                 $suratMasuk->whereRaw('1=0'); // Query akan selalu false, jadi hasilnya kosong
             }
         }
-        
+
         // --- Proses SELECT dan UNION ---
         $suratMasukQuery = $suratMasuk->select(
-            'no_surat as nomor_surat', 
-            'tanggal_terima as tanggal', 
-            'perihal', 
+            'no_surat as nomor_surat',
+            'tanggal_terima as tanggal',
+            'perihal',
             'klasifikasi as status',
-            'id_surat_masuk as id' 
+            'id_surat_masuk as id'
         )->selectRaw("'masuk' as jenis_surat");
 
         $suratKeluarQuery = $suratKeluar->select(
-            'nomor_surat', 
-            'tanggal', 
-            'perihal', 
+            'nomor_surat',
+            'tanggal',
+            'perihal',
             'klasifikasi as status',
             'id'
         )->selectRaw("'keluar' as jenis_surat");
-        
+
         // Menggabungkan kedua query
         $query = $suratMasukQuery->unionAll($suratKeluarQuery);
-        
+
         // ... (Logika Sorting dan Paginasi) ...
         $sortColumn = $request->get('sort', 'tanggal');
         $sortDirection = $request->get('direction', 'desc');
@@ -129,17 +129,17 @@ public function cetakLaporan(Request $request)
 
     // --- Gabungkan Query ---
     $suratMasukQuery = $suratMasuk->select(
-        'no_surat as nomor_surat', 
-        'tanggal_terima as tanggal', 
-        'perihal', 
+        'no_surat as nomor_surat',
+        'tanggal_terima as tanggal',
+        'perihal',
         'klasifikasi as status',
         'id_surat_masuk as id'
     )->selectRaw("'masuk' as jenis_surat");
 
     $suratKeluarQuery = $suratKeluar->select(
-        'nomor_surat', 
-        'tanggal', 
-        'perihal', 
+        'nomor_surat',
+        'tanggal',
+        'perihal',
         'klasifikasi as status',
         'id'
     )->selectRaw("'keluar' as jenis_surat");

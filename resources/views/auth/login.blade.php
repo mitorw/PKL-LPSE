@@ -111,11 +111,10 @@
 
             <!-- Actions -->
             <div class="d-flex justify-content-between align-items-center mb-3">
-                @if (Route::has('password.request'))
-                    <a class="forgot-link" href="{{ route('password.request') }}">
-                        Forgot your password?
+
+                    <a class="forgot-link">
+                        Lupa Password? Silakan Hubungi Admin!
                     </a>
-                @endif
             </div>
 
             <!-- Button -->

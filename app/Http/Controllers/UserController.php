@@ -14,12 +14,17 @@ class UserController extends Controller
      */
     public function index()
     {
+        $pageTitle = 'Manajemen Akun';
+
+        // Proteksi manual: Hanya admin yang bisa mengakses.
         if (Auth::user()->role !== 'admin') {
-            return redirect('/');
+            return redirect('/')->with('error', 'Akses ditolak.');
         }
 
         $users = User::all();
-        return view('manajemen_akun.index', compact('users'));
+        return view(
+            'manajemen_akun.index', compact('users')
+        )->with('pageTitle', $pageTitle);
     }
 
     public function create()

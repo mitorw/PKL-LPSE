@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-    <h2>Daftar Surat Masuk</h2>
+    <h2 class="mb-4">Daftar Surat Masuk</h2>
 
     @if (session('success'))
         <div class="alert alert-success">

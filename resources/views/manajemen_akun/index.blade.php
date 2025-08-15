@@ -2,14 +2,13 @@
 
 @section('content')
     <div class="container mt-4">
-        <h1 class="mb-4">Manajemen Akun</h1>
 
         @if (session('success'))
             <div class="alert alert-success">
                 {{ session('success') }}
             </div>
         @endif
-        
+
         @if (Auth::user()->role === 'admin')
             <a href="{{ route('manajemen_akun.create') }}" class="mb-3 btn btn-primary">
                 + Tambah Akun

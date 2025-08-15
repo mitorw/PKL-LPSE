@@ -16,8 +16,13 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        // Mendefinisikan variabel $pageTitle
+        $pageTitle = 'Profil';
+
         return view('profile.edit', [
             'user' => $request->user(),
+            // Mengirimkan variabel $pageTitle ke view
+            'pageTitle' => $pageTitle,
         ]);
     }
 

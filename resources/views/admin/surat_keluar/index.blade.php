@@ -1,24 +1,18 @@
 @extends('layouts.admin')
 
 @section('content')
-    <div class="container">
-        <h2>Daftar Surat Keluar</h2>
+        <h2 class="mb-4">Daftar Surat Keluar</h2>
 
         @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
-        @auth
-            @if (Auth::user()->role === 'admin')
-                <a href="{{ route('surat_keluar.create') }}" class="mb-3 btn btn-primary">Tambah Surat Keluar</a>
-            @endif
-        @endauth
 
 
         <form method="GET" action="{{ route('surat_keluar.index') }}" class="mb-3 row g-2">
             {{-- Search --}}
             <div class="col-md-3">
                 <input type="text" name="search" value="{{ request('search') }}" class="form-control"
-                    placeholder="Cari...">
+                placeholder="Cari...">
             </div>
 
             {{-- Filter Klasifikasi --}}
@@ -50,6 +44,11 @@
             </div>
         </form>
 
+        @auth
+            @if (Auth::user()->role === 'admin')
+                <a href="{{ route('surat_keluar.create') }}" class="mb-3 btn btn-primary">Tambah Surat Keluar</a>
+            @endif
+        @endauth
 
         <table class="table table-bordered">
             <thead>

@@ -16,9 +16,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Profile
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
 
     // Surat Masuk
     Route::get('/surat_masuk', [SuratMasukController::class, 'index'])->name('surat_masuk.index');
@@ -33,7 +35,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/surat_masuk/{surat_masuk}', [SuratMasukController::class, 'update'])->name('surat_masuk.update');
         Route::delete('/surat_masuk/{surat_masuk}', [SuratMasukController::class, 'destroy'])->name('surat_masuk.destroy');
     });
-    
+
     // Surat Keluar
     Route::resource('surat_keluar', SuratKeluarController::class);
     Route::get('/surat_keluar/{surat_keluar}', [SuratKeluarController::class, 'show'])->name('surat_keluar.show');

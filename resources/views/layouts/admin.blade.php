@@ -17,7 +17,7 @@
             background-color: #3f51b5;
             color: white;
             position: fixed;
-            padding-top: 20px;
+            padding-top:5px;
         }
 
         .sidebar a {
@@ -25,9 +25,20 @@
             display: block;
             padding: 10px 20px;
             text-decoration: none;
+            font-size: 18px;
         }
 
         .sidebar a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .sidebar h3 {
+            color: white;
+            display: block;
+            padding: 10px 20px;
+            text-decoration: none;
+        }
+
+        .sidebar h3:hover {
             background-color: rgba(255, 255, 255, 0.2);
         }
 
@@ -73,7 +84,7 @@
 <body>
     {{-- Side Bar --}}
     <div class="sidebar">
-        <a href="{{ route('dashboard') }}" class="mb-4 text-center">Sistem Manajemen Surat</a>
+        <h3 href="{{ route('dashboard') }}" class="mb-4 text-center">Sistem Inventaris Surat</h3>
         <a href="{{ route('surat_masuk.index') }}"><i class="fa fa-inbox"
                 style="padding-top: 10px; padding-block: 10px"></i> Surat Masuk</a>
         <a href="{{ route('surat_keluar.index') }}"><i class="fa fa-paper-plane"
@@ -100,7 +111,7 @@
     <div class="header-bar">
         <h2 class="mb-0">{{ $pageTitle ?? 'Halaman' }}</h2>
 
-        {{-- Ini adalah kode yang dimodifikasi --}}
+        {{-- Profile --}}
         <a href="{{ route('profile.edit') }}" class="profile-link">
             <i class="fa fa-user-circle fa-2x"></i>
         </a>
