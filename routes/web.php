@@ -61,6 +61,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['checkrole:admin'])->group(function () {
         Route::get('/manajemen-akun', [UserController::class, 'index'])->name('manajemen_akun.index');
         Route::post('/manajemen-akun/{user}', [UserController::class, 'updateRole'])->name('manajemen_akun.updateRole');
+        Route::post('/manajemen_akun/{user}/reset-password', [UserController::class, 'resetPassword'])->name('manajemen_akun.resetPassword');
+        Route::delete('/manajemen_akun/{user}', [UserController::class, 'destroy'])->name('manajemen_akun.destroy');
+
     });
 });
 require __DIR__ . '/auth.php';
