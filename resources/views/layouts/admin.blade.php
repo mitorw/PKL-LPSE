@@ -108,14 +108,18 @@
     </div>
 
     {{-- Header bar --}}
-    <div class="header-bar">
-        <h2 class="mb-0">{{ $pageTitle ?? 'Halaman' }}</h2>
+    <div class="header-bar d-flex justify-content-between align-items-center">
+    <h2 class="mb-0">{{ $pageTitle ?? 'Halaman' }}</h2>
 
-        {{-- Profile --}}
+    {{-- Profile --}}
+    <div class="d-flex align-items-center">
+        <span class="me-2">{{ Auth::user()->name }}</span>
         <a href="{{ route('profile.edit') }}" class="profile-link">
             <i class="fa fa-user-circle fa-2x"></i>
         </a>
     </div>
+</div>
+
 
     <div class="content" style="padding-top: 20px;">
         @yield('content')
