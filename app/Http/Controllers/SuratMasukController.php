@@ -121,7 +121,7 @@ class SuratMasukController extends Controller
             'keterangan' => $request->keterangan,
             'klasifikasi' => $request->klasifikasi,
             'id_disposisi' => $idDisposisi,
-            'user_id' => Auth::id(), // <-- INI YANG DIUBAH
+            'user_id' => Auth::id(),
             'file_surat' => $fileSuratPath
         ]);
 

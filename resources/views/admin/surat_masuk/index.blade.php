@@ -82,16 +82,21 @@
                             No Surat
                             @if (request('sort') == 'no_surat')
                                 <i class="ms-1 fas fa-{{ request('direction') == 'asc' ? 'arrow-up' : 'arrow-down' }}"></i>
+                            @else
+                                <i class="ms-1 fas fa-sort text-muted"></i>
                             @endif
+
                         </a>
                     </th>
                     <th>Asal Surat</th>
                     <th>
                         <a class="text-decoration-none text-dark sortable-link"
                             href="{{ route('surat_masuk.search', array_merge(request()->query(), ['sort' => 'tanggal_terima', 'direction' => request('direction') == 'asc' ? 'desc' : 'asc'])) }}">
-                            Tanggal Terima
+                            Tanggal
                             @if (request('sort') == 'tanggal_terima')
                                 <i class="ms-1 fas fa-{{ request('direction') == 'asc' ? 'arrow-up' : 'arrow-down' }}"></i>
+                            @else
+                                <i class="ms-1 fas fa-sort text-muted"></i>
                             @endif
                         </a>
                     </th>

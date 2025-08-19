@@ -34,6 +34,13 @@ class SuratKeluarController extends Controller
             $query->whereBetween('tanggal', [$request->tanggal_awal, $request->tanggal_akhir]);
         }
 
+        if ($request->has('sort') && $request->has('direction')) {
+            $query->orderBy($request->input('sort'), $request->input('direction'));
+        } else {
+            // Urutan default jika tidak ada sorting (opsional, tapi disarankan)
+            $query->orderBy('tanggal', 'desc');
+        }
+
         $suratKeluar = $query->latest()->paginate(10);
 
         return view('admin.surat_keluar.index', [
