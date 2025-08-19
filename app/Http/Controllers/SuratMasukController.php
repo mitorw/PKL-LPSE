@@ -6,6 +6,8 @@ use App\Models\SuratMasuk;
 use App\Models\Disposisi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth; // <-- TAMBAHKAN BARIS INI
+
 
 
 class SuratMasukController extends Controller
@@ -77,45 +79,45 @@ class SuratMasukController extends Controller
 
     public function store(Request $request)
     {
-    $request->validate([
-        'no_surat' => 'required',
-        'asal_surat' => 'required',
-        'tanggal_terima' => 'required|date',
-        'perihal' => 'required',
-        'klasifikasi' => 'required|in:Rahasia,Penting,Biasa',
-        'file_surat' => 'nullable|mimes:pdf|max:2048',
-        'dis_bagian' => 'nullable|in:Bagian 1,Bagian 2,Bagian 3',
-    ]);
-
-    $idDisposisi = null;
-
-    if ($request->dis_bagian) {
-        $disposisi = Disposisi::create([
-            'dis_bagian' => $request->dis_bagian,
-            'catatan' => $request->catatan,
-            'instruksi' => $request->instruksi
+        $request->validate([
+            'no_surat' => 'required',
+            'asal_surat' => 'required',
+            'tanggal_terima' => 'required|date',
+            'perihal' => 'required',
+            'klasifikasi' => 'required|in:Rahasia,Penting,Biasa',
+            'file_surat' => 'nullable|mimes:pdf|max:2048',
+            'dis_bagian' => 'nullable|in:Bagian 1,Bagian 2,Bagian 3',
         ]);
-        $idDisposisi = $disposisi->id_disposisi;
-    }
 
-    $fileSuratPath = null;
-    if ($request->hasFile('file_surat')) {
-        $fileSuratPath = $request->file('file_surat')->store('surat_masuk', 'public');
-    }
+        $idDisposisi = null;
 
-    SuratMasuk::create([
-        'no_surat' => $request->no_surat,
-        'asal_surat' => $request->asal_surat,
-        'tanggal_terima' => $request->tanggal_terima,
-        'perihal' => $request->perihal,
-        'keterangan' => $request->keterangan,
-        'klasifikasi' => $request->klasifikasi,
-        'id_disposisi' => $idDisposisi,
-        'user_id' => 1, // nanti ganti ke Auth::id()
-        'file_surat' => $fileSuratPath
-    ]);
+        if ($request->dis_bagian) {
+            $disposisi = Disposisi::create([
+                'dis_bagian' => $request->dis_bagian,
+                'catatan' => $request->catatan,
+                'instruksi' => $request->instruksi
+            ]);
+            $idDisposisi = $disposisi->id_disposisi;
+        }
 
-    return redirect()->route('surat_masuk.index')->with('success', 'Surat masuk berhasil ditambahkan');
+        $fileSuratPath = null;
+        if ($request->hasFile('file_surat')) {
+            $fileSuratPath = $request->file('file_surat')->store('surat_masuk', 'public');
+        }
+
+        SuratMasuk::create([
+            'no_surat' => $request->no_surat,
+            'asal_surat' => $request->asal_surat,
+            'tanggal_terima' => $request->tanggal_terima,
+            'perihal' => $request->perihal,
+            'keterangan' => $request->keterangan,
+            'klasifikasi' => $request->klasifikasi,
+            'id_disposisi' => $idDisposisi,
+            'user_id' => Auth::id(), // <-- INI YANG DIUBAH
+            'file_surat' => $fileSuratPath
+        ]);
+
+        return redirect()->route('surat_masuk.index')->with('success', 'Surat masuk berhasil ditambahkan');
     }
 
     public function edit($id)

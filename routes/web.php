@@ -23,9 +23,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
     // Surat Masuk
-    Route::get('/surat_masuk', [SuratMasukController::class, 'index'])->name('surat_masuk.index');
     Route::get('/surat_masuk/search', [SuratMasukController::class, 'search'])->name('surat_masuk.search');
-    Route::get('/surat_masuk/{surat_masuk}', [SuratMasukController::class, 'show'])->name('surat_masuk.show');
+    Route::resource('surat_masuk', SuratMasukController::class);
 
     // Create/Store/Edit/Update/Delete hanya admin
     Route::middleware(['checkrole:admin'])->group(function () {
