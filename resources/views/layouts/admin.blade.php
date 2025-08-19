@@ -113,7 +113,7 @@
 
     {{-- Profile --}}
     <div class="d-flex align-items-center">
-        <span class="me-2">{{ Auth::user()->name }}</span>
+        <span class="me-2">Hallo, {{ Auth::user()->name }}</span>
         <a href="{{ route('profile.edit') }}" class="profile-link">
             <i class="fa fa-user-circle fa-2x"></i>
         </a>
