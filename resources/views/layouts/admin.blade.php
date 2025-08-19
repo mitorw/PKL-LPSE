@@ -29,17 +29,7 @@
         }
 
         .sidebar a:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-        }
-        .sidebar h3 {
-            color: white;
-            display: block;
-            padding: 10px 20px;
-            text-decoration: none;
-        }
-
-        .sidebar h3:hover {
-            background-color: rgba(255, 255, 255, 0.2);
+            background-color: #ffffff33;
         }
 
         .content {
@@ -53,7 +43,6 @@
 
         /* CSS untuk header bar yang baru */
         .header-bar {
-            background-color: #5c6bc0;
             color: white;
             height: 95px;
             margin-left: 240px;
@@ -62,6 +51,15 @@
             justify-content: space-between;
             /* Menjaga agar konten terbagi rata */
             padding: 0 20px;
+        }
+        /* public/css/app.css */
+
+        .header-sticky {
+            position: sticky;   /* Membuat elemen menempel */
+            top: 0;             /* Menempel di bagian paling atas viewport */
+            z-index: 1020;      /* Memastikan header selalu di atas konten lain */
+            background-color: #5c6bc0; /* Memberi warna latar agar konten di bawah tidak tembus pandang */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Opsional: memberi efek bayangan agar terlihat melayang */
         }
 
         /* Gaya untuk tautan profil */
@@ -75,7 +73,7 @@
         }
 
         .profile-link:hover {
-            color: #f1f1f1;
+            color: #ffffff33;
             /* Mengubah warna saat di-hover */
         }
     </style>
@@ -108,17 +106,17 @@
     </div>
 
     {{-- Header bar --}}
-    <div class="header-bar d-flex justify-content-between align-items-center">
-    <h2 class="mb-0">{{ $pageTitle ?? 'Halaman' }}</h2>
+    <div class="header-bar header-sticky d-flex justify-content-between align-items-center"> {{-- <-- TAMBAHKAN class 'header-sticky' --}}
+        <h2 class="mb-0">{{ $pageTitle ?? 'Halaman' }}</h2>
 
-    {{-- Profile --}}
-    <div class="d-flex align-items-center">
-        <span class="me-2">Hallo, {{ Auth::user()->name }}</span>
-        <a href="{{ route('profile.edit') }}" class="profile-link">
-            <i class="fa fa-user-circle fa-2x"></i>
-        </a>
+        {{-- Profile --}}
+        <div class="d-flex align-items-center">
+            <span class="me-2">Hallo, {{ Auth::user()->name }}</span>
+            <a href="{{ route('profile.edit') }}" class="profile-link">
+                <i class="fa fa-user-circle fa-2x"></i>
+            </a>
+        </div>
     </div>
-</div>
 
 
     <div class="content" style="padding-top: 20px;">

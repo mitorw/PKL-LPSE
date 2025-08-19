@@ -43,12 +43,20 @@ class SuratMasukController extends Controller
         }
 
         if ($request->has('disposisi_status') && !empty($request->disposisi_status)) {
-        if ($request->disposisi_status === 'ada') {
-            $query->whereNotNull('id_disposisi'); // Hanya tampilkan surat yang id_disposisi-nya tidak kosong
-        } elseif ($request->disposisi_status === 'tidak_ada') {
-            $query->whereNull('id_disposisi'); // Hanya tampilkan surat yang id_disposisi-nya kosong
+            if ($request->disposisi_status === 'ada') {
+                $query->whereNotNull('id_disposisi'); // Hanya tampilkan surat yang id_disposisi-nya tidak kosong
+            } elseif ($request->disposisi_status === 'tidak_ada') {
+                $query->whereNull('id_disposisi'); // Hanya tampilkan surat yang id_disposisi-nya kosong
         }
-    }
+        }
+
+            // === TAMBAHKAN BLOK LOGIKA SORTING DI SINI ===
+        if ($request->has('sort') && $request->has('direction')) {
+            $query->orderBy($request->input('sort'), $request->input('direction'));
+        } else {
+            // Urutan default jika tidak ada sorting (opsional, tapi disarankan)
+            $query->orderBy('tanggal_terima', 'desc');
+        }
 
         // Dapatkan data surat masuk yang sudah difilter dan/atau dicari
         $data = $query->get();

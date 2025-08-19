@@ -81,7 +81,7 @@
                 <table class="table align-middle table-hover">
                     <thead class="table-light">
                     <tr>
-                        <th>
+                        <th> 
                             <a class="text-decoration-none"
                                href="{{ route('laporan.surat', array_merge(request()->query(), ['sort' => 'nomor_surat', 'direction' => request('direction') == 'asc' ? 'desc' : 'asc'])) }}">
                                 Nomor Surat

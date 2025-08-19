@@ -1,6 +1,17 @@
 @extends('layouts.admin')
 
 @section('content')
+    <style>
+    /* Menambahkan efek hover pada link sorting di header tabel */
+        .sortable-link:hover {
+        color: #0d6efd !important; /* Ganti warna teks menjadi biru saat di-hover */
+        text-decoration: underline !important; /* Tambahkan garis bawah saat di-hover */
+        }
+
+        .clickable-row {
+            cursor: pointer;
+        }
+    </style>
     <h2 class="mb-4">Daftar Surat Masuk</h2>
 
     @if (session('success'))
@@ -61,78 +72,88 @@
         @endif
     @endauth
 
-
-    <table class="table table-bordered table-striped">
-        <thead class="table-blue">
-            <tr>
-                <th>No Surat</th>
-                <th>Asal Surat</th>
-                <th>Tanggal Terima</th>
-                <th>Perihal</th>
-                <th>Klasifikasi</th>
-                <th>Disposisi</th>
-                <th>Keterangan</th>
-                <th>File Surat</th>
-                <th>Action</th>
-
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($suratMasuk as $surat)
+    <div class="table-responsive card">
+        <table class="table align-middle table-hover">
+            <thead class="table-light">
                 <tr>
-                    <td>{{ $surat->no_surat }}</td>
-                    <td>{{ $surat->asal_surat }}</td>
-                    <td>{{ $surat->tanggal_terima }}</td>
-                    <td>{{ $surat->perihal }}</td>
-                    <td>{{ $surat->klasifikasi }}</td>
-                    <td>{{ $surat->disposisi->dis_bagian ?? '-' }}</td>
-                    <td>{{ $surat->keterangan }}</td>
-                    <td>
-                        @if ($surat->file_surat)
-                            <!-- Preview -->
-                            <button class="my-2 btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#pdfModal"
-                                data-file="{{ asset('storage/' . $surat->file_surat) }}">
-                                Preview
-                            </button>
-                            <!-- Download -->
-                            <a href="{{ asset('storage/' . $surat->file_surat) }}" class="btn btn-sm btn-success" download>
-                                Download
-                            </a>
-                        @else
-                            -
-                        @endif
-                    </td>
-
-                    <td>
-                        {{-- Button View --}}
-                        <button type="button" class="my-2 btn btn-sm btn-info" data-bs-toggle="modal"
-                            data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
-                            View
-                        </button>
-                        @auth
-                            @if (Auth::user()->role === 'admin')
-                                <a href="{{ route('surat_masuk.edit', $surat->id_surat_masuk) }}"
-                                    class="btn btn-sm btn-warning">Edit</a>
-
-                                {{-- Button Delete --}}
-                                <form action="{{ route('surat_masuk.destroy', $surat->id_surat_masuk) }}" method="POST"
-                                    style="display:inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" onclick="return confirm('Yakin hapus data ini?')"
-                                        class="btn btn-sm btn-danger">Delete</button>
-                                </form>
+                    <th>
+                        <a class="text-decoration-none text-dark sortable-link"
+                            href="{{ route('surat_masuk.search', array_merge(request()->query(), ['sort' => 'no_surat', 'direction' => request('direction') == 'asc' ? 'desc' : 'asc'])) }}">
+                            No Surat
+                            @if (request('sort') == 'no_surat')
+                                <i class="ms-1 fas fa-{{ request('direction') == 'asc' ? 'arrow-up' : 'arrow-down' }}"></i>
                             @endif
-                        @endauth
-                        {{-- Button Edit --}}
-
-
-                    </td>
+                        </a>
+                    </th>
+                    <th>Asal Surat</th>
+                    <th>
+                        <a class="text-decoration-none text-dark sortable-link"
+                            href="{{ route('surat_masuk.search', array_merge(request()->query(), ['sort' => 'tanggal_terima', 'direction' => request('direction') == 'asc' ? 'desc' : 'asc'])) }}">
+                            Tanggal Terima
+                            @if (request('sort') == 'tanggal_terima')
+                                <i class="ms-1 fas fa-{{ request('direction') == 'asc' ? 'arrow-up' : 'arrow-down' }}"></i>
+                            @endif
+                        </a>
+                    </th>
+                    <th>Perihal</th>
+                    <th>Klasifikasi</th>
+                    <th>Disposisi</th>
+                    <th>Keterangan</th>
+                    <th>File Surat</th>
+                    <th>Action</th>
 
                 </tr>
-            @endforeach
-        </tbody>
-    </table>
+            </thead>
+
+            {{-- Table hover bisa menjadi view --}}
+            <tbody>
+                @foreach ($suratMasuk as $surat)
+                    <tr class="clickable-row" data-bs-toggle="modal"
+                        data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
+
+                        <td>{{ $surat->no_surat }}</td>
+                        <td>{{ $surat->asal_surat }}</td>
+                        <td>{{ $surat->tanggal_terima }}</td>
+                        <td>{{ $surat->perihal }}</td>
+                        <td>{{ $surat->klasifikasi }}</td>
+                        <td>{{ $surat->disposisi->dis_bagian ?? '-' }}</td>
+                        <td>{{ $surat->keterangan }}</td>
+                        <td>
+                            @if ($surat->file_surat)
+                                <button class="my-2 btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#pdfModal"
+                                    data-file="{{ asset('storage/' . $surat->file_surat) }}" onclick="event.stopPropagation()">
+                                    Preview
+                                </button>
+                                <a href="{{ asset('storage/' . $surat->file_surat) }}" class="btn btn-sm btn-success" download
+                                    onclick="event.stopPropagation()">
+                                    Download
+                                </a>
+                            @else
+                                -
+                            @endif
+                        </td>
+                        <td>
+                            @auth
+                                @if (Auth::user()->role === 'admin')
+
+                                    <a href="{{ route('surat_masuk.edit', $surat->id_surat_masuk) }}"
+                                        class="my-2 btn btn-sm btn-warning" onclick="event.stopPropagation()">Edit</a>
+
+                                    <form action="{{ route('surat_masuk.destroy', $surat->id_surat_masuk) }}" method="POST"
+                                        style="display:inline;" onclick="event.stopPropagation()">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" onclick="return confirm('Yakin hapus data ini?')"
+                                            class="btn btn-sm btn-danger ">Delete</button>
+                                    </form>
+                                @endif
+                            @endauth
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
 
 
 
