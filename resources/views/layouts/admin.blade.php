@@ -84,7 +84,7 @@
 <body>
     {{-- Side Bar --}}
     <div class="sidebar">
-        <h3 href="{{ route('dashboard') }}" class="mb-4 text-center">Sistem Inventaris Surat</h3>
+        <a href="{{ route('dashboard') }}" class="mb-4 text-center" style="font-size: 25px; font-weight: bold">Sistem Inventaris Surat</a>
         <a href="{{ route('surat_masuk.index') }}"><i class="fa fa-inbox"
                 style="padding-top: 10px; padding-block: 10px"></i> Surat Masuk</a>
         <a href="{{ route('surat_keluar.index') }}"><i class="fa fa-paper-plane"
