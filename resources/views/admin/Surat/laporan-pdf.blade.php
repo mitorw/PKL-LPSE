@@ -1,61 +1,193 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Laporan Inventaris Surat</title>
     <style>
-        body { font-family: 'Times New Roman', Times, serif; font-size: 12pt; margin: 3cm 2.5cm; }
-        .header-section { text-align: center; margin-bottom: 30px; }
-        .header-section h3, .header-section h4 { margin: 0; line-height: 1.2; }
-        .line { border-bottom: 2px solid black; margin: 15px 0; }
-        .report-title { text-align: center; font-weight: bold; margin-bottom: 5px; }
-        .subtitle { text-align: center; font-size: 12pt; font-weight: normal; margin-bottom: 20px; }
-        
-        .report-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .report-table th, .report-table td { border: 1px solid #000; padding: 8px; text-align: left; font-size: 10pt; }
-        .report-table th { background-color: #f2f2f2; }
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 12pt;
+            margin: 2cm 2.5cm;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th,
+        td {
+            border: 1px solid #000;
+            padding: 6px;
+            font-size: 11pt;
+        }
+
+        th {
+            background-color: #f0f0f0;
+            text-align: center;
+        }
+
+        .kop-surat {
+            margin-bottom: 20px;
+        }
+
+        .line {
+            border-bottom: 3px solid #000;
+            margin-top: 5px;
+        }
+
+        .judul {
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 14pt;
+        }
+
+        .subjudul {
+            margin-top: 25px;
+            font-weight: bold;
+            font-size: 12pt;
+        }
+
+        .ttd {
+            margin-top: 60px;
+            width: 100%;
+            text-align: right;
+        }
     </style>
 </head>
+
 <body>
-    {{-- HEADER --}}
-    <div class="header-section">
-        <h3>YAYASAN PERGURUAN 17 AGUSTUS 1945 SURABAYA</h3>
-        <h4>UNIVERSITAS 17 AGUSTUS 1945 (UNTAG) SURABAYA</h4>
-        <p style="font-size: 10pt;">Jl. Semolowaru No. 45 Surabaya 60118 Telp. +62 31 5931800 (hunting) Fax. +62 31 5927817</p>
+
+    {{-- HEADER INSTANSI --}}
+    <div class="kop-surat">
+        <table width="100%">
+            <tr>
+                <td width="15%" style="text-align:center;">
+                    <img src="{{ public_path('storage/assets/logo-lampung.png') }}" alt="Logo"
+                        style="width:90px; height:auto;">
+                </td>
+                <td width="85%" style="text-align:center;">
+                    <h2 style="margin:0; font-size:16pt;">PEMERINTAH PROVINSI LAMPUNG</h2>
+                    <h3 style="margin:0; font-size:14pt;">SEKRETARIAT DAERAH</h3>
+                    <div style="font-size:11pt; margin-top:2px;">
+                        Jalan R.W. Monginsidi No. 69 Teluk Betung Bandar Lampung, Kode Pos 52211 <br>
+                        Telp. (0721) 483465, Fax (0721) 481166, Email: info@lampungprov.go.id <br>
+                        Website: http://lampungprov.go.id
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <div class="line"></div>
     </div>
-    <div class="line"></div>
-    
+
     {{-- JUDUL LAPORAN --}}
-    <h1 class="report-title">LAPORAN INVENTARIS SURAT MASUK DAN KELUAR</h1>
-    <h2 class="subtitle">PENGADAAN BARANG DAN JASA</h2>
-    
-    {{-- TABEL --}}
-    <table class="report-table">
+    <div class="judul">
+        LAPORAN INVENTARISASI SURAT <br>
+        BIRO PENGADAAN BARANG DAN JASA
+    </div>
+
+    {{-- SURAT MASUK --}}
+    <div class="subjudul">A. Surat Masuk</div>
+    <table>
         <thead>
             <tr>
                 <th>No</th>
                 <th>Nomor Surat</th>
                 <th>Tanggal</th>
-                <th>Jenis Surat</th>
                 <th>Perihal</th>
                 <th>Status</th>
             </tr>
         </thead>
         <tbody>
-            @forelse($dataSurat as $surat)
-            <tr>
-                <td>{{ $loop->iteration }}</td>
-                <td>{{ $surat->nomor_surat }}</td>
-                <td>{{ \Carbon\Carbon::parse($surat->tanggal)->format('d-m-Y') }}</td>
-                <td>{{ ucfirst($surat->jenis_surat) }}</td>
-                <td>{{ $surat->perihal }}</td>
-                <td>{{ $surat->status }}</td>
-            </tr>
+            @php $no = 1; @endphp
+            @forelse($dataSurat->where('jenis_surat', 'masuk') as $surat)
+                <tr>
+                    <td style="text-align:center;">{{ $no++ }}</td>
+                    <td>{{ $surat->nomor_surat }}</td>
+                    <td style="text-align:center;">{{ \Carbon\Carbon::parse($surat->tanggal)->format('d-m-Y') }}</td>
+                    <td>{{ $surat->perihal }}</td>
+                    <td style="text-align:center;">{{ ucfirst($surat->status) }}</td>
+                </tr>
             @empty
-            <tr>
-                <td colspan="6" style="text-align: center;">Tidak ada data surat yang ditemukan.</td>
-            </tr>
+                <tr>
+                    <td colspan="5" style="text-align:center;">Tidak ada data surat masuk.</td>
+                </tr>
             @endforelse
         </tbody>
     </table>
+
+    {{-- SURAT KELUAR --}}
+    <div class="subjudul">B. Surat Keluar</div>
+    <table>
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Nomor Surat</th>
+                <th>Tanggal</th>
+                <th>Perihal</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @php $no = 1; @endphp
+            @forelse($dataSurat->where('jenis_surat', 'keluar') as $surat)
+                <tr>
+                    <td style="text-align:center;">{{ $no++ }}</td>
+                    <td>{{ $surat->nomor_surat }}</td>
+                    <td style="text-align:center;">{{ \Carbon\Carbon::parse($surat->tanggal)->format('d-m-Y') }}</td>
+                    <td>{{ $surat->perihal }}</td>
+                    <td style="text-align:center;">{{ ucfirst($surat->status) }}</td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="5" style="text-align:center;">Tidak ada data surat keluar.</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+
+    <h3>C. Laporan Disposisi</h3>
+<table border="1" cellspacing="0" cellpadding="5" width="100%">
+    <thead>
+        <tr>
+            <th>No</th>
+            <th>Nomor Surat</th>
+            <th>Tanggal</th>
+            <th>Bagian</th>
+            <th>Catatan</th>
+            <th>Instruksi</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($dataSurat as $index => $sm)
+            <tr>
+                <td>{{ $index+1 }}</td>
+                <td>{{ $sm->nomor_surat }}</td>
+                <td>{{ $sm->tanggal }}</td>
+                <td>{{ $sm->disposisi->bagian ?? '-' }}</td>
+                <td>{{ $sm->disposisi->catatan ?? '-' }}</td>
+                <td>{{ $sm->disposisi->instruksi ?? '-' }}</td>
+            </tr>
+        @endforeach
+    </tbody>
+</table>
+
+    {{-- TANDA TANGAN --}}
+    <div class="ttd">
+        <div class="jabatan"> Bandar Lampung, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }} <br> Kepala Biro
+            Pengadaan Barang dan Jasa
+        </div>
+        <br>
+        <br>
+        <br>
+        <br>
+        <div class="nama"> <u>PUADI JAILANI, SH, MH.</u>
+            <br> NIP. 19650905 199103 1 004
+        </div>
+    </div>
+
 </body>
+
 </html>
