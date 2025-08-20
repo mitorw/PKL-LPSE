@@ -130,11 +130,8 @@
                     @endforelse
                     </tbody>
                 </table>
+            <div class="mt-3 d-flex justify-content-center">
+                {{ $laporanSurat->appends(request()->query())->links('pagination::bootstrap-5') }}
             </div>
-
-            <div class="mt-3">
-                {{ $laporanSurat->appends(request()->query())->links() }}
-            </div>
-        </div>
     </div>
 @endsection
