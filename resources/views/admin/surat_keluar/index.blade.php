@@ -144,6 +144,11 @@
                     @endforeach
                 </tbody>
             </table>
+             @if ($suratKeluar->hasPages())
+                <div class="card-footer d-flex justify-content-center">
+                    {{ $suratKeluar->links('pagination::bootstrap-5') }}
+                </div>
+            @endif
         </div>
 
         @foreach ($suratKeluar as $surat)
@@ -216,9 +221,6 @@
             </div>
         </div>
 
-
-        {{-- Pagination --}}
-        {{ $suratKeluar->appends(request()->all())->links() }}
 
         <script>
             document.addEventListener('DOMContentLoaded', function() {

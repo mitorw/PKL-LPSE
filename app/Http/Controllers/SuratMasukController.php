@@ -6,75 +6,74 @@ use App\Models\SuratMasuk;
 use App\Models\Disposisi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Auth; // <-- TAMBAHKAN BARIS INI
-
-
+use Illuminate\Support\Facades\Auth;
 
 class SuratMasukController extends Controller
 {
-    public function search(Request $request)
+    /**
+     * Menampilkan daftar surat masuk dengan filter, pencarian, sorting, dan pagination.
+     * Method ini menangani semuanya.
+     */
+    public function index(Request $request)
     {
-        // Mulai query Eloquent untuk model SuratMasuk
+        // Mulai query builder, jangan langsung eksekusi
         $query = SuratMasuk::with('disposisi');
 
-        // Cek apakah ada input pencarian
-        if ($request->has('search')) {
+        // Terapkan filter PENCARIAN jika ada input 'search'
+        $query->when($request->filled('search'), function ($q) use ($request) {
             $searchTerm = $request->input('search');
+            // Kelompokkan kondisi pencarian agar tidak bentrok dengan filter lain
+            $q->where(function ($subq) use ($searchTerm) {
+                $subq->where('no_surat', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('asal_surat', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('perihal', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('keterangan', 'LIKE', "%{$searchTerm}%");
+            });
+        });
 
-            // Tambahkan kondisi where untuk pencarian
-            $query->where('no_surat', 'LIKE', "%{$searchTerm}%")
-                  ->orWhere('asal_surat', 'LIKE', "%{$searchTerm}%")
-                  ->orWhere('perihal', 'LIKE', "%{$searchTerm}%")
-                  ->orWhere('tanggal_terima', 'LIKE', "%{$searchTerm}%")
-                  ->orWhere('keterangan', 'LIKE', "%{$searchTerm}%");
-        }
+        // Terapkan filter TANGGAL AWAL jika ada
+        $query->when($request->filled('start_date'), function ($q) use ($request) {
+            $q->whereDate('tanggal_terima', '>=', $request->start_date);
+        });
 
-        if ($request->has('start_date') && !empty($request->start_date)) {
-        $query->whereDate('tanggal_terima', '>=', $request->start_date);
-        }
+        // Terapkan filter TANGGAL AKHIR jika ada
+        $query->when($request->filled('end_date'), function ($q) use ($request) {
+            $q->whereDate('tanggal_terima', '<=', $request->end_date);
+        });
 
-        if ($request->has('end_date') && !empty($request->end_date)) {
-            $query->whereDate('tanggal_terima', '<=', $request->end_date);
-        }
+        // Terapkan filter KLASIFIKASI jika ada
+        $query->when($request->filled('klasifikasi'), function ($q) use ($request) {
+            $q->where('klasifikasi', $request->klasifikasi);
+        });
 
-        // Tambahkan logika untuk filter klasifikasi
-        if ($request->has('klasifikasi') && !empty($request->klasifikasi)) {
-            $query->where('klasifikasi', $request->klasifikasi);
-        }
-
-        if ($request->has('disposisi_status') && !empty($request->disposisi_status)) {
+        // Terapkan filter STATUS DISPOSISI jika ada
+        $query->when($request->filled('disposisi_status'), function ($q) use ($request) {
             if ($request->disposisi_status === 'ada') {
-                $query->whereNotNull('id_disposisi'); // Hanya tampilkan surat yang id_disposisi-nya tidak kosong
+                $q->whereNotNull('id_disposisi');
             } elseif ($request->disposisi_status === 'tidak_ada') {
-                $query->whereNull('id_disposisi'); // Hanya tampilkan surat yang id_disposisi-nya kosong
-        }
-        }
+                $q->whereNull('id_disposisi');
+            }
+        });
 
-            // === TAMBAHKAN BLOK LOGIKA SORTING DI SINI ===
-        if ($request->has('sort') && $request->has('direction')) {
-            $query->orderBy($request->input('sort'), $request->input('direction'));
-        } else {
-            // Urutan default jika tidak ada sorting (opsional, tapi disarankan)
-            $query->orderBy('tanggal_terima', 'desc');
-        }
+        // Tentukan kolom dan arah SORTING (urutan)
+        $sortColumn = $request->input('sort', 'created_at'); // Default sorting
+        $sortDirection = $request->input('direction', 'desc');   // Default direction
 
-        // Dapatkan data surat masuk yang sudah difilter dan/atau dicari
-        $data = $query->get();
+        // Terapkan sorting ke query
+        $query->orderBy($sortColumn, $sortDirection);
 
+        // Eksekusi query dengan PAGINATION di akhir
+        // appends($request->query()) penting agar filter tetap aktif saat pindah halaman
+        $data = $query->latest()->paginate(10)->appends($request->query());
+
+        // Kembalikan view dengan data yang sudah benar
         return view('admin.surat_masuk.index', [
             'pageTitle' => 'Surat Masuk',
-            'suratMasuk' => $data
+            'data' => $data // Mengirim dengan nama 'data' agar konsisten
         ]);
     }
 
-    public function index()
-    {
-        $data = SuratMasuk::with('disposisi')->get();
-        return view('admin.surat_masuk.index', [
-            'pageTitle' => 'Surat Masuk',
-            'suratMasuk' => $data
-        ]);
-    }
+    // Method 'search' sudah tidak diperlukan lagi.
 
     public function create()
     {
@@ -88,18 +87,17 @@ class SuratMasukController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'no_surat' => 'required',
-            'asal_surat' => 'required',
+            'no_surat' => 'required|string|max:255',
+            'asal_surat' => 'required|string|max:255',
             'tanggal_terima' => 'required|date',
-            'perihal' => 'required',
+            'perihal' => 'required|string',
             'klasifikasi' => 'required|in:Rahasia,Penting,Biasa',
             'file_surat' => 'nullable|mimes:pdf|max:2048',
             'dis_bagian' => 'nullable|in:Bagian 1,Bagian 2,Bagian 3',
         ]);
 
         $idDisposisi = null;
-
-        if ($request->dis_bagian) {
+        if ($request->filled('dis_bagian')) {
             $disposisi = Disposisi::create([
                 'dis_bagian' => $request->dis_bagian,
                 'catatan' => $request->catatan,
@@ -130,57 +128,51 @@ class SuratMasukController extends Controller
 
     public function edit($id)
     {
-        $surat = SuratMasuk::findOrFail($id);
-        $disposisi = Disposisi::all();
-
+        $surat = SuratMasuk::with('disposisi')->findOrFail($id);
         return view('admin.surat_masuk.edit', [
             'pageTitle' => 'Edit Surat Masuk',
-            'surat' => $surat,
-            'disposisi' => $disposisi
+            'surat' => $surat
         ]);
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
-            'no_surat' => 'required',
-            'asal_surat' => 'required',
+            'no_surat' => 'required|string|max:255',
+            'asal_surat' => 'required|string|max:255',
             'tanggal_terima' => 'required|date',
-            'perihal' => 'required',
+            'perihal' => 'required|string',
             'klasifikasi' => 'required|in:Rahasia,Penting,Biasa',
             'file_surat' => 'nullable|mimes:pdf|max:2048',
             'dis_bagian' => 'nullable|in:Bagian 1,Bagian 2,Bagian 3',
         ]);
 
         $surat = SuratMasuk::findOrFail($id);
-
-        // Update disposisi
         $idDisposisi = $surat->id_disposisi;
-        if ($request->dis_bagian) {
+
+        if ($request->filled('dis_bagian')) {
+            $disposisiData = [
+                'dis_bagian' => $request->dis_bagian,
+                'catatan' => $request->catatan,
+                'instruksi' => $request->instruksi
+            ];
             if ($idDisposisi) {
-                $disposisi = Disposisi::find($idDisposisi);
-                $disposisi->update([
-                    'dis_bagian' => $request->dis_bagian,
-                    'catatan' => $request->catatan,
-                    'instruksi' => $request->instruksi
-                ]);
+                Disposisi::find($idDisposisi)->update($disposisiData);
             } else {
-                $disposisi = Disposisi::create([
-                    'dis_bagian' => $request->dis_bagian,
-                    'catatan' => $request->catatan,
-                    'instruksi' => $request->instruksi
-                ]);
+                $disposisi = Disposisi::create($disposisiData);
                 $idDisposisi = $disposisi->id_disposisi;
             }
         }
 
-        // Update file kalau ada upload baru
         $fileSuratPath = $surat->file_surat;
         if ($request->hasFile('file_surat')) {
+            // Hapus file lama jika ada
+            if ($fileSuratPath && Storage::disk('public')->exists($fileSuratPath)) {
+                Storage::disk('public')->delete($fileSuratPath);
+            }
             $fileSuratPath = $request->file('file_surat')->store('surat_masuk', 'public');
         }
 
-        // Update surat masuk
         $surat->update([
             'no_surat' => $request->no_surat,
             'asal_surat' => $request->asal_surat,
@@ -198,7 +190,6 @@ class SuratMasukController extends Controller
     public function show($id)
     {
         $surat = SuratMasuk::with('disposisi')->findOrFail($id);
-
         return view('admin.surat_masuk.show', [
             'pageTitle' => 'Detail Surat Masuk',
             'surat' => $surat
@@ -208,18 +199,10 @@ class SuratMasukController extends Controller
     public function destroy($id)
     {
         $surat = SuratMasuk::findOrFail($id);
-
-        // Hapus file surat di storage jika ada
         if ($surat->file_surat && Storage::disk('public')->exists($surat->file_surat)) {
             Storage::disk('public')->delete($surat->file_surat);
         }
-
-        // Hapus data surat
         $surat->delete();
-
         return redirect()->route('surat_masuk.index')->with('success', 'Surat berhasil dihapus');
     }
-
-
-
 }

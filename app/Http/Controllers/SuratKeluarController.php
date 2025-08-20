@@ -37,11 +37,9 @@ class SuratKeluarController extends Controller
         if ($request->has('sort') && $request->has('direction')) {
             $query->orderBy($request->input('sort'), $request->input('direction'));
         } else {
-            // Urutan default jika tidak ada sorting (opsional, tapi disarankan)
-            $query->orderBy('tanggal', 'desc');
         }
 
-        $suratKeluar = $query->latest()->paginate(10);
+        $suratKeluar = $query->latest()->paginate(10)->appends($request->query());
 
         return view('admin.surat_keluar.index', [
             'pageTitle' => 'Surat Keluar',

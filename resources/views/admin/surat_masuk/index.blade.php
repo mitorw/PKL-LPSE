@@ -20,10 +20,10 @@
         </div>
     @endif
 
-    <form action="{{ route('surat_masuk.search') }}" method="GET" class="mb-3">
+    <form action="{{ route('surat_masuk.index') }}" method="GET" class="mb-3">
 
         <div class="input-group">
-            <input type="text" class="form-control" placeholder="Cari Surat" name="search" value="{{ request('search') }}">
+            <input type="text" class="form-control" placeholder="Cari Surat" name="search" value="{{ request('index') }}">
             <div class="input-group-append">
                 <button class="mx-2 btn btn-primary" type="submit">Cari</button>
             </div>
@@ -33,7 +33,7 @@
 
 
 
-    <form action="{{ route('surat_masuk.search') }}" method="GET" class="mb-3">
+    <form action="{{ route('surat_masuk.index') }}" method="GET" class="mb-3">
 
         <div class="input-group">
 
@@ -78,7 +78,7 @@
                 <tr>
                     <th>
                         <a class="text-decoration-none text-dark sortable-link"
-                            href="{{ route('surat_masuk.search', array_merge(request()->query(), ['sort' => 'no_surat', 'direction' => request('direction') == 'asc' ? 'desc' : 'asc'])) }}">
+                            href="{{ route('surat_masuk.index', array_merge(request()->query(), ['sort' => 'no_surat', 'direction' => request('direction') == 'asc' ? 'desc' : 'asc'])) }}">
                             No Surat
                             @if (request('sort') == 'no_surat')
                                 <i class="ms-1 fas fa-{{ request('direction') == 'asc' ? 'arrow-up' : 'arrow-down' }}"></i>
@@ -91,7 +91,7 @@
                     <th>Asal Surat</th>
                     <th>
                         <a class="text-decoration-none text-dark sortable-link"
-                            href="{{ route('surat_masuk.search', array_merge(request()->query(), ['sort' => 'tanggal_terima', 'direction' => request('direction') == 'asc' ? 'desc' : 'asc'])) }}">
+                            href="{{ route('surat_masuk.index', array_merge(request()->query(), ['sort' => 'tanggal_terima', 'direction' => request('direction') == 'asc' ? 'desc' : 'asc'])) }}">
                             Tanggal
                             @if (request('sort') == 'tanggal_terima')
                                 <i class="ms-1 fas fa-{{ request('direction') == 'asc' ? 'arrow-up' : 'arrow-down' }}"></i>
@@ -112,7 +112,7 @@
 
             {{-- Table hover bisa menjadi view --}}
             <tbody>
-                @foreach ($suratMasuk as $surat)
+                @foreach ($data as $surat)
                     <tr class="clickable-row" data-bs-toggle="modal"
                         data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
 
@@ -158,6 +158,9 @@
                 @endforeach
             </tbody>
         </table>
+        <div class="mt-3 d-flex justify-content-center">
+            {{ $data->appends(request()->query())->links('pagination::bootstrap-5') }}
+        </div>
     </div>
 
 
@@ -177,7 +180,7 @@
         </div>
     </div>
 
-    @foreach ($suratMasuk as $surat)
+    @foreach ($data as $surat)
         <div class="modal fade" id="detailSuratModal{{ $surat->id_surat_masuk }}" tabindex="-1"
             aria-labelledby="detailSuratLabel{{ $surat->id_surat_masuk }}" aria-hidden="true">
             <style>
