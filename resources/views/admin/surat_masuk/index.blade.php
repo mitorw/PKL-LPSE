@@ -2,10 +2,12 @@
 
 @section('content')
     <style>
-    /* Menambahkan efek hover pada link sorting di header tabel */
+        /* Menambahkan efek hover pada link sorting di header tabel */
         .sortable-link:hover {
-        color: #0d6efd !important; /* Ganti warna teks menjadi biru saat di-hover */
-        text-decoration: underline !important; /* Tambahkan garis bawah saat di-hover */
+            color: #0d6efd !important;
+            /* Ganti warna teks menjadi biru saat di-hover */
+            text-decoration: underline !important;
+            /* Tambahkan garis bawah saat di-hover */
         }
 
         .clickable-row {
@@ -113,24 +115,31 @@
             {{-- Table hover bisa menjadi view --}}
             <tbody>
                 @foreach ($data as $surat)
-                    <tr class="clickable-row" data-bs-toggle="modal"
-                        data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
+                    <tr class="clickable-row">
 
-                        <td>{{ $surat->no_surat }}</td>
-                        <td>{{ $surat->asal_surat }}</td>
-                        <td>{{ $surat->tanggal_terima }}</td>
-                        <td>{{ $surat->perihal }}</td>
-                        <td>{{ $surat->klasifikasi }}</td>
-                        <td>{{ $surat->disposisi->dis_bagian ?? '-' }}</td>
-                        <td>{{ $surat->keterangan }}</td>
+                        <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
+                            {{ $surat->no_surat }}</td>
+                        <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
+                            {{ $surat->asal_surat }}</td>
+                        <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
+                            {{ $surat->tanggal_terima }}</td>
+                        <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
+                            {{ $surat->perihal }}</td>
+                        <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
+                            {{ $surat->klasifikasi }}</td>
+                        <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
+                            {{ $surat->disposisi->dis_bagian ?? '-' }}</td>
+                        <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
+                            {{ $surat->keterangan }}</td>
                         <td>
                             @if ($surat->file_surat)
                                 <button class="my-2 btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#pdfModal"
-                                    data-file="{{ asset('storage/' . $surat->file_surat) }}" onclick="event.stopPropagation()">
+                                    data-file="{{ asset('storage/' . $surat->file_surat) }}"
+                                    onclick="event.stopPropagation()">
                                     Preview
                                 </button>
-                                <a href="{{ asset('storage/' . $surat->file_surat) }}" class="btn btn-sm btn-success" download
-                                    onclick="event.stopPropagation()">
+                                <a href="{{ asset('storage/' . $surat->file_surat) }}" class="btn btn-sm btn-success"
+                                    download onclick="event.stopPropagation()">
                                     Download
                                 </a>
                             @else
@@ -140,7 +149,6 @@
                         <td>
                             @auth
                                 @if (Auth::user()->role === 'admin')
-
                                     <a href="{{ route('surat_masuk.edit', $surat->id_surat_masuk) }}"
                                         class="my-2 btn btn-sm btn-warning" onclick="event.stopPropagation()">Edit</a>
 
