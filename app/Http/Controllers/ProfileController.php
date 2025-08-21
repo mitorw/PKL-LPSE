@@ -62,4 +62,26 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+    public function updatePhoto(Request $request)
+    {
+        $request->validate([
+            'profile_photo' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        $user = Auth::user();
+
+        // Hapus foto lama jika ada
+        if ($user->profile_photo && \Storage::exists('public/' . $user->profile_photo)) {
+            \Storage::delete('public/' . $user->profile_photo);
+        }
+
+        // Simpan foto baru
+        $path = $request->file('profile_photo')->store('profile_photos', 'public');
+
+        // Update database
+        $user->profile_photo = $path;
+        $user->save();
+
+        return back()->with('success', 'Foto profil berhasil diperbarui.');
+    }
 }

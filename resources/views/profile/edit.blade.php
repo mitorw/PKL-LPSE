@@ -36,11 +36,11 @@
         }
 
         .toggle-password {
-        border: 1px solid #ced4da;
+            border: 1px solid #ced4da;
 
-        background-color: transparent;
+            background-color: transparent;
 
-        transition: background-color 0.2s ease;
+            transition: background-color 0.2s ease;
         }
 
         .toggle-password:hover {
@@ -49,18 +49,26 @@
             color: white
         }
 
-        .toggle-password:focus, .toggle-password:active {
+        .toggle-password:focus,
+        .toggle-password:active {
             box-shadow: none !important;
             outline: none !important;
         }
-
-
     </style>
 
     <div class="container mt-4">
         <div class="profile-header">
             <div class="profile-avatar">
-                <i class="fa fa-user"></i>
+                @if (Auth::user()->profile_photo)
+                    <img src="{{ Auth::user()->profile_photo
+                        ? asset('storage/' . Auth::user()->profile_photo)
+                        : 'https://via.placeholder.com/150' }}"
+                        alt="Foto Profil" class="rounded-circle" width="100" height="100" style="object-fit: cover;">
+                @else
+                    <i class="fa fa-user"></i>
+                @endif
+                </a>
+
             </div>
             <div>
                 <h4 class="mb-1">{{ Auth::user()->name ?? 'Nama Pengguna' }}</h4>
@@ -167,20 +175,25 @@
                     <div class="card-header">
                         <i class="fa fa-image me-2"></i> Ubah Foto Profil
                     </div>
-                    <div class="card-body text-center d-flex flex-column justify-content-center">
-                        <form method="POST" action="">
+                    <div class="text-center card-body d-flex flex-column justify-content-center">
+                        <form method="POST" action="{{ route('profile.photo.update') }}" enctype="multipart/form-data">
                             @csrf
                             <div class="mb-3">
-                                <img src="https://via.placeholder.com/150" alt="Foto Profil" class="rounded-circle"
-                                    width="150" height="150" style="object-fit: cover;">
+                                <img src="{{ Auth::user()->profile_photo
+                                    ? asset('storage/' . Auth::user()->profile_photo)
+                                    : 'https://via.placeholder.com/150' }}"
+                                    alt="Foto Profil" class="rounded-circle" width="150" height="150"
+                                    style="object-fit: cover;">
                             </div>
                             <div class="mb-3">
-                                <input class="form-control" type="file" id="formFile">
+                                <input class="form-control" type="file" name="profile_photo" id="formFile"
+                                    accept="image/*">
                             </div>
                             <div class="text-end">
                                 <button type="submit" class="btn btn-primary">Simpan Foto</button>
                             </div>
                         </form>
+
                     </div>
                 </div>
             </div>

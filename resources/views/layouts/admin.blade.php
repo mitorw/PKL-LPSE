@@ -17,7 +17,7 @@
             background-color: #3f51b5;
             color: white;
             position: fixed;
-            padding-top:5px;
+            padding-top: 5px;
         }
 
         .sidebar a {
@@ -52,14 +52,20 @@
             /* Menjaga agar konten terbagi rata */
             padding: 0 20px;
         }
+
         /* public/css/app.css */
 
         .header-sticky {
-            position: sticky;   /* Membuat elemen menempel */
-            top: 0;             /* Menempel di bagian paling atas viewport */
-            z-index: 1020;      /* Memastikan header selalu di atas konten lain */
-            background-color: #5c6bc0; /* Memberi warna latar agar konten di bawah tidak tembus pandang */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Opsional: memberi efek bayangan agar terlihat melayang */
+            position: sticky;
+            /* Membuat elemen menempel */
+            top: 0;
+            /* Menempel di bagian paling atas viewport */
+            z-index: 1020;
+            /* Memastikan header selalu di atas konten lain */
+            background-color: #5c6bc0;
+            /* Memberi warna latar agar konten di bawah tidak tembus pandang */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            /* Opsional: memberi efek bayangan agar terlihat melayang */
         }
 
         /* Gaya untuk tautan profil */
@@ -82,7 +88,8 @@
 <body>
     {{-- Side Bar --}}
     <div class="sidebar">
-        <a href="{{ route('dashboard') }}" class="mb-4 text-center" style="font-size: 25px; font-weight: bold">Sistem Inventaris Surat</a>
+        <a href="{{ route('dashboard') }}" class="mb-4 text-center" style="font-size: 25px; font-weight: bold">Sistem
+            Inventaris Surat</a>
         <a href="{{ route('surat_masuk.index') }}"><i class="fa fa-inbox"
                 style="padding-top: 10px; padding-block: 10px"></i> Surat Masuk</a>
         <a href="{{ route('surat_keluar.index') }}"><i class="fa fa-paper-plane"
@@ -112,8 +119,15 @@
         {{-- Profile --}}
         <div class="d-flex align-items-center">
             <span class="me-2">Hallo, {{ Auth::user()->name }}</span>
-            <a href="{{ route('profile.edit') }}" class="profile-link">
-                <i class="fa fa-user-circle fa-2x"></i>
+                <a href="{{ route('profile.edit') }}" class="profile-link d-flex align-items-center">
+                    @if (Auth::user()->profile_photo)
+                        <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}"
+                            alt="Foto Profil" class="rounded-circle" width="40" height="40"
+                            style="object-fit: cover;">
+                    @else
+                        <i class="fa fa-user-circle fa-2x text-secondary"></i>
+                    @endif
+
             </a>
         </div>
     </div>
@@ -124,8 +138,10 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
 </body>
 
-    @stack('scripts')
+@stack('scripts')
 
 </html>
