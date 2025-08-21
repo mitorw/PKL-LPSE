@@ -62,25 +62,28 @@
 
     {{-- HEADER INSTANSI --}}
     <div class="kop-surat">
-        <table width="100%">
-            <tr>
-                <td width="15%" style="text-align:center;">
-                    <img src="{{ public_path('storage/assets/logo-lampung.png') }}" alt="Logo"
-                        style="width:90px; height:auto;">
-                </td>
-                <td width="85%" style="text-align:center;">
-                    <h2 style="margin:0; font-size:16pt;">PEMERINTAH PROVINSI LAMPUNG</h2>
-                    <h3 style="margin:0; font-size:14pt;">SEKRETARIAT DAERAH</h3>
-                    <div style="font-size:11pt; margin-top:2px;">
-                        Jalan R.W. Monginsidi No. 69 Teluk Betung Bandar Lampung, Kode Pos 52211 <br>
-                        Telp. (0721) 483465, Fax (0721) 481166, Email: info@lampungprov.go.id <br>
-                        Website: http://lampungprov.go.id
-                    </div>
-                </td>
-            </tr>
-        </table>
-        <div class="line"></div>
-    </div>
+    <table width="100%" style="border: none; border-collapse: collapse;">
+        <tr>
+            <td width="15%" style="text-align:center; border:none;">
+                <img src="{{ public_path('storage/assets/logo-lampung.png') }}" alt="Logo"
+                    style="width:90px; height:auto;">
+            </td>
+            <td width="85%" style="text-align:center; border:none;">
+                <h2 style="margin:0; font-size:16pt;">PEMERINTAH PROVINSI LAMPUNG</h2>
+                <h3 style="margin:0; font-size:14pt;">SEKRETARIAT DAERAH</h3>
+                <div style="font-size:11pt; margin-top:2px;">
+                    Jalan R.W. Monginsidi No. 69 Teluk Betung Bandar Lampung, Kode Pos 52211 <br>
+                    Telp. (0721) 483465, Fax (0721) 481166, Email: info@lampungprov.go.id <br>
+                    Website: http://lampungprov.go.id
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    {{-- Garis pemisah bawah --}}
+    <div class="line" style="border-top: 2px solid #000; margin-top:5px; margin-bottom:15px;"></div>
+</div>
+
 
     {{-- JUDUL LAPORAN --}}
     <div class="judul">
@@ -203,18 +206,19 @@
 
 
     {{-- TANDA TANGAN --}}
-    <div class="ttd">
-        <div class="jabatan"> Bandar Lampung, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }} <br> Kepala Biro
-            Pengadaan Barang dan Jasa
-        </div>
-        <br>
-        <br>
-        <br>
-        <br>
-        <div class="nama"> <u>PUADI JAILANI, SH, MH.</u>
-            <br> NIP. 19650905 199103 1 004
-        </div>
+    <div class="ttd" style="text-align: right; margin-top: 50px;">
+    <div class="jabatan">
+        Bandar Lampung, {{ \Carbon\Carbon::now()->locale('id')->translatedFormat('d F Y') }} <br>
+        Kepala Biro Pengadaan Barang dan Jasa
     </div>
+
+    <div style="margin-top: 80px;"></div>
+
+    <div class="nama">
+        <u>PUADI JAILANI, SH, MH.</u><br>
+        NIP. 19650905 199103 1 004
+    </div>
+</div>
 
 </body>
 
