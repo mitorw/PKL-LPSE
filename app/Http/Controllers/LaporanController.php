@@ -92,10 +92,11 @@ class LaporanController extends Controller
 
 public function cetakLaporan(Request $request)
 {
+    // --- Query dasar (tetap seperti sebelumnya) ---
     $suratMasuk = SuratMasuk::query();
     $suratKeluar = SuratKeluar::query();
 
-    // --- Logika Filter ---
+    // --- Filter yang sama dengan sebelumnya ---
     if ($request->filled('nomor_surat')) {
         $nomorSurat = $request->nomor_surat;
         $suratMasuk->where('no_surat', 'like', '%' . $nomorSurat . '%');
@@ -121,13 +122,13 @@ public function cetakLaporan(Request $request)
     if ($request->filled('jenis_surat') && $request->jenis_surat !== 'all') {
         $jenisSurat = $request->jenis_surat;
         if ($jenisSurat == 'masuk') {
-            $suratKeluar->whereRaw('1=0');
+            $suratKeluar->whereRaw('1=0'); // kosongkan keluar
         } else if ($jenisSurat == 'keluar') {
-            $suratMasuk->whereRaw('1=0');
+            $suratMasuk->whereRaw('1=0'); // kosongkan masuk
         }
     }
 
-    // --- Gabungkan Query ---
+    // --- UNION (tetap seperti sebelumnya) ---
     $suratMasukQuery = $suratMasuk->select(
         'no_surat as nomor_surat',
         'tanggal_terima as tanggal',
@@ -148,10 +149,32 @@ public function cetakLaporan(Request $request)
 
     $sortColumn = $request->get('sort', 'tanggal');
     $sortDirection = $request->get('direction', 'desc');
-    $dataSurat = $query->orderBy($sortColumn, $sortDirection)->get();
+    $dataSurat = $query->orderBy($sortColumn, $sortDirection)->get(); // <-- A & B tetap ada
 
-    // --- Gunakan stream() untuk preview ---
-    $pdf = Pdf::loadView('admin.Surat.laporan-pdf', compact('dataSurat'))
+    // --- DATA KHUSUS LAPORAN DISPOSISI (sekadar DARI SuratMasuk) ---
+    // Jika user filter jenis_surat=keluar, maka disposisi kosong (karena relevan di "masuk")
+    if ($request->filled('jenis_surat') && $request->jenis_surat === 'keluar') {
+        $disposisiSurat = collect(); // kosong
+    } else {
+        $disposisiSurat = SuratMasuk::with('disposisi')
+            ->when($request->filled('nomor_surat'), function($q) use ($request) {
+                $q->where('no_surat', 'like', '%' . $request->nomor_surat . '%');
+            })
+            ->when($request->filled('dari_tanggal'), function($q) use ($request) {
+                $q->whereDate('tanggal_terima', '>=', $request->dari_tanggal);
+            })
+            ->when($request->filled('sampai_tanggal'), function($q) use ($request) {
+                $q->whereDate('tanggal_terima', '<=', $request->sampai_tanggal);
+            })
+            ->when($request->filled('status') && $request->status !== 'all', function($q) use ($request) {
+                $q->where('klasifikasi', $request->status);
+            })
+            ->orderBy('tanggal_terima', $sortDirection)
+            ->get();
+    }
+
+    // --- Generate PDF: kirim dua dataset ke view ---
+    $pdf = Pdf::loadView('admin.Surat.laporan-pdf', compact('dataSurat', 'disposisiSurat'))
               ->setPaper('A4', 'portrait');
 
     return $pdf->stream('Laporan-Surat-' . now()->format('Y-m-d') . '.pdf');

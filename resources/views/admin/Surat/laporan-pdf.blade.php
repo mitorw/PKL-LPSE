@@ -89,90 +89,118 @@
     </div>
 
     {{-- SURAT MASUK --}}
-    <div class="subjudul">A. Surat Masuk</div>
-    <table>
-        <thead>
+{{-- SURAT MASUK --}}
+<div class="subjudul">A. Surat Masuk</div>
+<table>
+    <thead>
+        <tr>
+            <th>No</th>
+            <th>Nomor Surat</th>
+            <th>Asal</th>
+            <th>Tanggal</th>
+            <th>Perihal</th>
+            <th>Klasifikasi</th>
+            <th>Keterangan</th>
+        </tr>
+    </thead>
+    <tbody>
+        @php $no = 1; @endphp
+        @forelse($dataSurat->where('jenis_surat', 'masuk') as $surat)
             <tr>
-                <th>No</th>
-                <th>Nomor Surat</th>
-                <th>Tanggal</th>
-                <th>Perihal</th>
-                <th>Status</th>
+                <td style="text-align:center;">{{ $no++ }}</td>
+                <td>{{ $surat->nomor_surat }}</td>
+                <td>{{ $surat->asal ?? '-' }}</td>
+                <td style="text-align:center;">
+                    {{ \Carbon\Carbon::parse($surat->tanggal)->format('d-m-Y') }}
+                </td>
+                <td>{{ $surat->perihal }}</td>
+                <td style="text-align:center;">{{ ucfirst($surat->status) }}</td>
+                <td>{{ $surat->keterangan ?? '-' }}</td>
             </tr>
-        </thead>
-        <tbody>
-            @php $no = 1; @endphp
-            @forelse($dataSurat->where('jenis_surat', 'masuk') as $surat)
-                <tr>
-                    <td style="text-align:center;">{{ $no++ }}</td>
-                    <td>{{ $surat->nomor_surat }}</td>
-                    <td style="text-align:center;">{{ \Carbon\Carbon::parse($surat->tanggal)->format('d-m-Y') }}</td>
-                    <td>{{ $surat->perihal }}</td>
-                    <td style="text-align:center;">{{ ucfirst($surat->status) }}</td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="5" style="text-align:center;">Tidak ada data surat masuk.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
-
-    {{-- SURAT KELUAR --}}
-    <div class="subjudul">B. Surat Keluar</div>
-    <table>
-        <thead>
+        @empty
             <tr>
-                <th>No</th>
-                <th>Nomor Surat</th>
-                <th>Tanggal</th>
-                <th>Perihal</th>
-                <th>Status</th>
+                <td colspan="7" style="text-align:center;">Tidak ada data surat masuk.</td>
             </tr>
-        </thead>
-        <tbody>
-            @php $no = 1; @endphp
-            @forelse($dataSurat->where('jenis_surat', 'keluar') as $surat)
-                <tr>
-                    <td style="text-align:center;">{{ $no++ }}</td>
-                    <td>{{ $surat->nomor_surat }}</td>
-                    <td style="text-align:center;">{{ \Carbon\Carbon::parse($surat->tanggal)->format('d-m-Y') }}</td>
-                    <td>{{ $surat->perihal }}</td>
-                    <td style="text-align:center;">{{ ucfirst($surat->status) }}</td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="5" style="text-align:center;">Tidak ada data surat keluar.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+        @endforelse
+    </tbody>
+</table>
 
-    <h3>C. Laporan Disposisi</h3>
+{{-- SURAT KELUAR --}}
+<div class="subjudul">B. Surat Keluar</div>
+<table>
+    <thead>
+        <tr>
+            <th>No</th>
+            <th>Nomor Surat</th>
+            <th>Perihal</th>
+            <th>Tanggal</th>
+            <th>Tujuan</th>
+            <th>Dibuat Oleh</th>
+            <th>Klasifikasi</th>
+        </tr>
+    </thead>
+    <tbody>
+        @php $no = 1; @endphp
+        @forelse($dataSurat->where('jenis_surat', 'keluar') as $surat)
+            <tr>
+                <td style="text-align:center;">{{ $no++ }}</td>
+                <td>{{ $surat->nomor_surat }}</td>
+                <td>{{ $surat->perihal }}</td>
+                <td style="text-align:center;">
+                    {{ \Carbon\Carbon::parse($surat->tanggal)->format('d-m-Y') }}
+                </td>
+                <td>{{ $surat->tujuan ?? '-' }}</td>
+                <td>{{ $surat->dibuat_oleh ?? '-' }}</td>
+                <td style="text-align:center;">{{ ucfirst($surat->status) }}</td>
+            </tr>
+        @empty
+            <tr>
+                <td colspan="7" style="text-align:center;">Tidak ada data surat keluar.</td>
+            </tr>
+        @endforelse
+    </tbody>
+</table>
+
+
+   <h3>C. Laporan Disposisi</h3>
 <table border="1" cellspacing="0" cellpadding="5" width="100%">
     <thead>
         <tr>
             <th>No</th>
             <th>Nomor Surat</th>
             <th>Tanggal</th>
-            <th>Bagian</th>
+            <th>Status Disposisi</th>
+            <th>Tujuan/Bagian</th>
             <th>Catatan</th>
             <th>Instruksi</th>
         </tr>
     </thead>
     <tbody>
-        @foreach($dataSurat as $index => $sm)
+        @php $no=1; @endphp
+        @foreach($disposisiSurat as $sm)
             <tr>
-                <td>{{ $index+1 }}</td>
-                <td>{{ $sm->nomor_surat }}</td>
-                <td>{{ $sm->tanggal }}</td>
-                <td>{{ $sm->disposisi->bagian ?? '-' }}</td>
-                <td>{{ $sm->disposisi->catatan ?? '-' }}</td>
-                <td>{{ $sm->disposisi->instruksi ?? '-' }}</td>
+                <td style="text-align:center;">{{ $no++ }}</td>
+                <td>{{ $sm->no_surat }}</td>
+                <td style="text-align:center;">
+                    {{ \Carbon\Carbon::parse($sm->tanggal_terima)->format('d-m-Y') }}
+                </td>
+
+                @if($sm->disposisi)
+                    <td style="text-align:center;">Ada</td>
+                    <td>{{ $sm->disposisi->dis_bagian }}</td>
+                    <td>{{ $sm->disposisi->catatan }}</td>
+                    <td>{{ $sm->disposisi->instruksi }}</td>
+                @else
+                    <td style="text-align:center;">Tidak Ada</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                @endif
             </tr>
         @endforeach
     </tbody>
 </table>
+
 
     {{-- TANDA TANGAN --}}
     <div class="ttd">
