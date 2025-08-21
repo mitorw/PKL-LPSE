@@ -66,9 +66,9 @@
             <label>Bagian Tujuan</label>
             <select name="dis_bagian" class="form-control">
                 <option value="">-- Pilih Bagian --</option>
-                <option value="Bagian 1">Bagian 1</option>
-                <option value="Bagian 2">Bagian 2</option>
-                <option value="Bagian 3">Bagian 3</option>
+                <option value="Bagian Layanan Pengadaan Secara Elektronik">Bagian Layanan Pengadaan Secara Elektronik</option>
+                <option value="Bagian Advokasi dan Pembinaan">Bagian Advokasi dan Pembinaan</option>
+                <option value="Bagian Pengelolaan Pengadaan Barang dan Jasa">Bagian Pengelolaan Pengadaan Barang dan Jasa</option>
             </select>
         </div>
         <div class="mb-3">
@@ -83,8 +83,8 @@
 
     {{-- Upload PDF --}}
     <div class="mb-3">
-        <label>Upload Scan Surat (PDF)</label>
-        <input type="file" name="file_surat" class="form-control" accept="application/pdf">
+        <label>Upload Scan Surat (PDF/PNG/JPG)</label>
+        <input type="file" name="file_surat" class="form-control" accept=".pdf,.png,.jpg,">
     </div>
 
     <button class="btn btn-success" type="submit">Simpan</button>

@@ -74,9 +74,9 @@
         <label>Bagian Tujuan</label>
         <select name="dis_bagian" class="form-control">
             <option value="">-- Tidak Ada Disposisi --</option>
-            <option value="Bagian 1" {{ old('dis_bagian', $surat->disposisi->dis_bagian ?? '') == 'Bagian 1' ? 'selected' : '' }}>Bagian 1</option>
-            <option value="Bagian 2" {{ old('dis_bagian', $surat->disposisi->dis_bagian ?? '') == 'Bagian 2' ? 'selected' : '' }}>Bagian 2</option>
-            <option value="Bagian 3" {{ old('dis_bagian', $surat->disposisi->dis_bagian ?? '') == 'Bagian 3' ? 'selected' : '' }}>Bagian 3</option>
+            <option value="Bagian Layanan Pengadaan Secara Elektronik" {{ old('dis_bagian', $surat->disposisi->dis_bagian ?? '') == 'Bagian Layanan Pengadaan Secara Elektronik' ? 'selected' : '' }}>Bagian Layanan Pengadaan Secara Elektronik</option>
+            <option value="Bagian Advokasi dan Pembinaan" {{ old('dis_bagian', $surat->disposisi->dis_bagian ?? '') == 'Bagian Advokasi dan Pembinaan' ? 'selected' : '' }}>Bagian Advokasi dan Pembinaan</option>
+            <option value="Bagian Pengelolaan Pengadaan Barang dan Jasa" {{ old('dis_bagian', $surat->disposisi->dis_bagian ?? '') == 'Bagian Pengelolaan Pengadaan Barang dan Jasa' ? 'selected' : '' }}>Bagian Pengelolaan Pengadaan Barang dan Jasa</option>
         </select>
     </div>
 
@@ -97,7 +97,7 @@
     <div class="mb-3">
         <label>File Surat (PDF)</label>
         @if($surat->file_surat)
-            <p>File sekarang: <a href="{{ asset('storage/' . $surat->file_surat) }}" target="_blank">Lihat PDF</a></p>
+            <p>File sekarang: <a href="{{ asset('storage/' . $surat->file_surat) }}" target="_blank">Lihat File</a></p>
         @endif
         <input type="file" name="file_surat" class="form-control">
     </div>
