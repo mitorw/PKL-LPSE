@@ -90,6 +90,12 @@
         LAPORAN INVENTARISASI SURAT <br>
         BIRO PENGADAAN BARANG DAN JASA
     </div>
+    {{-- PERIODE CETAK --}}
+<div style="text-align: center; margin-top: 10px; font-weight: bold; font-size: 12pt;">
+    PERIODE: {{ \Carbon\Carbon::parse($tglAwal)->translatedFormat('d') }}
+    &ndash; {{ \Carbon\Carbon::parse($tglAkhir)->translatedFormat('d F Y') }}
+</div>
+
 
     {{-- SURAT MASUK --}}
 {{-- SURAT MASUK --}}
