@@ -9,6 +9,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\DB;
 
 class LaporanController extends Controller
 {
@@ -61,22 +62,29 @@ class LaporanController extends Controller
         }
 
         // --- Proses SELECT dan UNION ---
-        $suratMasukQuery = $suratMasuk->select(
-            'no_surat as nomor_surat',
-            'tanggal_terima as tanggal',
-            'perihal',
-            'klasifikasi as status',
-            'id_surat_masuk as id'
-        )->selectRaw("'masuk' as jenis_surat");
+       $suratMasukQuery = $suratMasuk->select(
+    'no_surat as nomor_surat',
+    'tanggal_terima as tanggal',
+    'perihal',
+    'klasifikasi as status',
+    'id_surat_masuk as id',
+    'asal_surat as asal',
+    'keterangan',
+    DB::raw('NULL as tujuan'),
+    DB::raw('NULL as dibuat_oleh')
+)->selectRaw("'masuk' as jenis_surat");
 
-        $suratKeluarQuery = $suratKeluar->select(
-            'nomor_surat',
-            'tanggal',
-            'perihal',
-            'klasifikasi as status',
-            'id'
-        )->selectRaw("'keluar' as jenis_surat");
-
+$suratKeluarQuery = $suratKeluar->select(
+    'nomor_surat',
+    'tanggal',
+    'perihal',
+    'klasifikasi as status',
+    'id',
+    DB::raw('NULL as asal'),
+    DB::raw('NULL as keterangan'),
+    'tujuan',
+    'dibuat_oleh'
+)->selectRaw("'keluar' as jenis_surat");
         // Menggabungkan kedua query
         $query = $suratMasukQuery->unionAll($suratKeluarQuery);
 
@@ -92,11 +100,11 @@ class LaporanController extends Controller
 
 public function cetakLaporan(Request $request)
 {
-    // --- Query dasar (tetap seperti sebelumnya) ---
+    // --- Query dasar ---
     $suratMasuk = SuratMasuk::query();
     $suratKeluar = SuratKeluar::query();
 
-    // --- Filter yang sama dengan sebelumnya ---
+    // --- Filter ---
     if ($request->filled('nomor_surat')) {
         $nomorSurat = $request->nomor_surat;
         $suratMasuk->where('no_surat', 'like', '%' . $nomorSurat . '%');
@@ -128,31 +136,38 @@ public function cetakLaporan(Request $request)
         }
     }
 
-    // --- UNION (tetap seperti sebelumnya) ---
+    // --- UNION dengan tambahan kolom ---
     $suratMasukQuery = $suratMasuk->select(
-        'no_surat as nomor_surat',
-        'tanggal_terima as tanggal',
-        'perihal',
-        'klasifikasi as status',
-        'id_surat_masuk as id'
-    )->selectRaw("'masuk' as jenis_surat");
+    'no_surat as nomor_surat',
+    'tanggal_terima as tanggal',
+    'perihal',
+    'klasifikasi as status',
+    'id_surat_masuk as id',
+    'asal_surat as asal',
+    'keterangan',
+    DB::raw('NULL as tujuan'),
+    DB::raw('NULL as dibuat_oleh')
+)->selectRaw("'masuk' as jenis_surat");
 
-    $suratKeluarQuery = $suratKeluar->select(
-        'nomor_surat',
-        'tanggal',
-        'perihal',
-        'klasifikasi as status',
-        'id'
-    )->selectRaw("'keluar' as jenis_surat");
+$suratKeluarQuery = $suratKeluar->select(
+    'nomor_surat',
+    'tanggal',
+    'perihal',
+    'klasifikasi as status',
+    'id',
+    DB::raw('NULL as asal'),
+    DB::raw('NULL as keterangan'),
+    'tujuan',
+    'dibuat_oleh'
+)->selectRaw("'keluar' as jenis_surat");
 
     $query = $suratMasukQuery->unionAll($suratKeluarQuery);
 
     $sortColumn = $request->get('sort', 'tanggal');
     $sortDirection = $request->get('direction', 'desc');
-    $dataSurat = $query->orderBy($sortColumn, $sortDirection)->get(); // <-- A & B tetap ada
+    $dataSurat = $query->orderBy($sortColumn, $sortDirection)->get();
 
-    // --- DATA KHUSUS LAPORAN DISPOSISI (sekadar DARI SuratMasuk) ---
-    // Jika user filter jenis_surat=keluar, maka disposisi kosong (karena relevan di "masuk")
+    // --- DATA DISPOSISI (hanya untuk surat masuk) ---
     if ($request->filled('jenis_surat') && $request->jenis_surat === 'keluar') {
         $disposisiSurat = collect(); // kosong
     } else {
@@ -173,12 +188,13 @@ public function cetakLaporan(Request $request)
             ->get();
     }
 
-    // --- Generate PDF: kirim dua dataset ke view ---
+    // --- Generate PDF ---
     $pdf = Pdf::loadView('admin.Surat.laporan-pdf', compact('dataSurat', 'disposisiSurat'))
               ->setPaper('A4', 'portrait');
 
     return $pdf->stream('Laporan-Surat-' . now()->format('Y-m-d') . '.pdf');
 }
+
 
 
     protected function paginateCollection($items, $perPage, $page = null)
