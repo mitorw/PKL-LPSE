@@ -188,9 +188,16 @@
                             <div class="mb-3">
                                 <input class="form-control" type="file" name="profile_photo" id="formFile"
                                     accept="image/*">
+
+                                <!-- Area Cropping -->
+                                <div id="croppie-container"
+                                    style="width: 100%; height: 300px; margin-top: 15px; display: none;"></div>
+
+
+
                             </div>
-                            <div class="text-end">
-                                <button type="submit" class="btn btn-primary">Simpan Foto</button>
+                            <div class="mt-5">
+                                <button type="button" id="crop-result" class="btn btn-primary">Simpan Foto</button>
                             </div>
                         </form>
 
@@ -237,6 +244,73 @@
                 });
             });
 
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let croppieInstance;
+            const fileInput = document.getElementById('formFile');
+            const croppieContainer = document.getElementById('croppie-container');
+            const croppieDemo = document.getElementById('croppie-demo');
+            const cropBtn = document.getElementById('crop-result');
+
+            fileInput.addEventListener('change', function(event) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    croppieContainer.style.display = 'block';
+
+                    // Hapus instance lama jika ada
+                    if (croppieInstance) {
+                        croppieInstance.destroy();
+                    }
+
+                    // Buat croppie baru
+                    croppieInstance = new Croppie(croppieContainer, {
+                        viewport: {
+                            width: 200,
+                            height: 200,
+                            type: 'circle'
+                        },
+                        boundary: {
+                            width: 300,
+                            height: 300
+                        },
+                        enableOrientation: true
+                    });
+
+
+                    croppieInstance.bind({
+                        url: e.target.result
+                    });
+                };
+                reader.readAsDataURL(event.target.files[0]);
+            });
+
+            cropBtn.addEventListener('click', function() {
+                croppieInstance.result({
+                    type: 'base64',
+                    size: 'viewport'
+                }).then(function(base64) {
+                    // kirim ke server via ajax
+                    fetch("{{ route('profile.photo.update') }}", {
+                            method: "POST",
+                            headers: {
+                                "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                image: base64
+                            }) // base64 dari croppie/cropper
+                        })
+
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                location.reload(); // reload halaman supaya foto berubah
+                            }
+                        });
+                });
+            });
         });
     </script>
 @endpush

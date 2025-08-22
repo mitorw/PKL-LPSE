@@ -62,26 +62,32 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
-    public function updatePhoto(Request $request)
-    {
-        $request->validate([
-            'profile_photo' => 'required|image|mimes:jpg,jpeg,png|max:2048',
-        ]);
+public function updatePhoto(Request $request)
+{
+    $request->validate([
+        'image' => 'required|string',
+    ]);
 
-        $user = Auth::user();
+    $user = Auth::user();
 
-        // Hapus foto lama jika ada
-        if ($user->profile_photo && \Storage::exists('public/' . $user->profile_photo)) {
-            \Storage::delete('public/' . $user->profile_photo);
-        }
-
-        // Simpan foto baru
-        $path = $request->file('profile_photo')->store('profile_photos', 'public');
-
-        // Update database
-        $user->profile_photo = $path;
-        $user->save();
-
-        return back()->with('success', 'Foto profil berhasil diperbarui.');
+    // Hapus foto lama jika ada
+    if ($user->profile_photo && \Storage::exists('public/' . $user->profile_photo)) {
+        \Storage::delete('public/' . $user->profile_photo);
     }
+
+    // Proses base64
+    $image = $request->image;
+    $image = preg_replace('#^data:image/\w+;base64,#i', '', $image);
+    $image = str_replace(' ', '+', $image);
+    $imageName = 'profile_' . uniqid() . '.png';
+
+    \Storage::disk('public')->put('profile_photos/' . $imageName, base64_decode($image));
+
+    // Update database
+    $user->profile_photo = 'profile_photos/' . $imageName;
+    $user->save();
+
+    return response()->json(['success' => true]);
+}
+
 }

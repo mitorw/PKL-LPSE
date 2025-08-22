@@ -5,6 +5,8 @@
     <title>Sistem Manajemen Surat</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Croppie CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css" />
 
     <style>
         body {
@@ -22,7 +24,8 @@
             padding-top: 5px;
             /* Menambahkan transisi untuk efek animasi yang mulus */
             transition: margin-left 0.3s ease-in-out;
-            z-index: 1030; /* Pastikan sidebar di atas konten lain */
+            z-index: 1030;
+            /* Pastikan sidebar di atas konten lain */
         }
 
         .sidebar a {
@@ -40,7 +43,8 @@
         /* Wrapper untuk konten utama (header + content) */
         #content-wrapper {
             margin-left: 240px;
-            padding-top: 0; /* Header akan menangani padding atas */
+            padding-top: 0;
+            /* Header akan menangani padding atas */
             transition: margin-left 0.3s ease-in-out;
         }
 
@@ -69,14 +73,20 @@
 
         /* Tombol untuk toggle sidebar */
         #sidebarToggle {
-            background: transparent; /* Latar belakang transparan */
-            border: 1px solid rgba(255, 255, 255, 0.3); /* Border tipis semi-transparan */
+            background: transparent;
+            /* Latar belakang transparan */
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            /* Border tipis semi-transparan */
             color: white;
-            font-size: 20px; /* Sedikit diperkecil agar pas dengan padding */
+            font-size: 20px;
+            /* Sedikit diperkecil agar pas dengan padding */
             margin-right: 15px;
-            padding: 6px 12px; /* Memberi ruang di dalam tombol */
-            border-radius: 8px; /* Sudut yang sedikit melengkung */
-            cursor: pointer; /* Mengubah kursor menjadi tangan saat di-hover */
+            padding: 6px 12px;
+            /* Memberi ruang di dalam tombol */
+            border-radius: 8px;
+            /* Sudut yang sedikit melengkung */
+            cursor: pointer;
+            /* Mengubah kursor menjadi tangan saat di-hover */
 
             /* Menambahkan transisi untuk efek hover yang mulus */
             transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
@@ -84,22 +94,27 @@
 
         /* Efek saat kursor mouse berada di atas tombol */
         #sidebarToggle:hover {
-            background-color: rgba(255, 255, 255, 0.1); /* Latar belakang sedikit menyala */
-            border-color: rgba(255, 255, 255, 0.7); /* Border menjadi lebih jelas */
+            background-color: rgba(255, 255, 255, 0.1);
+            /* Latar belakang sedikit menyala */
+            border-color: rgba(255, 255, 255, 0.7);
+            /* Border menjadi lebih jelas */
         }
 
         /* === KONDISI KETIKA SIDEBAR DISEMBUNYIKAN === */
         body.sidebar-toggled .sidebar {
-            margin-left: -240px; /* Sembunyikan sidebar ke kiri */
+            margin-left: -240px;
+            /* Sembunyikan sidebar ke kiri */
         }
 
         body.sidebar-toggled #content-wrapper {
-            margin-left: 0; /* Konten utama memakai lebar penuh */
+            margin-left: 0;
+            /* Konten utama memakai lebar penuh */
         }
 
 
         /* === ATURAN RESPONSIVE UNTUK MOBILE === */
         @media (max-width: 768px) {
+
             /* Secara default, sembunyikan sidebar di mobile */
             .sidebar {
                 margin-left: -240px;
@@ -175,9 +190,8 @@
                 <span class="me-2">Hallo, {{ Auth::user()->name }}</span>
                 <a href="{{ route('profile.edit') }}" class="profile-link d-flex align-items-center">
                     @if (Auth::user()->profile_photo)
-                        <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}"
-                            alt="Foto Profil" class="rounded-circle" width="40" height="40"
-                            style="object-fit: cover;">
+                        <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="Foto Profil"
+                            class="rounded-circle" width="40" height="40" style="object-fit: cover;">
                     @else
                         <i class="fa fa-user-circle fa-2x text-secondary"></i>
                     @endif
@@ -193,17 +207,20 @@
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+    <!-- Croppie JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js"></script>
+
 
     {{-- SCRIPT BARU UNTUK FUNGSI TOGGLE SIDEBAR --}}
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
 
             const sidebarToggle = document.getElementById('sidebarToggle');
             const contentWrapper = document.getElementById('content-wrapper');
 
             // Event listener untuk Tombol Hamburger
-            sidebarToggle.addEventListener('click', function (event) {
+            sidebarToggle.addEventListener('click', function(event) {
                 // HENTIKAN event agar tidak "menggelembung" ke content-wrapper
                 event.stopPropagation();
 
@@ -212,7 +229,7 @@
             });
 
             // Event listener untuk menutup sidebar saat klik di konten
-            contentWrapper.addEventListener('click', function () {
+            contentWrapper.addEventListener('click', function() {
                 const isSidebarToggled = document.body.classList.contains('sidebar-toggled');
                 const isMobile = window.innerWidth <= 768;
 
