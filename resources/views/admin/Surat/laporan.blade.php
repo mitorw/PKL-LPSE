@@ -64,13 +64,16 @@
             </form>
 
             <script>
-                function cetakLaporan() {
-                    const form = document.getElementById('filterForm');
-                    const url = '{{ route('laporan.cetak') }}';
-                    const queryString = new URLSearchParams(new FormData(form)).toString();
-                    window.location.href = `${url}?${queryString}`;
-                }
-            </script>
+    function cetakLaporan() {
+        const form = document.getElementById('filterForm');
+        const url = '{{ route('laporan.cetak') }}';
+        const queryString = new URLSearchParams(new FormData(form)).toString();
+
+        // tetap pakai query string, tapi dibuka di tab baru
+        window.open(`${url}?${queryString}`, '_blank', 'noopener,noreferrer');
+    }
+</script>
+
         </div>
     </div>
 

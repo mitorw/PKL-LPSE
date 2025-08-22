@@ -93,10 +93,10 @@
     {{-- PERIODE CETAK --}}
 <div style="text-align: center; margin-top: 10px; font-weight: bold; font-size: 12pt;">
     @if ($tglAwal == $tglAkhir)
-        PERIODE: {{ \Carbon\Carbon::parse($tglAwal)->translatedFormat('d F Y') }}
+        PERIODE: {{ \Carbon\Carbon::now()->locale('id')->translatedFormat('d F Y') }}
     @else
-        PERIODE: {{ \Carbon\Carbon::parse($tglAwal)->translatedFormat('d') }}
-        &ndash; {{ \Carbon\Carbon::parse($tglAkhir)->translatedFormat('d F Y') }}
+        PERIODE: {{ \Carbon\Carbon::now()->locale('id')->translatedFormat('d F Y') }}
+        &ndash; {{ \Carbon\Carbon::now()->locale('id')->translatedFormat('d F Y') }}
     @endif
 </div>
 
