@@ -26,7 +26,7 @@
         <input type="text" name="asal_surat" class="form-control" value="{{ old('asal_surat') }}" required>
     </div>
 
-    <div class="mb-3">
+    <div class="mb-3" style="width: 200px">
         <label>Tanggal Terima</label>
         <input type="date" name="tanggal_terima" class="form-control" value="{{ old('tanggal_terima') }}" required>
     </div>

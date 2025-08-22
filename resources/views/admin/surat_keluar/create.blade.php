@@ -31,7 +31,7 @@
                 <input type="text" name="tujuan" class="form-control" required>
             </div>
 
-            <div class="mb-3">
+            <div class="mb-3" style="width: 200px">
                 <label>Tanggal</label>
                 <input type="date" id="tanggal" name="tanggal" class="form-control" placeholder="Pilih Tanggal.." required>
             </div>
