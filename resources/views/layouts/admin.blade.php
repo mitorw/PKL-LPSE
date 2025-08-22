@@ -197,16 +197,30 @@
 
     {{-- SCRIPT BARU UNTUK FUNGSI TOGGLE SIDEBAR --}}
     <script>
-        // Pastikan DOM sudah termuat sepenuhnya sebelum menjalankan script
         document.addEventListener('DOMContentLoaded', function () {
-            // Ambil elemen tombol toggle
-            const sidebarToggle = document.getElementById('sidebarToggle');
 
-            // Tambahkan event listener untuk 'click'
-            sidebarToggle.addEventListener('click', function () {
-                // Toggle class 'sidebar-toggled' pada body
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const contentWrapper = document.getElementById('content-wrapper');
+
+            // Event listener untuk Tombol Hamburger
+            sidebarToggle.addEventListener('click', function (event) {
+                // HENTIKAN event agar tidak "menggelembung" ke content-wrapper
+                event.stopPropagation();
+
+                // Lakukan aksi seperti biasa
                 document.body.classList.toggle('sidebar-toggled');
             });
+
+            // Event listener untuk menutup sidebar saat klik di konten
+            contentWrapper.addEventListener('click', function () {
+                const isSidebarToggled = document.body.classList.contains('sidebar-toggled');
+                const isMobile = window.innerWidth <= 768;
+
+                if (isSidebarToggled && isMobile) {
+                    document.body.classList.remove('sidebar-toggled');
+                }
+            });
+
         });
     </script>
 
