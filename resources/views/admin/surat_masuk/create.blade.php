@@ -88,6 +88,7 @@
     </div>
 
     <button class="btn btn-success" type="submit">Simpan</button>
+    <a href="{{ route('surat_masuk.index') }}" class="btn btn-secondary">Tutup</a>
 </form>
 
 <script>

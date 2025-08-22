@@ -33,7 +33,7 @@
 
             <div class="mb-3">
                 <label>Tanggal</label>
-                <input type="date" name="tanggal" class="form-control" required>
+                <input type="date" id="tanggal" name="tanggal" class="form-control" placeholder="Pilih Tanggal.." required>
             </div>
 
             <div class="mb-3">
@@ -61,6 +61,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary">Simpan</button>
+            <a href="{{ route('surat_keluar.index') }}" class="btn btn-secondary">Tutup</a>
         </form>
     </div>
 @endsection

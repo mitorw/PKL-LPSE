@@ -112,7 +112,7 @@
                         <td data-bs-toggle="modal" data-bs-target="#detailSuratKeluarModal{{ $surat->id }}">
                             {{ $surat->tujuan }}</td>
                         <td data-bs-toggle="modal" data-bs-target="#detailSuratKeluarModal{{ $surat->id }}">
-                            {{ $surat->tanggal }}</td>
+                            {{ date('d/m/Y', strtotime($surat->tanggal)) }}</td>
                         <td data-bs-toggle="modal" data-bs-target="#detailSuratKeluarModal{{ $surat->id }}">
                             {{ $surat->dibuat_oleh }}</td>
                         <td data-bs-toggle="modal" data-bs-target="#detailSuratKeluarModal{{ $surat->id }}">
@@ -197,7 +197,7 @@
                                 </tr>
                                 <tr>
                                     <th>Tanggal</th>
-                                    <td>{{ $surat->tanggal }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($surat->tanggal)->locale('id')->translatedFormat('d F Y') }}</td>
                                 </tr>
                                 <tr>
                                     <th>Perihal</th>
