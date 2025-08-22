@@ -9,6 +9,8 @@
     <style>
         body {
             background-color: #f5f5f5;
+            /* Mencegah scroll horizontal saat sidebar transisi */
+            overflow-x: hidden;
         }
 
         .sidebar {
@@ -18,6 +20,9 @@
             color: white;
             position: fixed;
             padding-top: 5px;
+            /* Menambahkan transisi untuk efek animasi yang mulus */
+            transition: margin-left 0.3s ease-in-out;
+            z-index: 1030; /* Pastikan sidebar di atas konten lain */
         }
 
         .sidebar a {
@@ -32,8 +37,14 @@
             background-color: #ffffff33;
         }
 
-        .content {
+        /* Wrapper untuk konten utama (header + content) */
+        #content-wrapper {
             margin-left: 240px;
+            padding-top: 0; /* Header akan menangani padding atas */
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        .content {
             padding: 20px;
         }
 
@@ -41,46 +52,84 @@
             border-radius: 10px;
         }
 
-        /* CSS untuk header bar yang baru */
+        /* Header bar yang menempel */
         .header-bar {
             color: white;
             height: 95px;
-            margin-left: 240px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            /* Menjaga agar konten terbagi rata */
             padding: 0 20px;
-        }
-
-        /* public/css/app.css */
-
-        .header-sticky {
             position: sticky;
-            /* Membuat elemen menempel */
             top: 0;
-            /* Menempel di bagian paling atas viewport */
             z-index: 1020;
-            /* Memastikan header selalu di atas konten lain */
             background-color: #5c6bc0;
-            /* Memberi warna latar agar konten di bawah tidak tembus pandang */
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            /* Opsional: memberi efek bayangan agar terlihat melayang */
         }
 
-        /* Gaya untuk tautan profil */
+        /* Tombol untuk toggle sidebar */
+        #sidebarToggle {
+            background: transparent; /* Latar belakang transparan */
+            border: 1px solid rgba(255, 255, 255, 0.3); /* Border tipis semi-transparan */
+            color: white;
+            font-size: 20px; /* Sedikit diperkecil agar pas dengan padding */
+            margin-right: 15px;
+            padding: 6px 12px; /* Memberi ruang di dalam tombol */
+            border-radius: 8px; /* Sudut yang sedikit melengkung */
+            cursor: pointer; /* Mengubah kursor menjadi tangan saat di-hover */
+
+            /* Menambahkan transisi untuk efek hover yang mulus */
+            transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+        }
+
+        /* Efek saat kursor mouse berada di atas tombol */
+        #sidebarToggle:hover {
+            background-color: rgba(255, 255, 255, 0.1); /* Latar belakang sedikit menyala */
+            border-color: rgba(255, 255, 255, 0.7); /* Border menjadi lebih jelas */
+        }
+
+        /* === KONDISI KETIKA SIDEBAR DISEMBUNYIKAN === */
+        body.sidebar-toggled .sidebar {
+            margin-left: -240px; /* Sembunyikan sidebar ke kiri */
+        }
+
+        body.sidebar-toggled #content-wrapper {
+            margin-left: 0; /* Konten utama memakai lebar penuh */
+        }
+
+
+        /* === ATURAN RESPONSIVE UNTUK MOBILE === */
+        @media (max-width: 768px) {
+            /* Secara default, sembunyikan sidebar di mobile */
+            .sidebar {
+                margin-left: -240px;
+            }
+
+            #content-wrapper {
+                margin-left: 0;
+            }
+
+            /* Saat di-toggle, tampilkan sidebar */
+            body.sidebar-toggled .sidebar {
+                margin-left: 0;
+            }
+
+            /* Di mobile, saat sidebar muncul, kita tidak ingin kontennya terdorong */
+            /* Ini akan membuat sidebar muncul di atas konten (overlay) */
+            body.sidebar-toggled #content-wrapper {
+                margin-left: 0;
+            }
+        }
+
+
         .profile-link {
             color: white;
-            /* Mengatur warna ikon */
             text-decoration: none;
-            /* Menghapus garis bawah */
             transition: color 0.3s;
-            /* Efek transisi saat hover */
         }
 
         .profile-link:hover {
             color: #ffffff33;
-            /* Mengubah warna saat di-hover */
         }
     </style>
 </head>
@@ -112,13 +161,18 @@
         </form>
     </div>
 
-    {{-- Header bar --}}
-    <div class="header-bar header-sticky d-flex justify-content-between align-items-center"> {{-- <-- TAMBAHKAN class 'header-sticky' --}}
-        <h2 class="mb-0">{{ $pageTitle ?? 'Halaman' }}</h2>
+    {{-- Wrapper untuk Konten Utama --}}
+    <div id="content-wrapper">
+        {{-- Header bar --}}
+        <div class="header-bar">
+            <div class="d-flex align-items-center">
+                <button id="sidebarToggle"><i class="fas fa-bars"></i></button>
+                <h2 class="mb-0">{{ $pageTitle ?? 'Halaman' }}</h2>
+            </div>
 
-        {{-- Profile --}}
-        <div class="d-flex align-items-center">
-            <span class="me-2">Hallo, {{ Auth::user()->name }}</span>
+            {{-- Profile --}}
+            <div class="d-flex align-items-center">
+                <span class="me-2">Hallo, {{ Auth::user()->name }}</span>
                 <a href="{{ route('profile.edit') }}" class="profile-link d-flex align-items-center">
                     @if (Auth::user()->profile_photo)
                         <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}"
@@ -127,18 +181,34 @@
                     @else
                         <i class="fa fa-user-circle fa-2x text-secondary"></i>
                     @endif
+                </a>
+            </div>
+        </div>
 
-            </a>
+        {{-- Konten Utama dari setiap halaman --}}
+        <div class="content">
+            @yield('content')
         </div>
     </div>
 
 
-    <div class="content" style="padding-top: 20px;">
-        @yield('content')
-    </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+    {{-- SCRIPT BARU UNTUK FUNGSI TOGGLE SIDEBAR --}}
+    <script>
+        // Pastikan DOM sudah termuat sepenuhnya sebelum menjalankan script
+        document.addEventListener('DOMContentLoaded', function () {
+            // Ambil elemen tombol toggle
+            const sidebarToggle = document.getElementById('sidebarToggle');
+
+            // Tambahkan event listener untuk 'click'
+            sidebarToggle.addEventListener('click', function () {
+                // Toggle class 'sidebar-toggled' pada body
+                document.body.classList.toggle('sidebar-toggled');
+            });
+        });
+    </script>
 
 </body>
 
