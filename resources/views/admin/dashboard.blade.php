@@ -49,7 +49,11 @@
                 <div class="card shadow p-3">
                     <h5>Proporsi Surat Bulan Ini</h5>
                     <canvas id="pieChart"></canvas>
+
+                    <h6 class="mt-1">Total Surat Bulan Ini {{ $totalSuratBulanIni }} Surat</h6>
                 </div>
+
+
             </div>
         </div>
     </div>
