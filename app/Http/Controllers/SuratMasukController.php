@@ -144,35 +144,50 @@ class SuratMasukController extends Controller
             'perihal' => 'required|string',
             'klasifikasi' => 'required|in:Rahasia,Penting,Biasa',
             'file_surat' => 'nullable|mimes:pdf,png,jpg,jpeg|max:2048',
-            'dis_bagian' => 'nullable|in:Bagian Layanan Pengadaan Secara Elektronik,Bagian Advokasi dan Pembinaan,Bagian Pengelolaan Pengadaan Barang dan Jasa',
+            // Tambahkan validasi untuk status disposisi
+            'disposisi_status' => 'required|in:ada,tidak',
+            'dis_bagian' => 'required_if:disposisi_status,ada|in:Bagian Layanan Pengadaan Secara Elektronik,Bagian Advokasi dan Pembinaan,Bagian Pengelolaan Pengadaan Barang dan Jasa',
         ]);
 
         $surat = SuratMasuk::findOrFail($id);
         $idDisposisi = $surat->id_disposisi;
 
-        if ($request->filled('dis_bagian')) {
+        // LOGIKA BARU UNTUK MENGELOLA DISPOSISI
+        if ($request->disposisi_status === 'ada') {
+            // JIKA USER INGIN ADA DISPOSISI (CREATE ATAU UPDATE)
             $disposisiData = [
                 'dis_bagian' => $request->dis_bagian,
                 'catatan' => $request->catatan,
                 'instruksi' => $request->instruksi
             ];
+
             if ($idDisposisi) {
+                // Jika sudah ada, update disposisi yang lama
                 Disposisi::find($idDisposisi)->update($disposisiData);
             } else {
+                // Jika belum ada, buat disposisi baru
                 $disposisi = Disposisi::create($disposisiData);
-                $idDisposisi = $disposisi->id_disposisi;
+                $idDisposisi = $disposisi->id_disposisi; // Dapatkan ID baru
+            }
+        } else {
+            // JIKA USER MEMILIH "TIDAK ADA" DISPOSISI (DELETE)
+            if ($idDisposisi) {
+                // Jika surat ini punya disposisi, hapus disposisinya
+                Disposisi::find($idDisposisi)->delete();
+                $idDisposisi = null; // Set ID menjadi null untuk diupdate di tabel surat
             }
         }
 
+        // ... (Logika update file Anda tetap sama) ...
         $fileSuratPath = $surat->file_surat;
         if ($request->hasFile('file_surat')) {
-            // Hapus file lama jika ada
             if ($fileSuratPath && Storage::disk('public')->exists($fileSuratPath)) {
                 Storage::disk('public')->delete($fileSuratPath);
             }
             $fileSuratPath = $request->file('file_surat')->store('surat_masuk', 'public');
         }
 
+        // Update data surat masuk
         $surat->update([
             'no_surat' => $request->no_surat,
             'asal_surat' => $request->asal_surat,
@@ -180,7 +195,7 @@ class SuratMasukController extends Controller
             'perihal' => $request->perihal,
             'keterangan' => $request->keterangan,
             'klasifikasi' => $request->klasifikasi,
-            'id_disposisi' => $idDisposisi,
+            'id_disposisi' => $idDisposisi, // Simpan ID disposisi yang baru (atau null)
             'file_surat' => $fileSuratPath
         ]);
 

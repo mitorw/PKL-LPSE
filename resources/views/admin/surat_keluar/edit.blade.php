@@ -67,11 +67,11 @@
             <input type="file" name="isi_surat" class="form-control">
         </div>
 
-        <button class="btn btn-success" type="submit">Simpan</button>
+        <button class="btn btn-success" type="submit">Simpan Perubahan</button>
     </form>
 
     <div class="mt-3">
-        <a href="{{ route('surat_keluar.index') }}" class="btn btn-secondary">Kembali</a>
+        <a href="{{ route('surat_keluar.index') }}" class="btn btn-secondary">Batal</a>
     </div>
     </div>
 @endsection
