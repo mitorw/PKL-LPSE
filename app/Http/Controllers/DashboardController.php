@@ -19,14 +19,16 @@ class DashboardController extends Controller
         $suratKeluarCount = SuratKeluar::count();
         $penggunaCount = User::count();
 
+        \Carbon\Carbon::setLocale('id');
+
         // Data untuk Bar Chart (6 Bulan Terakhir)
         $barChartLabels = [];
         $suratMasukData = [];
         $suratKeluarData = [];
 
         for ($i = 5; $i >= 0; $i--) {
-            $date = Carbon::now()->subMonths($i);
-            $bulan = $date->format('F');
+            $date = \Carbon\Carbon::now()->subMonths($i);
+            $bulan = $date->translatedFormat('F');
             $tahun = $date->format('Y');
 
             array_push($barChartLabels, $bulan);

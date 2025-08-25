@@ -63,6 +63,10 @@
     const suratKeluarData = @json($suratKeluarData);
     const pieChartData = @json($pieChartData);
 
+
+    // Inisialisasi Chart.js
+    Chart.register(ChartDataLabels);
+
     // BAR CHART
     const barCtx = document.getElementById('barChart').getContext('2d');
     const barChart = new Chart(barCtx, {
@@ -84,6 +88,14 @@
             }]
         },
         options: {
+            plugins: {
+                datalabels: {
+                    color: '#fff', // Mengubah warna teks label menjadi putih
+                    font: {
+                        weight: 'bold' // Membuat teks label menjadi tebal
+                    }
+                }
+            },
             scales: {
                 y: {
                     beginAtZero: true
@@ -110,6 +122,30 @@
                 ],
                 hoverOffset: 4
             }]
+        },
+
+        options: {
+            plugins: {
+                datalabels: {
+                    // Fungsi untuk format tampilan label
+                    formatter: (value, context) => {
+                        // Dapatkan semua data dalam dataset
+                        const datapoints = context.chart.data.datasets[0].data;
+                        // Hitung total dari semua data
+                        const total = datapoints.reduce((total, datapoint) => total + datapoint, 0);
+                        // Hitung persentase
+                        const percentage = (value / total) * 100;
+                        // Tampilkan dengan 1 angka di belakang koma dan simbol %
+                        // Jika tidak ada data, tampilkan 0%
+                        return total > 0 ? percentage.toFixed(1) + "%" : "0%";
+                    },
+                    color: '#fff', // Warna teks persentase
+                    font: {
+                        weight: 'bold',
+                        size: 14,
+                    }
+                }
+            }
         }
     });
 </script>
