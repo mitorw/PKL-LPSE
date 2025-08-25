@@ -60,7 +60,7 @@
         </div>
         <!-- File Surat -->
         <div class="mb-3">
-            <label>Isi Surat (PDF)</label>
+            <label>Isi Surat (PDF/PNG/JPG)</label>
             @if ($surat->isi_surat)
                 <p>File sekarang: <a href="{{ asset('storage/' . $surat->isi_surat) }}" target="_blank">Lihat PDF</a></p>
             @endif

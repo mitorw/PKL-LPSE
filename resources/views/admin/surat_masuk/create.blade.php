@@ -84,7 +84,7 @@
     {{-- Upload PDF --}}
     <div class="mb-3">
         <label>Upload Scan Surat (PDF/PNG/JPG)</label>
-        <input type="file" name="file_surat" class="form-control" accept=".pdf,.png,.jpg,">
+        <input type="file" name="file_surat" class="form-control" accept=".pdf,.png,.jpg," required>
     </div>
 
     <button class="btn btn-success" type="submit">Simpan</button>

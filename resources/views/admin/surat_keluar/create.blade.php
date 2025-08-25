@@ -57,7 +57,7 @@
 
             <div class="mb-3">
                 <label>File Surat (PDF/PNG/JPG)</label>
-                <input type="file" name="isi_surat" class="form-control">
+                <input type="file" name="isi_surat" class="form-control" required>
             </div>
 
             <button type="submit" class="btn btn-primary">Simpan</button>

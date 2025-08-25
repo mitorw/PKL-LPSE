@@ -62,7 +62,7 @@ class SuratKeluarController extends Controller
             'tanggal' => 'required|date',
             'dibuat_oleh' => 'required|max:50',
             'klasifikasi' => 'required|in:biasa,penting,rahasia',
-            'isi_surat' => 'nullable|mimes:pdf,png,jpg,jpeg|max:2048'
+            'isi_surat' => 'required|mimes:pdf,png,jpg,jpeg|max:2048'
         ]);
 
         $filePath = null;

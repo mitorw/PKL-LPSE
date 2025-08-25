@@ -92,7 +92,7 @@ class SuratMasukController extends Controller
             'tanggal_terima' => 'required|date',
             'perihal' => 'required|string',
             'klasifikasi' => 'required|in:Rahasia,Penting,Biasa',
-            'file_surat' => 'nullable|mimes:pdf,png,jpg,jpeg|max:2048',
+            'file_surat' => 'required|mimes:pdf,png,jpg,jpeg|max:2048',
             'dis_bagian' => 'nullable|in:Bagian Layanan Pengadaan Secara Elektronik, Bagian Advokasi dan Pembinaan, Bagian Pengelolaan Pengadaan Barang dan Jasa',
         ]);
 
