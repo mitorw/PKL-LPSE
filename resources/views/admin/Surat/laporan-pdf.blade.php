@@ -100,12 +100,24 @@
     @endif
 </div>
 
+{{-- PIE CHART SURAT --}}
+<div class="subjudul">A. PIE CHART SURAT</div>
+<div style="text-align:center; margin-top:20px;">
+    <img src="data:image/png;base64,{{ $chartBase64 }}" alt="Pie Chart"
+         style="width:300px; height:auto;">
+    <p style="font-size:11pt; margin-top:5px;">
+        Total Surat Masuk: {{ $dataSurat->where('jenis_surat','masuk')->count() }} |
+        Total Surat Keluar: {{ $dataSurat->where('jenis_surat','keluar')->count() }}
+    </p>
+</div>
+
+
 
 
 
     {{-- SURAT MASUK --}}
 {{-- SURAT MASUK --}}
-<div class="subjudul">A. Surat Masuk</div>
+<div class="subjudul">B. Surat Masuk</div>
 <table>
     <thead>
         <tr>
@@ -141,7 +153,7 @@
 </table>
 
 {{-- SURAT KELUAR --}}
-<div class="subjudul">B. Surat Keluar</div>
+<div class="subjudul">C. Surat Keluar</div>
 <table>
     <thead>
         <tr>
@@ -177,7 +189,7 @@
 </table>
 
 
-   <h3>C. Laporan Disposisi</h3>
+   <h3>D. Laporan Disposisi</h3>
 <table border="1" cellspacing="0" cellpadding="5" width="100%">
     <thead>
         <tr>
