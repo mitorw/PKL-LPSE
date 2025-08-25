@@ -219,6 +219,10 @@ class LaporanController extends Controller
                 'datasets' => [[
                     'data' => [$totalMasuk, $totalKeluar],
                     'backgroundColor' => ['#198754', '#dc3545'],
+                    'datalabels' => [
+                        'color' => '#fff',
+                        'font' => ['weight' => 'bold']
+                    ]
                 ]]
             ],
             'options' => [
