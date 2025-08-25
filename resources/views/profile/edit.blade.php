@@ -2,6 +2,34 @@
 
 @section('content')
     <h2>Profil Pengguna</h2>
+
+   {{-- ALERT BERHASIL --}}
+@if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
+{{-- ALERT GAGAL (custom dari controller) --}}
+@if(session('error'))
+    <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
+{{-- ALERT VALIDASI LARAVEL --}}
+@if($errors->updatePassword->any())
+    <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+        <ul class="mb-0">
+            @foreach($errors->updatePassword->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
     <style>
         .profile-header {
             display: flex;
