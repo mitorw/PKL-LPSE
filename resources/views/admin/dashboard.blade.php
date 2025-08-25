@@ -47,10 +47,10 @@
             {{-- Kolom untuk Pie Chart --}}
             <div class="col-md-4">
                 <div class="card shadow p-3">
-                    <h5>Proporsi Surat Bulan Ini</h5>
+                    <h5>Proporsi Surat Bulan {{ $namaBulanIni }}</h5>
                     <canvas id="pieChart"></canvas>
 
-                    <h6 class="mt-1">Total Surat Bulan Ini {{ $totalSuratBulanIni }} Surat</h6>
+                    <h6 class="mt-1">Total Surat Bulan {{ $namaBulanIni }} : {{ $totalSuratBulanIni }} Surat</h6>
                 </div>
 
 

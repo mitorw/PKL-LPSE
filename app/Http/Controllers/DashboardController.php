@@ -54,6 +54,7 @@ class DashboardController extends Controller
 
         $pieChartData = [$pieChartSuratMasuk, $pieChartSuratKeluar];
         $totalSuratBulanIni = $pieChartSuratMasuk + $pieChartSuratKeluar;
+        $namaBulanIni = $currentMonth->translatedFormat('F');
 
         // Kirim semua data ke view HANYA SEKALI di akhir
         return view('admin.dashboard', [
@@ -70,6 +71,8 @@ class DashboardController extends Controller
 
             // Variabel baru untuk total surat
             'totalSuratBulanIni' => $totalSuratBulanIni,
+            'namaBulanIni' => $namaBulanIni,
+
 
             // Variabel tambahan
             'pageTitle' => 'Dashboard'
