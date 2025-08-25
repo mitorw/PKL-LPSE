@@ -7,7 +7,7 @@
         body {
             font-family: 'Times New Roman', Times, serif;
             font-size: 12pt;
-            margin: 2cm 2.5cm;
+            margin: 0.5cm 1cm;
         }
 
         table {
