@@ -247,70 +247,89 @@
         });
     </script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            let croppieInstance;
-            const fileInput = document.getElementById('formFile');
-            const croppieContainer = document.getElementById('croppie-container');
-            const croppieDemo = document.getElementById('croppie-demo');
-            const cropBtn = document.getElementById('crop-result');
+document.addEventListener('DOMContentLoaded', function() {
+    let croppieInstance;
+    const fileInput = document.getElementById('formFile');
+    const croppieContainer = document.getElementById('croppie-container');
+    const cropBtn = document.getElementById('crop-result');
 
-            fileInput.addEventListener('change', function(event) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    croppieContainer.style.display = 'block';
+    fileInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
 
-                    // Hapus instance lama jika ada
-                    if (croppieInstance) {
-                        croppieInstance.destroy();
-                    }
+        if (!file) return;
 
-                    // Buat croppie baru
-                    croppieInstance = new Croppie(croppieContainer, {
-                        viewport: {
-                            width: 200,
-                            height: 200,
-                            type: 'circle'
-                        },
-                        boundary: {
-                            width: 300,
-                            height: 300
-                        },
-                        enableOrientation: true
-                    });
+        // ✅ Validasi ekstensi / MIME type
+        const validTypes = ["image/jpeg", "image/jpg", "image/png"];
+        if (!validTypes.includes(file.type)) {
+            alert("❌ Hanya file JPG, JPEG, atau PNG yang diperbolehkan!");
+            fileInput.value = ""; // reset input
+            return;
+        }
 
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            croppieContainer.style.display = 'block';
 
-                    croppieInstance.bind({
-                        url: e.target.result
-                    });
-                };
-                reader.readAsDataURL(event.target.files[0]);
+            // Hapus instance lama
+            if (croppieInstance) {
+                croppieInstance.destroy();
+            }
+
+            // Buat croppie baru
+            croppieInstance = new Croppie(croppieContainer, {
+                viewport: {
+                    width: 200,
+                    height: 200,
+                    type: 'circle'
+                },
+                boundary: {
+                    width: 300,
+                    height: 300
+                },
+                enableOrientation: true
             });
 
-            cropBtn.addEventListener('click', function() {
-                croppieInstance.result({
-                    type: 'base64',
-                    size: 'viewport'
-                }).then(function(base64) {
-                    // kirim ke server via ajax
-                    fetch("{{ route('profile.photo.update') }}", {
-                            method: "POST",
-                            headers: {
-                                "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify({
-                                image: base64
-                            }) // base64 dari croppie/cropper
-                        })
+            croppieInstance.bind({
+                url: e.target.result
+            });
+        };
+        reader.readAsDataURL(file);
+    });
 
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.success) {
-                                location.reload(); // reload halaman supaya foto berubah
-                            }
-                        });
-                });
+    cropBtn.addEventListener('click', function() {
+        if (!croppieInstance) {
+            alert("⚠️ Silakan pilih foto dulu!");
+            return;
+        }
+
+        croppieInstance.result({
+            type: 'base64',
+            size: 'viewport'
+        }).then(function(base64) {
+            fetch("{{ route('profile.photo.update') }}", {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    image: base64
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert("❌ Gagal menyimpan foto profil!");
+                }
+            })
+            .catch(() => {
+                alert("❌ Terjadi error saat mengirim data!");
             });
         });
+    });
+});
+
     </script>
 @endpush

@@ -62,32 +62,33 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
-public function updatePhoto(Request $request)
-{
-    $request->validate([
-        'image' => 'required|string',
-    ]);
+    public function updatePhoto(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|string', // karena dikirim base64 string
+        ]);
 
-    $user = Auth::user();
+        $user = Auth::user();
 
-    // Hapus foto lama jika ada
-    if ($user->profile_photo && \Storage::exists('public/' . $user->profile_photo)) {
-        \Storage::delete('public/' . $user->profile_photo);
+        // Hapus foto lama jika ada
+        if ($user->profile_photo && \Storage::exists('public/' . $user->profile_photo)) {
+            \Storage::delete('public/' . $user->profile_photo);
+        }
+
+        // Ambil data base64
+        $image = $request->input('image');
+        $image = preg_replace('#^data:image/\w+;base64,#i', '', $image);
+        $image = str_replace(' ', '+', $image);
+
+        $imageName = 'profile_' . uniqid() . '.png';
+
+        // Simpan ke storage
+        \Storage::disk('public')->put('profile_photos/' . $imageName, base64_decode($image));
+
+        // Update database
+        $user->profile_photo = 'profile_photos/' . $imageName;
+        $user->save();
+
+        return response()->json(['success' => true, 'path' => $user->profile_photo]);
     }
-
-    // Proses base64
-    $image = $request->image;
-    $image = preg_replace('#^data:image/\w+;base64,#i', '', $image);
-    $image = str_replace(' ', '+', $image);
-    $imageName = 'profile_' . uniqid() . '.png';
-
-    \Storage::disk('public')->put('profile_photos/' . $imageName, base64_decode($image));
-
-    // Update database
-    $user->profile_photo = 'profile_photos/' . $imageName;
-    $user->save();
-
-    return response()->json(['success' => true]);
-}
-
 }
