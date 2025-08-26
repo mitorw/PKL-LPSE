@@ -11,6 +11,38 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
+
+public function updateBasic(Request $request): RedirectResponse
+{
+    try {
+        // ✅ Validasi langsung di controller
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'min:4'],
+            'email' => ['required', 'string', 'email:rfc,dns'],
+        ], [
+            'name.required' => 'Nama wajib diisi.',
+            'name.min' => 'Nama minimal 4 karakter.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid, gunakan format seperti nama@gmail.com.',
+        ]);
+
+        // ✅ Update data user
+        $request->user()->fill($validated);
+
+        if ($request->user()->isDirty('email')) {
+            $request->user()->email_verified_at = null;
+        }
+
+        $request->user()->save();
+
+        return Redirect::route('profile.edit')
+            ->with('success', 'Profil berhasil diperbarui!');
+    } catch (\Exception $e) {
+        return Redirect::route('profile.edit')
+            ->with('error', 'Gagal memperbarui profil: ' . $e->getMessage());
+    }
+}
+
     /**
      * Display the user's profile form.
      */
@@ -29,18 +61,29 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
-    {
-        $request->user()->fill($request->validated());
+    public function update(Request $request): RedirectResponse
+{
+    $validated = $request->validate([
+        'name' => ['required', 'string', 'min:4'],
+        'email' => ['required', 'string', 'email:rfc,dns'],
+    ], [
+        'name.required' => 'Nama wajib diisi.',
+        'name.min' => 'Nama minimal 4 karakter.',
+        'email.required' => 'Email wajib diisi.',
+        'email.email' => 'Format email tidak valid, gunakan format seperti nama@gmail.com.',
+    ]);
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
+    $request->user()->fill($validated);
 
-        $request->user()->save();
-
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+    if ($request->user()->isDirty('email')) {
+        $request->user()->email_verified_at = null;
     }
+
+    $request->user()->save();
+
+    return Redirect::route('profile.edit')->with('success', 'Profil berhasil diperbarui!');
+}
+
 
     /**
      * Delete the user's account.
