@@ -47,7 +47,7 @@
 
         <div class="mb-3">
             <label>Keterangan</label>
-            <textarea name="keterangan" class="form-control" value="{{ old('keterangan', $surat->keterangan) }}"></textarea>
+            <textarea name="keterangan" class="form-control">{{ old('keterangan', $surat->keterangan) }}</textarea>
         </div>
 
         <div class="mb-3">
