@@ -114,7 +114,7 @@ class SuratKeluarController extends Controller
             $filePath = $request->file('isi_surat')->store('surat_keluar', 'public');
         }
 
-        // Update surat masuk
+        // Update surat keluar
         $surat->update([
             'nomor_surat' => $request->nomor_surat,
             'perihal' => $request->perihal,
@@ -126,7 +126,7 @@ class SuratKeluarController extends Controller
             'isi_surat' => $filePath
         ]);
 
-        return redirect()->route('surat_keluar.index')->with('success', 'Surat masuk berhasil diperbarui');
+        return redirect()->route('surat_keluar.index')->with('success', 'Surat keluar berhasil diperbarui');
     }
 
 
