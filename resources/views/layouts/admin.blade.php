@@ -15,6 +15,31 @@
             overflow-x: hidden;
         }
 
+        .sidebar-brand {
+            height: 95px; /* Sama dengan tinggi .header-bar */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 10px; /* Sedikit padding horizontal */
+            margin-bottom: 10px; /* Jarak ke menu di bawahnya */
+        }
+
+        /* Style khusus untuk link di dalam wadah judul */
+        .sidebar-brand a {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            text-decoration: none;
+            line-height: 1.2; /* Mengatur jarak antar baris jika teksnya 2 baris */
+        }
+
+        /* Pastikan link judul tidak terpengaruh style flexbox dari link menu */
+        .sidebar-brand a:hover {
+            background-color: transparent; /* Hilangkan efek hover */
+        }
+
+
         .sidebar {
             width: 240px;
             height: 100vh;
@@ -30,14 +55,25 @@
 
         .sidebar a {
             color: white;
-            display: block;
+            display: flex;
             padding: 10px 20px;
             text-decoration: none;
             font-size: 18px;
+            align-items: center; /* Menyejajarkan ikon dan teks secara vertikal di tengah */
+            transition: background-color 0.2s transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        /* Memberi gaya pada ikon di dalam link */
+        .sidebar a i {
+            width: 40px;         /* Memberi lebar tetap agar semua teks lurus sejajar */
+            margin-right: 8px;   /* Memberi sedikit jarak antara ikon dan teks */
+            text-align: center;  /* Memastikan ikon berada di tengah area lebarnya */
+            font-size: 1.1em;    /* Sedikit menyesuaikan ukuran ikon */
         }
 
         .sidebar a:hover {
             background-color: #ffffff33;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
         }
 
         /* Wrapper untuk konten utama (header + content) */
@@ -152,18 +188,16 @@
 <body>
     {{-- Side Bar --}}
     <div class="sidebar">
-        <a href="{{ route('dashboard') }}" class="mb-4 text-center" style="font-size: 25px; font-weight: bold">Sistem
-            Inventaris Surat</a>
-        <a href="{{ route('surat_masuk.index') }}"><i class="fa fa-inbox"
-                style="padding-top: 10px; padding-block: 10px"></i> Surat Masuk</a>
-        <a href="{{ route('surat_keluar.index') }}"><i class="fa fa-paper-plane"
-                style="padding-top: 10px; padding-block: 10px"></i> Surat Keluar</a>
-        <a href="{{ route('laporan.surat') }}"><i class="fa fa-file-alt"
-                style="padding-top: 10px; padding-block: 10px"></i> Laporan</a>
+        <div class="sidebar-brand">
+            <a href="{{ route('dashboard') }}">Sistem Inventaris Surat</a>
+        </div>
+        <a href="{{ route('surat_masuk.index') }}"><i class="fa fa-inbox"></i> Surat Masuk</a>
+        <a href="{{ route('surat_keluar.index') }}"><i class="fa fa-paper-plane"></i> Surat Keluar</a>
+        <a href="{{ route('laporan.surat') }}"><i class="fa fa-file-alt"></i> Laporan</a>
         @auth
             @if (Auth::user()->role === 'admin')
                 <a href="{{ route('manajemen_akun.index') }}"><i class="fa fa-users-cog"
-                        style="padding-top: 10px; padding-block: 10px"></i> Manajemen
+                        ></i> Manajemen
                     Akun</a>
             @endif
         @endauth
