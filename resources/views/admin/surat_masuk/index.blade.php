@@ -127,7 +127,11 @@
                     <th>Disposisi</th>
                     <th>Keterangan</th>
                     <th>File Surat</th>
-                    <th>Action</th>
+                    @auth
+                        @if (Auth::user()->role === 'admin')
+                            <th>Action</th>
+                        @endif
+                    @endauth
 
                 </tr>
             </thead>
