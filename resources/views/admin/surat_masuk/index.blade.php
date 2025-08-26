@@ -22,50 +22,70 @@
         </div>
     @endif
 
-    <form action="{{ route('surat_masuk.index') }}" method="GET" class="mb-3">
+    {{-- Form Filter dan Pencarian (Sudah Digabung) --}}
+    <form action="{{ route('surat_masuk.index') }}" method="GET" class="mb-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="row g-3 align-items-end">
+                    {{-- Kolom Pencarian --}}
+                    <div class="col-md-12">
+                        <label for="search" class="form-label">Cari Surat</label>
+                        <div class="input-group">
+                            <input type="text" id="search" name="search" class="form-control" placeholder="No surat, asal surat, perihal, keterangan..." value="{{ request('search') }}">
+                            <button class="btn btn-primary" type="submit">Cari</button>
+                        </div>
+                    </div>
 
-        <div class="input-group">
-            <input type="text" class="form-control" placeholder="Cari Surat" name="search" value="{{ request('index') }}">
-            <div class="input-group-append">
-                <button class="mx-2 btn btn-primary" type="submit">Cari</button>
+                    {{-- Kolom Filter Lanjutan --}}
+                    <div class="col-md-4">
+                        <label class="form-label">Tanggal Terima</label>
+                        <div class="input-group">
+                            <input type="date" name="start_date" class="form-control" value="{{ request('start_date') }}">
+                            <span class="input-group-text">s/d</span>
+                            <input type="date" name="end_date" class="form-control" value="{{ request('end_date') }}">
+                        </div>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label for="klasifikasi" class="form-label">Klasifikasi</label>
+                        <select id="klasifikasi" class="form-select" name="klasifikasi">
+                            <option value="">Semua</option>
+                            <option value="Rahasia" {{ request('klasifikasi') == 'Rahasia' ? 'selected' : '' }}>Rahasia</option>
+                            <option value="Penting" {{ request('klasifikasi') == 'Penting' ? 'selected' : '' }}>Penting</option>
+                            <option value="Biasa" {{ request('klasifikasi') == 'Biasa' ? 'selected' : '' }}>Biasa</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="disposisi_status_filter" class="form-label">Disposisi</label>
+                        <div class="input-group">
+                            <select id="disposisi_status_filter" class="form-select" name="disposisi_status">
+                                <option value="">Semua Status</option>
+                                <option value="ada" {{ request('disposisi_status') == 'ada' ? 'selected' : '' }}>Ada Disposisi</option>
+                                <option value="tidak_ada" {{ request('disposisi_status') == 'tidak_ada' ? 'selected' : '' }}>Belum Disposisi</option>
+                            </select>
+
+                            {{-- BARU: Dropdown untuk Bagian, awalnya tersembunyi --}}
+                            <select name="dis_bagian" id="bagian_filter" class="form-select" style="display: none;">
+                                <option value="">Semua Bagian</option>
+                                @foreach ($daftarBagian as $bagian)
+                                    <option value="{{ $bagian->dis_bagian }}" {{ request('dis_bagian') == $bagian->dis_bagian ? 'selected' : '' }}>
+                                        {{ $bagian->dis_bagian }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 d-grid">
+                        <div class="btn-group">
+                            <button class="btn btn-primary" type="submit">Filter</button>
+                            <a href="{{ route('surat_masuk.index') }}" class="btn btn-secondary">Reset</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-
-    </form>
-
-
-
-    <form action="{{ route('surat_masuk.index') }}" method="GET" class="mb-3">
-
-        <div class="input-group">
-
-            <input type="date" class="ml-2 form-control" name="start_date" value="{{ request('start_date') }}">
-            <input type="date" class="ml-2 form-control" name="end_date" value="{{ request('end_date') }}">
-
-            <select class="ml-2 form-control" name="klasifikasi">
-
-                <option value="">Semua Klasifikasi</option>
-                <option value="Rahasia" {{ request('klasifikasi') == 'Rahasia' ? 'selected' : '' }}>Rahasia</option>
-                <option value="Penting" {{ request('klasifikasi') == 'Penting' ? 'selected' : '' }}>Penting</option>
-                <option value="Biasa" {{ request('klasifikasi') == 'Biasa' ? 'selected' : '' }}>Biasa</option>
-
-            </select>
-            <select class="ml-2 form-control" name="disposisi_status">
-                <option value="">Semua Disposisi</option>
-                <option value="ada" {{ request('disposisi_status') == 'ada' ? 'selected' : '' }}>Ada Disposisi</option>
-                <option value="tidak_ada" {{ request('disposisi_status') == 'tidak_ada' ? 'selected' : '' }}>Belum
-                    Disposisi</option>
-            </select>
-
-            <div class="input-group-append">
-
-                <button class="mx-2 btn btn-primary" type="submit">Filter</button>
-                <a href="{{ route('surat_masuk.index') }}" class="mr-2 btn btn-secondary">Reset</a>
-
-            </div>
-
-        </div>
-
     </form>
 
     @auth
@@ -304,4 +324,32 @@
             });
         });
     </script>
+
+@push('scripts')
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const statusFilter = document.getElementById('disposisi_status_filter');
+        const bagianFilter = document.getElementById('bagian_filter');
+
+        function toggleBagianFilter() {
+            // Jika "Ada Disposisi" dipilih, tampilkan filter bagian
+            if (statusFilter.value === 'ada') {
+                bagianFilter.style.display = 'block';
+            } else {
+                // Jika tidak, sembunyikan dan kosongkan nilainya agar tidak ikut terfilter
+                bagianFilter.style.display = 'none';
+                bagianFilter.value = '';
+            }
+        }
+
+        // Jalankan fungsi saat halaman dimuat untuk memeriksa kondisi awal
+        // (Penting jika halaman dimuat ulang dengan filter yang sudah aktif)
+        toggleBagianFilter();
+
+        // Jalankan fungsi setiap kali nilai filter status berubah
+        statusFilter.addEventListener('change', toggleBagianFilter);
+    });
+    </script>
+@endpush
+
 @endsection

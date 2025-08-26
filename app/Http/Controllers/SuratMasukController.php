@@ -16,6 +16,8 @@ class SuratMasukController extends Controller
      */
     public function index(Request $request)
     {
+        // BARU: Mengambil semua nama bagian yang unik dari tabel disposisi untuk dikirim ke view
+        $daftarBagian = Disposisi::select('dis_bagian')->distinct()->orderBy('dis_bagian')->get();
         // Mulai query builder, jangan langsung eksekusi
         $query = SuratMasuk::with('disposisi');
 
@@ -46,6 +48,22 @@ class SuratMasukController extends Controller
             $q->where('klasifikasi', $request->klasifikasi);
         });
 
+        // BARU: Logika filter disposisi yang lebih canggih
+        $query->when($request->filled('disposisi_status'), function ($q) use ($request) {
+            if ($request->disposisi_status === 'ada') {
+                $q->whereHas('disposisi'); // Hanya tampilkan surat yang punya relasi disposisi
+            } elseif ($request->disposisi_status === 'tidak_ada') {
+                $q->whereDoesntHave('disposisi'); // Hanya tampilkan surat yang TIDAK punya relasi disposisi
+            }
+        });
+
+        // BARU: Terapkan filter berdasarkan BAGIAN disposisi jika ada
+        $query->when($request->filled('dis_bagian'), function ($q) use ($request) {
+            $q->whereHas('disposisi', function($disposisiQuery) use ($request) {
+                $disposisiQuery->where('dis_bagian', $request->dis_bagian);
+            });
+        });
+
         // Terapkan filter STATUS DISPOSISI jika ada
         $query->when($request->filled('disposisi_status'), function ($q) use ($request) {
             if ($request->disposisi_status === 'ada') {
@@ -69,7 +87,8 @@ class SuratMasukController extends Controller
         // Kembalikan view dengan data yang sudah benar
         return view('admin.surat_masuk.index', [
             'pageTitle' => 'Surat Masuk',
-            'data' => $data // Mengirim dengan nama 'data' agar konsisten
+            'data' => $data, // Mengirim dengan nama 'data' agar konsisten
+            'daftarBagian' => $daftarBagian // Kirim daftar bagian ke view
         ]);
     }
 
