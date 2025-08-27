@@ -100,34 +100,21 @@
     @endif
 </div>
 
-{{-- PIE CHART SURAT --}}
-<div class="subjudul">A. PIE CHART SURAT</div>
-<div style="text-align:center; margin-top:20px;">
-    <img src="data:image/png;base64,{{ $chartBase64 }}" alt="Pie Chart"
-         style="width:300px; height:auto;">
-    <p style="font-size:11pt; margin-top:5px;">
-        Total Surat Masuk: {{ $dataSurat->where('jenis_surat','masuk')->count() }} |
-        Total Surat Keluar: {{ $dataSurat->where('jenis_surat','keluar')->count() }}
-    </p>
-</div>
-
-
-
-
 
     {{-- SURAT MASUK --}}
 {{-- SURAT MASUK --}}
-<div class="subjudul">B. Surat Masuk</div>
+<div class="subjudul">A. Surat Masuk</div>
 <table>
     <thead>
         <tr>
             <th>No</th>
             <th>Nomor Surat</th>
-            <th>Asal</th>
-            <th>Tanggal</th>
             <th>Perihal</th>
+            <th>Tanggal</th>
+            <th>Asal</th>
             <th>Klasifikasi</th>
-            <th>Keterangan</th>
+            <th>Lokasi Penyimpanan</th>
+            <th>Status Disposisi</th>
         </tr>
     </thead>
     <tbody>
@@ -136,24 +123,32 @@
             <tr>
                 <td style="text-align:center;">{{ $no++ }}</td>
                 <td>{{ $surat->nomor_surat }}</td>
-                <td>{{ $surat->asal ?? '-' }}</td>
+                <td>{{ $surat->perihal }}</td>
                 <td style="text-align:center;">
                     {{ \Carbon\Carbon::parse($surat->tanggal)->format('d-m-Y') }}
                 </td>
-                <td>{{ $surat->perihal }}</td>
+                <td>{{ $surat->asal ?? '-' }}</td>
                 <td style="text-align:center;">{{ ucfirst($surat->status) }}</td>
                 <td>{{ $surat->keterangan ?? '-' }}</td>
+                @php
+                    $sm = $disposisiSurat->firstWhere('no_surat', $surat->nomor_surat);
+                @endphp
+                @if($sm && $sm->disposisi)
+                    <td style="text-align:center;">Ada</td>
+                @else
+                    <td style="text-align:center;">Tidak Ada</td>
+                @endif
             </tr>
         @empty
             <tr>
-                <td colspan="7" style="text-align:center;">Tidak ada data surat masuk.</td>
+                <td colspan="8" style="text-align:center;">Tidak ada data surat masuk.</td>
             </tr>
         @endforelse
     </tbody>
 </table>
 
 {{-- SURAT KELUAR --}}
-<div class="subjudul">C. Surat Keluar</div>
+<div class="subjudul">B. Surat Keluar</div>
 <table>
     <thead>
         <tr>
@@ -162,8 +157,9 @@
             <th>Perihal</th>
             <th>Tanggal</th>
             <th>Tujuan</th>
-            <th>Dibuat Oleh</th>
             <th>Klasifikasi</th>
+            <th>Lokasi Penyimpanan</th>
+            <th>Dibuat Oleh</th>
         </tr>
     </thead>
     <tbody>
@@ -177,8 +173,9 @@
                     {{ \Carbon\Carbon::parse($surat->tanggal)->format('d-m-Y') }}
                 </td>
                 <td>{{ $surat->tujuan ?? '-' }}</td>
-                <td>{{ $surat->dibuat_oleh ?? '-' }}</td>
                 <td style="text-align:center;">{{ ucfirst($surat->status) }}</td>
+                <td>{{ $surat->keterangan ?? '-' }}</td>
+                <td>{{ $surat->dibuat_oleh ?? '-' }}</td>
             </tr>
         @empty
             <tr>
@@ -189,7 +186,7 @@
 </table>
 
 
-   <h3>D. Laporan Disposisi</h3>
+   <h3>C. Laporan Disposisi</h3>
 <table border="1" cellspacing="0" cellpadding="5" width="100%">
     <thead>
         <tr>
@@ -200,6 +197,7 @@
             <th>Tujuan/Bagian</th>
             <th>Catatan</th>
             <th>Instruksi</th>
+            <th>Lokasi Penyimpanan</th>
         </tr>
     </thead>
     <tbody>
@@ -217,16 +215,31 @@
                     <td>{{ $sm->disposisi->dis_bagian }}</td>
                     <td>{{ $sm->disposisi->catatan }}</td>
                     <td>{{ $sm->disposisi->instruksi }}</td>
+
                 @else
                     <td style="text-align:center;">Tidak Ada</td>
                     <td>-</td>
                     <td>-</td>
                     <td>-</td>
                 @endif
+                <td>{{ $surat->keterangan ?? '-' }}</td>
             </tr>
         @endforeach
     </tbody>
 </table>
+
+{{-- PIE CHART SURAT --}}
+<div class="subjudul">D.Grafik Inventaris Surat</div>
+<div style="text-align:center; margin-top:20px;">
+    <img src="data:image/png;base64,{{ $chartBase64 }}" alt="Pie Chart"
+         style="width:300px; height:auto;">
+    <p style="font-size:11pt; margin-top:5px;">
+        Total Surat Masuk: {{ $dataSurat->where('jenis_surat','masuk')->count() }} |
+        Total Surat Keluar: {{ $dataSurat->where('jenis_surat','keluar')->count() }}
+    </p>
+</div>
+
+
 
 
     {{-- TANDA TANGAN --}}
@@ -234,12 +247,12 @@
     <div class="jabatan">
         Bandar Lampung, {{ \Carbon\Carbon::now()->locale('id')->translatedFormat('d F Y') }} <br>
         Kepala Biro Pengadaan Barang dan Jasa
-    </div>
-
-    <div style="margin-top: 80px;"></div>
-
-    <div class="nama">
-        <u>PUADI JAILANI, SH, MH.</u><br>
+ <div class="nama">
+    <br>
+    <br>
+    <br>
+    <br>
+    <u style="font-weight: bold;">PUADI JAILANI, SH, MH.</u><br>
         NIP. 19650905 199103 1 004
     </div>
 </div>

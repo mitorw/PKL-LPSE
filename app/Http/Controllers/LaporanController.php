@@ -82,7 +82,7 @@ class LaporanController extends Controller
             'klasifikasi as status',
             'id',
             DB::raw('NULL as asal'),
-            DB::raw('NULL as keterangan'),
+            'keterangan',
             'tujuan',
             'dibuat_oleh'
         )->selectRaw("'keluar' as jenis_surat");
@@ -181,7 +181,7 @@ class LaporanController extends Controller
             'klasifikasi as status',
             'id',
             DB::raw('NULL as asal'),
-            DB::raw('NULL as keterangan'),
+            'keterangan',
             'tujuan',
             'dibuat_oleh',
             DB::raw("'keluar' as jenis_surat")
