@@ -7,7 +7,7 @@
             @if ($tglAwal == $tglAkhir)
                 - {{ \Carbon\Carbon::parse($tglAwal)->locale('id')->translatedFormat('d F Y') }}
             @else
-                - {{ \Carbon\Carbon::parse($tglAwal)->locale('id')->translatedFormat('d') }}
+                - {{ \Carbon\Carbon::parse($tglAwal)->locale('id')->translatedFormat('d F Y') }}
                   s/d {{ \Carbon\Carbon::parse($tglAkhir)->locale('id')->translatedFormat('d F Y') }}
             @endif
     </title>
@@ -104,7 +104,7 @@
     @if ($tglAwal == $tglAkhir)
         PERIODE: {{ \Carbon\Carbon::parse($tglAwal)->locale('id')->translatedFormat('d F Y') }}
     @else
-        PERIODE: {{ \Carbon\Carbon::parse($tglAwal)->locale('id')->translatedFormat('d') }}
+        PERIODE: {{ \Carbon\Carbon::parse($tglAwal)->locale('id')->translatedFormat('d F Y') }}
         &ndash; {{ \Carbon\Carbon::parse($tglAkhir)->locale('id')->translatedFormat('d F Y') }}
     @endif
 </div>
