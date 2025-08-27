@@ -2,7 +2,15 @@
 <html>
 
 <head>
-    <title>Laporan Inventaris Surat</title>
+    <title>
+        Laporan Inventaris
+            @if ($tglAwal == $tglAkhir)
+                - {{ \Carbon\Carbon::parse($tglAwal)->locale('id')->translatedFormat('d F Y') }}
+            @else
+                - {{ \Carbon\Carbon::parse($tglAwal)->locale('id')->translatedFormat('d') }}
+                  s/d {{ \Carbon\Carbon::parse($tglAkhir)->locale('id')->translatedFormat('d F Y') }}
+            @endif
+    </title>
     <style>
         body {
             font-family: 'Times New Roman', Times, serif;
@@ -57,6 +65,7 @@
         }
     </style>
 </head>
+<body>
 
 <body>
 
