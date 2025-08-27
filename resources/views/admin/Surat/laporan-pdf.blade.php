@@ -231,7 +231,7 @@
                     <td>-</td>
                     <td>-</td>
                 @endif
-                <td>{{ $surat->keterangan ?? '-' }}</td>
+                <td>{{ $sm->keterangan ?? '-' }}</td>
             </tr>
         @endforeach
     </tbody>
