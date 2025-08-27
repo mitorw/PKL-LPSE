@@ -189,9 +189,9 @@
     {{-- Side Bar --}}
     <div class="sidebar">
         <div class="sidebar-brand">
-            <a href="{{ route('dashboard') }}">Sistem Inventaris Surat</a>
+            <h4>Sistem Inventaris Surat</h4>
         </div>
-        <a href="{{ route('laporan.surat') }}"><i class="fa fa-file-alt"></i> Laporan</a>
+        <a href="{{ route('dashboard') }}"><i class="fa fa-file-alt"></i> Dashboard</a>
         <a href="{{ route('surat_masuk.index') }}"><i class="fa fa-inbox"></i> Surat Masuk</a>
         <a href="{{ route('surat_keluar.index') }}"><i class="fa fa-paper-plane"></i> Surat Keluar</a>
         @auth
