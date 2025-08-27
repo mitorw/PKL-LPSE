@@ -18,6 +18,7 @@ class SuratKeluar extends Model
         'dibuat_oleh',
         'keterangan',
         'klasifikasi',
-        'isi_surat'
+        'isi_surat',
+        'isi_surat_original',
     ];
 }

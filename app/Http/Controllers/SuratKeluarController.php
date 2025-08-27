@@ -3,8 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\SuratKeluar;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpWord\IOFactory;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
+use Dompdf\Dompdf;
 
 class SuratKeluarController extends Controller
 {
@@ -62,12 +67,72 @@ class SuratKeluarController extends Controller
             'tanggal' => 'required|date',
             'dibuat_oleh' => 'required|max:50',
             'klasifikasi' => 'required|in:biasa,penting,rahasia',
-            'isi_surat' => 'required|mimes:pdf,png,jpg,jpeg|max:2048'
+            'isi_surat' => 'required|mimes:pdf,png,jpg,jpeg,doc,docx|max:4096',
+            'isi_surat_original' => 'nullable|string|max:255',
         ]);
 
         $filePath = null;
         if ($request->hasFile('isi_surat')) {
-            $filePath = $request->file('isi_surat')->store('surat_keluar', 'public');
+            $files = $request->file('isi_surat');
+            if (!is_array($files)) {
+                $files = [$files];
+            }
+
+            $ext = strtolower($files[0]->getClientOriginalExtension());
+
+            // Case 1: langsung PDF
+            if ($ext === 'pdf' && count($files) === 1) {
+                // Simpan file original PDF
+                $originalPath = $files[0]->store('surat_keluar/original', 'public');
+                $filePath = $originalPath; // karena sudah PDF, hasil konversi = original
+            }
+
+            // Case 2: banyak gambar -> PDF multi halaman
+            elseif (in_array($ext, ['jpg', 'jpeg', 'png'])) {
+                $html = '';
+                $manager = new ImageManager(new Driver());
+
+                foreach ($files as $file) {
+                    // Simpan file original
+                    $originalPath = $file->store('surat_keluar/original', 'public');
+
+                    // Convert ke base64 untuk dimasukkan ke PDF
+                    $image = $manager->read($file->getPathname())->toJpeg();
+                    $html .= '<div style="page-break-after: always; text-align:center;">
+                    <img src="data:image/jpeg;base64,' . base64_encode($image) . '" style="max-width:100%;height:auto;">
+                  </div>';
+                }
+
+                // Buat PDF hasil konversi
+                $pdf = Pdf::loadHTML($html)->setPaper('a4', 'portrait');
+                $filename = 'surat_keluar/converted/' . uniqid() . '.pdf';
+                Storage::disk('public')->put($filename, $pdf->output());
+                $filePath = $filename;
+            }
+
+            // Case 3: Word -> PDF
+            elseif (in_array($ext, ['doc', 'docx']) && count($files) === 1) {
+                // Simpan file original Word
+                $originalPath = $files[0]->store('surat_keluar/original', 'public');
+
+                // Set DomPDF sebagai renderer
+                \PhpOffice\PhpWord\Settings::setPdfRendererName('DomPDF');
+                \PhpOffice\PhpWord\Settings::setPdfRendererPath(base_path('vendor/dompdf/dompdf'));
+
+                // Load dokumen Word
+                $phpWord = IOFactory::load($files[0]->getPathName());
+
+                // Buat writer PDF
+                $pdfWriter = IOFactory::createWriter($phpWord, 'PDF');
+
+                $filename = 'surat_keluar/converted/' . uniqid() . '.pdf';
+                $tempPath = storage_path('app/public/' . $filename);
+
+                // Simpan hasil PDF
+                $pdfWriter->save($tempPath);
+
+                $filePath = $filename;
+            }
         }
 
         SuratKeluar::create([
@@ -78,7 +143,8 @@ class SuratKeluarController extends Controller
             'dibuat_oleh' => $request->dibuat_oleh,
             'keterangan' => $request->keterangan,
             'klasifikasi' => $request->klasifikasi,
-            'isi_surat' => $filePath
+            'isi_surat' => $filePath,
+            'isi_surat_original' => $originalPath ?? null,
         ]);
 
         return redirect()->route('surat_keluar.index')->with('success', 'Surat keluar berhasil disimpan.');
@@ -103,18 +169,61 @@ class SuratKeluarController extends Controller
             'tanggal' => 'required|date',
             'dibuat_oleh' => 'required|max:50',
             'klasifikasi' => 'required|in:biasa,penting,rahasia',
-            'isi_surat' => 'nullable|mimes:pdf,png,jpg,jpeg|max:2048'
+            'isi_surat' => 'nullable|mimes:pdf,png,jpg,jpeg,doc,docx|max:4096',
+            'isi_surat_original' => 'nullable|string|max:255',
         ]);
 
         $surat = SuratKeluar::findOrFail($id);
 
-        // Update file kalau ada upload baru
-        $filePath = $surat->isi_surat;
+        $filePath = $surat->isi_surat;             // converted (PDF)
+        $originalPath = $surat->isi_surat_original; // original
+
         if ($request->hasFile('isi_surat')) {
-            $filePath = $request->file('isi_surat')->store('surat_keluar', 'public');
+            // Hapus file lama (converted + original)
+            if ($filePath && Storage::disk('public')->exists($filePath)) {
+                Storage::disk('public')->delete($filePath);
+            }
+            if ($originalPath && Storage::disk('public')->exists($originalPath)) {
+                Storage::disk('public')->delete($originalPath);
+            }
+
+            $file = $request->file('isi_surat');
+            $ext  = strtolower($file->getClientOriginalExtension());
+
+            // Simpan original dulu
+            $originalPath = $file->store('surat_keluar/original', 'public');
+
+            // Case 1: kalau sudah PDF → tidak perlu convert
+            if ($ext === 'pdf') {
+                $filePath = $originalPath;
+            }
+            // Case 2: gambar → PDF
+            elseif (in_array($ext, ['jpg', 'jpeg', 'png'])) {
+                $manager = new ImageManager(new Driver());
+                $image = $manager->read($file->getPathname())->toJpeg();
+
+                $html = '<div style="page-break-after: always; text-align:center;">
+                <img src="data:image/jpeg;base64,' . base64_encode($image) . '" style="max-width:100%;height:auto;">
+            </div>';
+
+                $pdf = Pdf::loadHTML($html)->setPaper('a4', 'portrait');
+                $filePath = 'surat_keluar/converted/' . uniqid() . '.pdf';
+                Storage::disk('public')->put($filePath, $pdf->output());
+            }
+            // Case 3: Word → PDF
+            elseif (in_array($ext, ['doc', 'docx'])) {
+                \PhpOffice\PhpWord\Settings::setPdfRendererName('DomPDF');
+                \PhpOffice\PhpWord\Settings::setPdfRendererPath(base_path('vendor/dompdf/dompdf'));
+
+                $phpWord = IOFactory::load($file->getPathname());
+                $pdfWriter = IOFactory::createWriter($phpWord, 'PDF');
+
+                $filePath = 'surat_keluar/converted/' . uniqid() . '.pdf';
+                $tempPdf = storage_path('app/public/' . $filePath);
+                $pdfWriter->save($tempPdf);
+            }
         }
 
-        // Update surat keluar
         $surat->update([
             'nomor_surat' => $request->nomor_surat,
             'perihal' => $request->perihal,
@@ -123,24 +232,37 @@ class SuratKeluarController extends Controller
             'dibuat_oleh' => $request->dibuat_oleh,
             'keterangan' => $request->keterangan,
             'klasifikasi' => $request->klasifikasi,
-            'isi_surat' => $filePath
+            'isi_surat' => $filePath,              // converted
+            'isi_surat_original' => $originalPath, // original
         ]);
 
-        return redirect()->route('surat_keluar.index')->with('success', 'Surat keluar berhasil diperbarui');
+        return redirect()->route('surat_keluar.index')
+            ->with('success', 'Surat keluar berhasil diperbarui.');
     }
+
 
 
     public function destroy($id)
     {
         $surat = SuratKeluar::findOrFail($id);
-        // Jika ada file isi_surat, hapus file-nya dari storage
+
+        // Hapus file converted
         if ($surat->isi_surat && Storage::disk('public')->exists($surat->isi_surat)) {
             Storage::disk('public')->delete($surat->isi_surat);
         }
+
+        // Hapus file original
+        if ($surat->isi_surat_original && Storage::disk('public')->exists($surat->isi_surat_original)) {
+            Storage::disk('public')->delete($surat->isi_surat_original);
+        }
+
+        // Hapus data dari database
         $surat->delete();
 
-        return redirect()->route('surat_keluar.index')->with('success', 'Surat keluar berhasil dihapus.');
+        return redirect()->route('surat_keluar.index')
+            ->with('success', 'Surat keluar beserta file terkait berhasil dihapus.');
     }
+
 
 
     public function show($id)

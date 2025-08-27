@@ -18,46 +18,46 @@
             @csrf
             <div class="mb-3">
                 <label>Nomor Surat</label>
-                <input type="text" name="nomor_surat" class="form-control" required>
+                <input type="text" name="nomor_surat" class="form-control" value="{{ old('nomor_surat') }}" required>
             </div>
 
             <div class="mb-3">
                 <label>Perihal</label>
-                <input type="text" name="perihal" class="form-control" required>
+                <input type="text" name="perihal" class="form-control" value="{{ old('perihal') }}" required>
             </div>
 
             <div class="mb-3">
                 <label>Tujuan</label>
-                <input type="text" name="tujuan" class="form-control" required>
+                <input type="text" name="tujuan" class="form-control" value="{{ old('tujuan') }}" required>
             </div>
 
             <div class="mb-3" style="width: 200px">
                 <label>Tanggal</label>
-                <input type="date" id="tanggal" name="tanggal" class="form-control" placeholder="Pilih Tanggal.." required>
+                <input type="date" id="tanggal" name="tanggal" class="form-control" value="{{ old('tanggal') }}" placeholder="Pilih Tanggal.." required>
             </div>
 
             <div class="mb-3">
                 <label>Dibuat Oleh</label>
-                <input type="text" name="dibuat_oleh" class="form-control" required>
+                <input type="text" name="dibuat_oleh" class="form-control" value="{{ old('dibuat_oleh') }}" required>
             </div>
 
             <div class="mb-3">
                 <label>Lokasi Penyimpanan</label>
-                <textarea name="keterangan" class="form-control"></textarea>
+                <textarea name="keterangan" class="form-control">{{ old('keterangan') }}</textarea>
             </div>
 
             <div class="mb-3">
                 <label>Klasifikasi</label>
                 <select name="klasifikasi" class="form-control" required>
-                    <option value="biasa">Biasa</option>
-                    <option value="penting">Penting</option>
-                    <option value="rahasia">Rahasia</option>
+                    <option value="biasa" {{ old('klasifikasi')  == 'biasa' ? ' selected' : ''}}> Biasa</option>
+                    <option value="penting" {{ old('klasifikasi')  == 'penting' ? ' selected' : ''}}>Penting</option>
+                    <option value="rahasia" {{ old('klasifikasi')  == 'rahasia' ? ' selected' : ''}}>Rahasia</option>
                 </select>
             </div>
 
             <div class="mb-3">
-                <label>File Surat (PDF/PNG/JPG)</label>
-                <input type="file" name="isi_surat" class="form-control" required>
+                <label>File Surat (PDF/PNG/JPG/DOC)</label>
+                <input type="file" name="isi_surat" class="form-control" accept=".pdf,.png,.jpeg,.jpg,.doc,.docx" required>
             </div>
 
             <button type="submit" class="btn btn-primary">Simpan</button>

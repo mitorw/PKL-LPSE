@@ -22,6 +22,7 @@ class SuratMasuk extends Model
         'id_disposisi',
         'user_id',
         'file_surat',
+        'file_surat_original',
     ];
 
     public function disposisi()
