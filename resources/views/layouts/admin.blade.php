@@ -191,9 +191,9 @@
         <div class="sidebar-brand">
             <a href="{{ route('dashboard') }}">Sistem Inventaris Surat</a>
         </div>
+        <a href="{{ route('laporan.surat') }}"><i class="fa fa-file-alt"></i> Laporan</a>
         <a href="{{ route('surat_masuk.index') }}"><i class="fa fa-inbox"></i> Surat Masuk</a>
         <a href="{{ route('surat_keluar.index') }}"><i class="fa fa-paper-plane"></i> Surat Keluar</a>
-        <a href="{{ route('laporan.surat') }}"><i class="fa fa-file-alt"></i> Laporan</a>
         @auth
             @if (Auth::user()->role === 'admin')
                 <a href="{{ route('manajemen_akun.index') }}"><i class="fa fa-users-cog"
