@@ -220,7 +220,7 @@ class SuratMasukController extends Controller
             'file_surat_original' => 'nullable|string|max:255',
             // Tambahkan validasi untuk status disposisi
             'disposisi_status' => 'required|in:ada,tidak',
-            'dis_bagian' => 'required_if:disposisi_status,ada|in:Bagian Layanan Pengadaan Secara Elektronik,Bagian Advokasi dan Pembinaan,Bagian Pengelolaan Pengadaan Barang dan Jasa',
+            'dis_bagian' => 'nullable|required_if:disposisi_status,ada|in:Bagian Layanan Pengadaan Secara Elektronik,Bagian Advokasi dan Pembinaan,Bagian Pengelolaan Pengadaan Barang dan Jasa',
         ]);
 
         $surat = SuratMasuk::findOrFail($id);   // converted (PDF)
