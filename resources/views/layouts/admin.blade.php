@@ -202,12 +202,6 @@
             @endif
         @endauth
 
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();">
-                <i class="fa fa-sign-out-alt" style="padding-top: 10px; padding-block: 10px"></i> Log Out
-            </a>
-        </form>
     </div>
 
     {{-- Wrapper untuk Konten Utama --}}
@@ -219,18 +213,35 @@
                 <h2 class="mb-0">{{ $pageTitle ?? 'Halaman' }}</h2>
             </div>
 
-            {{-- Profile --}}
-            <div class="d-flex align-items-center">
-                <span class="me-2">Hallo, {{ Auth::user()->name }}</span>
-                <a href="{{ route('profile.edit') }}" class="profile-link d-flex align-items-center">
-                    @if (Auth::user()->profile_photo)
-                        <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="Foto Profil"
-                            class="rounded-circle" width="40" height="40" style="object-fit: cover;">
-                    @else
-                        <i class="fa fa-user-circle fa-2x text-secondary"></i>
-                    @endif
-                </a>
-            </div>
+<div class="dropdown">
+    <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#" role="button"
+       id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="color: #f5f5f5">
+        @if (Auth::user()->profile_photo)
+            <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}"
+                 alt="Foto Profil" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
+        @else
+            <i class="fa fa-user-circle fa-2x text-secondary"></i>
+        @endif
+        <span class="ms-2" style="color: #f5f5f5">Hallo, {{ Auth::user()->name }}</span>
+    </a>
+
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+        <li>
+            <a class="dropdown-item" href="{{ route('profile.edit') }}">
+                <i class="fa fa-user me-2"></i> Profile
+            </a>
+        </li>
+        <li>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="dropdown-item">
+                    <i class="fa fa-sign-out-alt me-2"></i> Logout
+                </button>
+            </form>
+        </li>
+    </ul>
+</div>
+
         </div>
 
         {{-- Konten Utama dari setiap halaman --}}
