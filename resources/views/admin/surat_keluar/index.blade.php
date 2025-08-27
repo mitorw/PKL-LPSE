@@ -137,12 +137,10 @@
                                 <td>
                                     <a href="{{ route('surat_keluar.edit', $surat->id) }}" class="btn btn-sm btn-warning"
                                         onclick="event.stopPropagation()">Edit</a>
-                                    <form action="{{ route('surat_keluar.destroy', $surat->id) }}" method="POST"
-                                        style="display:inline;" onclick="event.stopPropagation()">
+                                    <form class="delete-form" action="{{ route('surat_keluar.destroy', $surat->id) }}" method="POST" style="display:inline;" onclick="event.stopPropagation()">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" onclick="return confirm('Yakin hapus data ini?')"
-                                            class="btn btn-sm btn-danger">Delete</button>
+                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                                     </form>
                                 </td>
                             @endif
@@ -260,5 +258,51 @@
             });
         });
     </script>
+    @push('scripts')
+    <script>
+        // Menjalankan semua script setelah halaman dimuat sepenuhnya
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // --- Script untuk PDF Modal ---
+            const pdfModal = document.getElementById('pdfModal');
+            if (pdfModal) {
+                pdfModal.addEventListener('show.bs.modal', function(event) {
+                    const button = event.relatedTarget;
+                    const fileUrl = button.getAttribute('data-file');
+                    const iframe = pdfModal.querySelector('#pdfFrame');
+                    iframe.src = fileUrl;
+                });
+
+                pdfModal.addEventListener('hidden.bs.modal', function() {
+                    const iframe = pdfModal.querySelector('#pdfFrame');
+                    iframe.src = '';
+                });
+            }
+
+            // --- Script untuk SweetAlert Delete Confirmation ---
+            document.querySelectorAll('.delete-form').forEach(form => {
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+
+                    Swal.fire({
+                        title: 'Apakah Anda yakin?',
+                        text: "Data yang dihapus tidak dapat dikembalikan!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#28a745', // Contoh warna hijau
+                        cancelButtonColor: '#d33',  // Contoh warna abu-abu
+                        confirmButtonText: 'Ya, hapus!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            this.submit();
+                        }
+                    });
+                });
+            });
+
+        });
+    </script>
+    @endpush
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 @endsection

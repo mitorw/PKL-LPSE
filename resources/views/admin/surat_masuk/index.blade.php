@@ -176,12 +176,10 @@
                                     <a href="{{ route('surat_masuk.edit', $surat->id_surat_masuk) }}"
                                         class="my-2 btn btn-sm btn-warning" onclick="event.stopPropagation()">Edit</a>
 
-                                    <form action="{{ route('surat_masuk.destroy', $surat->id_surat_masuk) }}" method="POST"
-                                        style="display:inline;" onclick="event.stopPropagation()">
+                                    <form class="delete-form" action="{{ route('surat_masuk.destroy', $surat->id_surat_masuk) }}" method="POST" style="display:inline;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" onclick="return confirm('Yakin hapus data ini?')"
-                                            class="btn btn-sm btn-danger ">Delete</button>
+                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                                     </form>
                                 @endif
                             @endauth
@@ -353,6 +351,33 @@
         // Jalankan fungsi setiap kali nilai filter status berubah
         statusFilter.addEventListener('change', toggleBagianFilter);
     });
+    </script>
+
+    <script>
+        // Dengarkan event 'submit' pada semua form dengan class 'delete-form'
+        document.querySelectorAll('.delete-form').forEach(form => {
+            form.addEventListener('submit', function (event) {
+                // Hentikan aksi default form (yaitu submit langsung)
+                event.preventDefault();
+
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: "Data yang dihapus tidak dapat dikembalikan!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    // Jika pengguna menekan tombol "Ya, hapus!"
+                    if (result.isConfirmed) {
+                        // Lanjutkan submit form
+                        this.submit();
+                    }
+                });
+            });
+        });
     </script>
 @endpush
 
