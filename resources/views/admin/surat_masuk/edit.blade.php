@@ -39,7 +39,7 @@
     </div>
 
     <div class="mb-3">
-        <label>Keterangan (Lokasi Penyimpanan)</label>
+        <label>Lokasi Penyimpanan</label>
         <textarea name="keterangan" class="form-control">{{ old('keterangan', $surat->keterangan) }}</textarea>
     </div>
 

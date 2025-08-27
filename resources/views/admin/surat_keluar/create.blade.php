@@ -42,7 +42,7 @@
             </div>
 
             <div class="mb-3">
-                <label>Keterangan</label>
+                <label>Lokasi Penyimpanan</label>
                 <textarea name="keterangan" class="form-control"></textarea>
             </div>
 
@@ -61,7 +61,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary">Simpan</button>
-            <a href="{{ route('surat_keluar.index') }}" class="btn btn-secondary">Tutup</a>
+            <a href="{{ route('surat_keluar.index') }}" class="btn btn-secondary">Batal</a>
         </form>
     </div>
 @endsection

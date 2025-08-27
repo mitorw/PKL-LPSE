@@ -31,7 +31,7 @@
                     <div class="col-md-12">
                         <label for="search" class="form-label">Cari Surat</label>
                         <div class="input-group">
-                            <input type="text" id="search" name="search" class="form-control" placeholder="No surat, asal surat, perihal, keterangan..." value="{{ request('search') }}">
+                            <input type="text" id="search" name="search" class="form-control" placeholder="No surat, asal surat, perihal, Lokasi Penyimpanan..." value="{{ request('search') }}">
                             <button class="btn btn-primary" type="submit">Cari</button>
                         </div>
                     </div>
@@ -125,7 +125,7 @@
                     <th>Perihal</th>
                     <th>Klasifikasi</th>
                     <th>Disposisi</th>
-                    <th>Keterangan</th>
+                    <th>Lokasi Penyimpanan</th>
                     <th>File Surat</th>
                     @auth
                         @if (Auth::user()->role === 'admin')
@@ -267,7 +267,7 @@
                                         <td>{{ $surat->klasifikasi }}</td>
                                     </tr>
                                     <tr>
-                                        <th>Keterangan</th>
+                                        <th>Lokasi Penyimpanan</th>
                                         <td>{{ $surat->keterangan }}</td>
                                     </tr>
                                     <tr>

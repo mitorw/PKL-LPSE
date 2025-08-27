@@ -212,7 +212,7 @@
                                     <td>{{ $surat->dibuat_oleh }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Keterangan</th>
+                                    <th>Lokasi Penyimpanan</th>
                                     <td>{{ $surat->keterangan }}</td>
                                 </tr>
                             </tbody>

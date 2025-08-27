@@ -46,7 +46,7 @@
         </div>
 
         <div class="mb-3">
-            <label>Keterangan</label>
+            <label>Lokasi Penyimpanan</label>
             <textarea name="keterangan" class="form-control">{{ old('keterangan', $surat->keterangan) }}</textarea>
         </div>
 
@@ -62,7 +62,7 @@
         <div class="mb-3">
             <label>Isi Surat (PDF/PNG/JPG)</label>
             @if ($surat->isi_surat)
-                <p>File sekarang: <a href="{{ asset('storage/' . $surat->isi_surat) }}" target="_blank">Lihat PDF</a></p>
+                <p>File sekarang: <a href="{{ asset('storage/' . $surat->isi_surat) }}" target="_blank">Lihat File</a></p>
             @endif
             <input type="file" name="isi_surat" class="form-control">
         </div>

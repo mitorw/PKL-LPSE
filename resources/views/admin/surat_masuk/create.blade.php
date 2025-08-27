@@ -37,7 +37,7 @@
     </div>
 
     <div class="mb-3">
-        <label>Keterangan (Lokasi Penyimpanan)</label>
+        <label>Lokasi Penyimpanan</label>
         <textarea name="keterangan" class="form-control">{{ old('keterangan') }}</textarea>
     </div>
 
@@ -88,7 +88,7 @@
     </div>
 
     <button class="btn btn-success" type="submit">Simpan</button>
-    <a href="{{ route('surat_masuk.index') }}" class="btn btn-secondary">Tutup</a>
+    <a href="{{ route('surat_masuk.index') }}" class="btn btn-secondary">Batal</a>
 </form>
 
 <script>
