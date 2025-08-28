@@ -165,7 +165,7 @@
                                         $badgeClass = match (strtolower(trim($surat->status))) {
                                             'penting' => 'bg-warning text-dark',
                                             'rahasia' => 'bg-danger',
-                                            default => 'bg-info',
+                                            default => 'bg-success',
                                         };
                                     @endphp
                                     <span class="badge rounded-pill {{ $badgeClass }}">{{ ucfirst($surat->status) }}</span>
