@@ -1,9 +1,8 @@
 @extends('layouts.admin')
 
 @section('content')
-    <div class="container">
-        <h2>Tambah Surat Keluar</h2>
 
+    {{-- Tampilkan Error Validasi --}}
         @if ($errors->any())
             <div class="alert alert-danger">
                 <ul>
@@ -14,6 +13,12 @@
             </div>
         @endif
 
+    {{-- Form Tambah Surat Keluar --}}
+    <div class="card">
+        <div class="card-header">
+            <h4>Tambah Surat Keluar</h4>
+        </div>
+        <div class="card-body">
         <form action="{{ route('surat_keluar.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="mb-3">
