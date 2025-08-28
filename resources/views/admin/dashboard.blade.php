@@ -332,6 +332,24 @@
 
 @push('scripts')
 <script>
+    // Simpan posisi scroll sebelum reload
+    window.addEventListener("beforeunload", function () {
+        localStorage.setItem("scrollY", window.scrollY);
+    });
+
+    // Restore posisi scroll setelah reload
+    window.addEventListener("load", function () {
+        if (localStorage.getItem("scrollY") !== null) {
+            window.scrollTo(0, localStorage.getItem("scrollY"));
+            localStorage.removeItem("scrollY"); // optional, hapus setelah dipakai
+        }
+    });
+</script>
+@endpush
+
+
+@push('scripts')
+<script>
     function cetakLaporan() {
         const form = document.getElementById('filterForm');
         const url = '{{ route('laporan.cetak') }}';
