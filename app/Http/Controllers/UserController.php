@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -43,14 +44,34 @@ class UserController extends Controller
             abort(403, 'Akses ditolak.');
         }
 
-
-        $request->validate([
+        // 1. Definisikan aturan validasi
+        $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|max:16',
             'role' => 'required|in:user,admin',
-        ]);
+        ];
 
+        // 2. Buat instance validator
+        $validator = Validator::make($request->all(), $rules);
+
+        // 3. Cek jika validasi gagal
+        if ($validator->fails()) {
+            // 4. Cek apakah error spesifiknya karena email sudah ada
+            if ($validator->errors()->has('email')) {
+                // Kirim pesan error kustom untuk SweetAlert2
+                return redirect()->back()
+                    ->with('error', 'Gagal menambahkan akun. Email sudah terdaftar!')
+                    ->withInput(); // withInput() agar data yg sudah diisi tidak hilang
+            }
+
+            // Untuk error validasi lainnya (misal: password kurang dari 8 karakter)
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        // 5. Jika lolos validasi, buat user baru
         User::create([
             'name' => $request->name,
             'email' => $request->email,

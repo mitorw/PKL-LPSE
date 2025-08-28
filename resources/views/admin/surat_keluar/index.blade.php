@@ -17,11 +17,7 @@
 
     <h2 class="mb-4">Daftar Surat Keluar</h2>
 
-    @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-
-
+    {{-- Form Filter dan Pencarian (Sudah Digabung) --}}
     <form method="GET" action="{{ route('surat_keluar.index') }}" class="mb-3 row g-2">
         {{-- Search --}}
         <div class="col-md-3">

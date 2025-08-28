@@ -262,7 +262,51 @@
 
         });
     </script>
+
+    {{-- Script untuk menampilkan notifikasi toast --}}
+    @push('scripts')
+    <script>
+        // Periksa apakah ada session 'success'
+        @if (session('success'))
+            // Jika ada, tampilkan notifikasi toast
+            Swal.fire({
+                toast: true,
+                position: 'top-end', // Posisi di pojok kanan atas
+                icon: 'success',
+                title: 'Berhasil!',
+                text: '{{ session('success') }}', // Ambil pesan dari session
+                showConfirmButton: false, // Sembunyikan tombol OK
+                timer: 3000, // Hilang otomatis dalam 3 detik
+                timerProgressBar: true, // Tampilkan progress bar waktu
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
+        @endif
+
+        // Anda juga bisa menambahkan untuk session 'error'
+        @if (session('error'))
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'error',
+                title: 'Gagal!',
+                text: '{{ session('error') }}',
+                showConfirmButton: false,
+                timer: 4000, // Waktu lebih lama untuk pesan error
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
+        @endif
+    </script>
+    @endpush
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     @stack('scripts')
 </body>
 

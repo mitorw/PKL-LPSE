@@ -16,12 +16,6 @@
     </style>
     <h2 class="mb-4">Daftar Surat Masuk</h2>
 
-    @if (session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-    @endif
-
     {{-- Form Filter dan Pencarian (Sudah Digabung) --}}
     <form action="{{ route('surat_masuk.index') }}" method="GET" class="mb-4">
         <div class="card">
