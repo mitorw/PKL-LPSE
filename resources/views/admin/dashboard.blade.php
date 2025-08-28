@@ -186,138 +186,146 @@
 @else
     {{-- Tampilan Default Dashboard --}}
     <div class="card mb-4">
-        <div class="card-body">
-            <h2 class="mb-3 h5 fw-bold">5 Surat Masuk Terakhir</h2>
-            <div class="table-responsive">
-                <table class="table align-middle table-hover">
-                    <thead class="table-light">
+    <div class="card-body">
+        <h2 class="mb-3 h5 fw-bold">Daftar Surat Masuk</h2>
+        <div class="table-responsive">
+            <table class="table align-middle table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>No</th>
+                        <th>
+                            <a class="text-decoration-none text-dark"
+                                href="{{ route('dashboard', array_merge(request()->query(), ['sort' => 'nomor_surat', 'direction' => request('direction') == 'asc' ? 'desc' : 'asc'])) }}">
+                                Nomor Surat
+                                @if (request('sort') == 'nomor_surat')
+                                    <i class="ms-1 fas fa-{{ request('direction') == 'asc' ? 'sort-up' : 'sort-down' }}"></i>
+                                @else
+                                    <i class="ms-1 fas fa-sort text-muted"></i>
+                                @endif
+                            </a>
+                        </th>
+                        <th>
+                            <a class="text-decoration-none text-dark"
+                                href="{{ route('dashboard', array_merge(request()->query(), ['sort' => 'tanggal', 'direction' => request('direction') == 'asc' ? 'desc' : 'asc'])) }}">
+                                Tanggal
+                                @if (request('sort') == 'tanggal')
+                                    <i class="ms-1 fas fa-{{ request('direction') == 'asc' ? 'sort-up' : 'sort-down' }}"></i>
+                                @else
+                                    <i class="ms-1 fas fa-sort text-muted"></i>
+                                @endif
+                            </a>
+                        </th>
+                        <th>Perihal</th>
+                        <th>Status</th>
+                        <th>Asal</th>
+                        <th>Lokasi Penyimpanan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($suratMasukTerakhir as $index => $surat)
                         <tr>
-                            <th>No</th>
-                            <th>
-                                {{-- Kode Anda, disesuaikan untuk kolom Nomor Surat --}}
-                                <a class="text-decoration-none text-dark" href="{{ route('dashboard', array_merge(request()->query(), ['sort' => 'nomor_surat', 'direction' => request('direction') == 'asc' ? 'desc' : 'asc'])) }}">
-                                    Nomor Surat
-                                    @if (request('sort') == 'nomor_surat')
-                                        <i class="ms-1 fas fa-{{ request('direction') == 'asc' ? 'sort-up' : 'sort-down' }}"></i>
-                                    @else
-                                        <i class="ms-1 fas fa-sort text-muted"></i>
-                                    @endif
-                                </a>
-                            </th>
-                            <th>
-                                {{-- Kode Anda, disesuaikan untuk kolom Tanggal --}}
-                                <a class="text-decoration-none text-dark" href="{{ route('dashboard', array_merge(request()->query(), ['sort' => 'tanggal', 'direction' => request('direction') == 'asc' ? 'desc' : 'asc'])) }}">
-                                    Tanggal Terima
-                                    {{-- Pengecekan 'sort' menggunakan 'tanggal' sesuai controller dashboard kita --}}
-                                    @if (request('sort') == 'tanggal')
-                                        <i class="ms-1 fas fa-{{ request('direction') == 'asc' ? 'sort-up' : 'sort-down' }}"></i>
-                                    @else
-                                        <i class="ms-1 fas fa-sort text-muted"></i>
-                                    @endif
-                                </a>
-                            </th>
-                            <th>Perihal</th>
-                            <th>Status</th>
-                            <th>Asal</th>
+                            <td>{{ $suratMasukTerakhir->firstItem() + $index }}</td>
+                            <td>{{ $surat->no_surat }}</td>
+                            <td>{{ \Carbon\Carbon::parse($surat->tanggal_terima)->translatedFormat('d F Y') }}</td>
+                            <td>{{ $surat->perihal }}</td>
+                            <td>
+                                @php
+                                    $badgeClass = match (strtolower(trim($surat->klasifikasi))) {
+                                        'penting' => 'bg-warning text-dark',
+                                        'rahasia' => 'bg-danger',
+                                        default => 'bg-success',
+                                    };
+                                @endphp
+                                <span class="badge rounded-pill {{ $badgeClass }}">{{ ucfirst($surat->klasifikasi) }}</span>
+                            </td>
+                            <td>{{ $surat->asal_surat ?? '-' }}</td>
+                            <td>{{ $surat->keterangan ?? '-' }}</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($suratMasukTerakhir as $index => $surat)
-                            <tr>
-                                <td>{{ $suratMasukTerakhir->firstItem() + $index }}</td>
-                                <td>{{ $surat->no_surat }}</td>
-                                <td>{{ \Carbon\Carbon::parse($surat->tanggal_terima)->translatedFormat('d F Y') }}</td>
-                                <td>{{ $surat->perihal }}</td>
-                                <td>
-                                    @php
-                                        $badgeClass = match (strtolower(trim($surat->klasifikasi))) {
-                                            'penting' => 'bg-warning text-dark',
-                                            'rahasia' => 'bg-danger',
-                                            default => 'bg-success',
-                                        };
-                                    @endphp
-                                    <span class="badge rounded-pill {{ $badgeClass }}">{{ ucfirst($surat->klasifikasi) }}</span>
-                                </td>
-                                <td>{{ $surat->asal_surat ?? '-' }}</td>
-                            </tr>
-                        @empty
-                            <tr><td colspan="6" class="text-center text-muted">Tidak ada data surat masuk.</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-            <div class="mt-3 d-flex justify-content-end">
-                {{ $suratMasukTerakhir->links() }}
-            </div>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">Tidak ada data surat masuk.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-3 d-flex justify-content-end">
+            {{ $suratMasukTerakhir->links() }}
         </div>
     </div>
+</div>
 
-    <div class="card">
-        <div class="card-body">
-            <h2 class="mb-3 h5 fw-bold">5 Surat Keluar Terakhir</h2>
-            <div class="table-responsive">
-                <table class="table align-middle table-hover">
-                    <thead class="table-light">
+---
+
+<div class="card">
+    <div class="card-body">
+        <h2 class="mb-3 h5 fw-bold">Daftar Surat Keluar</h2>
+        <div class="table-responsive">
+            <table class="table align-middle table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>No</th>
+                        <th>
+                            <a class="text-decoration-none text-dark"
+                                href="{{ route('dashboard', array_merge(request()->query(), ['sort' => 'nomor_surat', 'direction' => request('direction') == 'asc' ? 'desc' : 'asc'])) }}">
+                                Nomor Surat
+                                @if (request('sort') == 'nomor_surat')
+                                    <i class="ms-1 fas fa-{{ request('direction') == 'asc' ? 'sort-up' : 'sort-down' }}"></i>
+                                @else
+                                    <i class="ms-1 fas fa-sort text-muted"></i>
+                                @endif
+                            </a>
+                        </th>
+                        <th>
+                            <a class="text-decoration-none text-dark"
+                                href="{{ route('dashboard', array_merge(request()->query(), ['sort' => 'tanggal', 'direction' => request('direction') == 'asc' ? 'desc' : 'asc'])) }}">
+                                Tanggal
+                                @if (request('sort') == 'tanggal')
+                                    <i class="ms-1 fas fa-{{ request('direction') == 'asc' ? 'sort-up' : 'sort-down' }}"></i>
+                                @else
+                                    <i class="ms-1 fas fa-sort text-muted"></i>
+                                @endif
+                            </a>
+                        </th>
+                        <th>Perihal</th>
+                        <th>Status</th>
+                        <th>Tujuan</th>
+                        <th>Lokasi Penyimpanan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($suratKeluarTerakhir as $index => $surat)
                         <tr>
-                            <th>No</th>
-                            <th>
-                                {{-- Kode Anda, disesuaikan untuk kolom Nomor Surat --}}
-                                <a class="text-decoration-none text-dark" href="{{ route('dashboard', array_merge(request()->query(), ['sort' => 'nomor_surat', 'direction' => request('direction') == 'asc' ? 'desc' : 'asc'])) }}">
-                                    Nomor Surat
-                                    @if (request('sort') == 'nomor_surat')
-                                        <i class="ms-1 fas fa-{{ request('direction') == 'asc' ? 'sort-up' : 'sort-down' }}"></i>
-                                    @else
-                                        <i class="ms-1 fas fa-sort text-muted"></i>
-                                    @endif
-                                </a>
-                            </th>
-                            <th>
-                                {{-- Kode Anda, disesuaikan untuk kolom Tanggal --}}
-                                <a class="text-decoration-none text-dark" href="{{ route('dashboard', array_merge(request()->query(), ['sort' => 'tanggal', 'direction' => request('direction') == 'asc' ? 'desc' : 'asc'])) }}">
-                                    Tanggal
-                                    {{-- Pengecekan 'sort' menggunakan 'tanggal' sesuai controller dashboard kita --}}
-                                    @if (request('sort') == 'tanggal')
-                                        <i class="ms-1 fas fa-{{ request('direction') == 'asc' ? 'sort-up' : 'sort-down' }}"></i>
-                                    @else
-                                        <i class="ms-1 fas fa-sort text-muted"></i>
-                                    @endif
-                                </a>
-                            </th>
-                            <th>Perihal</th>
-                            <th>Status</th>
-                            <th>Tujuan</th>
+                            <td>{{ $suratKeluarTerakhir->firstItem() + $index }}</td>
+                            <td>{{ $surat->nomor_surat }}</td>
+                            <td>{{ \Carbon\Carbon::parse($surat->tanggal)->translatedFormat('d F Y') }}</td>
+                            <td>{{ $surat->perihal }}</td>
+                            <td>
+                                @php
+                                    $badgeClass = match (strtolower(trim($surat->klasifikasi))) {
+                                        'penting' => 'bg-warning text-dark',
+                                        'rahasia' => 'bg-danger',
+                                        default => 'bg-success',
+                                    };
+                                @endphp
+                                <span class="badge rounded-pill {{ $badgeClass }}">{{ ucfirst($surat->klasifikasi) }}</span>
+                            </td>
+                            <td>{{ $surat->tujuan ?? '-' }}</td>
+                            <td>{{ $surat->keterangan ?? '-' }}</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($suratKeluarTerakhir as $index => $surat)
-                            <tr>
-                                <td>{{ $suratKeluarTerakhir->firstItem() + $index }}</td>
-                                <td>{{ $surat->nomor_surat }}</td>
-                                <td>{{ \Carbon\Carbon::parse($surat->tanggal)->translatedFormat('d F Y') }}</td>
-                                <td>{{ $surat->perihal }}</td>
-                                <td>
-                                     @php
-                                        $badgeClass = match (strtolower(trim($surat->klasifikasi))) {
-                                            'penting' => 'bg-warning text-dark',
-                                            'rahasia' => 'bg-danger',
-                                            default => 'bg-success',
-                                        };
-                                    @endphp
-                                    <span class="badge rounded-pill {{ $badgeClass }}">{{ ucfirst($surat->klasifikasi) }}</span>
-                                </td>
-                                <td>{{ $surat->tujuan ?? '-' }}</td>
-                            </tr>
-                        @empty
-                            <tr><td colspan="6" class="text-center text-muted">Tidak ada data surat keluar.</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-            <div class="mt-3 d-flex justify-content-end">
-                {{ $suratKeluarTerakhir->links() }}
-            </div>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">Tidak ada data surat keluar.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-3 d-flex justify-content-end">
+            {{ $suratKeluarTerakhir->links() }}
         </div>
     </div>
+</div>
 @endif
 
 @endsection
