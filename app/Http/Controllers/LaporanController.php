@@ -247,7 +247,7 @@ class LaporanController extends Controller
             'chartBase64'    => $chartBase64,
         ])->setPaper('A4', 'portrait');
 
-        return $pdf->stream('Laporan-Surat-' . now()->format('Y-m-d') . '.pdf');
+        return $pdf->stream('Laporan Inventaris-' . now()->format('Y-m-d') . '.pdf');
     }
 
 

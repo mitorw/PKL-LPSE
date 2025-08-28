@@ -106,53 +106,116 @@
         </div>
     </div>
 
-    {{-- TABEL LAPORAN --}}
-    <div class="card">
-        <div class="card-body">
-            <h2 class="mb-3 h5 fw-bold">Daftar Surat</h2>
-            <div class="table-responsive">
-                <table class="table align-middle table-hover">
-                    <thead class="table-light">
+{{-- TABEL SURAT MASUK --}}
+<div class="card mb-4">
+    <div class="card-body">
+        <h2 class="mb-3 h5 fw-bold">Daftar Surat Masuk</h2>
+        <div class="table-responsive">
+            <table class="table align-middle table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>No</th>
+                        <th>Nomor Surat</th>
+                        <th>Tanggal</th>
+                        <th>Perihal</th>
+                        <th>Status</th>
+                        <th>Asal</th>
+                        <th>Keterangan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php $noMasuk = 1; @endphp
+                    @forelse($laporanSurat->where('jenis_surat', 'masuk') as $surat)
                         <tr>
-                            <th>Nomor Surat</th>
-                            <th>Tanggal</th>
-                            <th>Jenis Surat</th>
-                            <th>Perihal</th>
-                            <th>Status</th>
+                            <td>{{ $noMasuk++ }}</td>
+                            <td>{{ $surat->nomor_surat }}</td>
+                            <td>{{ \Carbon\Carbon::parse($surat->tanggal)->translatedFormat('d F Y') }}</td>
+                            <td>{{ $surat->perihal }}</td>
+                            <td>
+                                @php
+                                    $status = strtolower(trim($surat->status));
+                                    $badgeClass = match ($status) {
+                                        'penting' => 'bg-warning text-dark',
+                                        'rahasia' => 'bg-danger',
+                                        default => 'bg-success',
+                                    };
+                                @endphp
+                                <span class="badge rounded-pill {{ $badgeClass }}">
+                                    {{ ucfirst($surat->status) }}
+                                </span>
+                            </td>
+                            <td>{{ $surat->asal ?? '-' }}</td>
+                            <td>{{ $surat->keterangan ?? '-' }}</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($laporanSurat as $surat)
-                            <tr>
-                                <td>{{ $surat->nomor_surat }}</td>
-                                <td>{{ $surat->tanggal }}</td>
-                                <td>{{ ucfirst($surat->jenis_surat) }}</td>
-                                <td>{{ $surat->perihal }}</td>
-                                <td>
-                                    @php
-                                        $status = trim(strtolower($surat->status));
-                                        $badgeClass = match ($status) {
-                                            'penting' => 'bg-warning text-dark',
-                                            'rahasia' => 'bg-danger',
-                                            default => 'bg-success',
-                                        };
-                                    @endphp
-                                    <span class="badge rounded-pill {{ $badgeClass }}">{{ ucfirst($surat->status) }}</span>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="text-center text-muted">Tidak ada data surat yang ditemukan.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-                <div class="mt-3 d-flex justify-content-center">
-                    {{ $laporanSurat->appends(request()->query())->links('pagination::bootstrap-5') }}
-                </div>
-            </div>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">
+                                Tidak ada data surat masuk.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
+</div>
+
+{{-- TABEL SURAT KELUAR --}}
+<div class="card">
+    <div class="card-body">
+        <h2 class="mb-3 h5 fw-bold">Daftar Surat Keluar</h2>
+        <div class="table-responsive">
+            <table class="table align-middle table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>No</th>
+                        <th>Nomor Surat</th>
+                        <th>Tanggal</th>
+                        <th>Perihal</th>
+                        <th>Status</th>
+                        <th>Tujuan</th>
+                        <th>Dibuat Oleh</th>
+                        <th>Keterangan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php $noKeluar = 1; @endphp
+                    @forelse($laporanSurat->where('jenis_surat', 'keluar') as $surat)
+                        <tr>
+                            <td>{{ $noKeluar++ }}</td>
+                            <td>{{ $surat->nomor_surat }}</td>
+                            <td>{{ \Carbon\Carbon::parse($surat->tanggal)->translatedFormat('d F Y') }}</td>
+                            <td>{{ $surat->perihal }}</td>
+                            <td>
+                                @php
+                                    $status = strtolower(trim($surat->status));
+                                    $badgeClass = match ($status) {
+                                        'penting' => 'bg-warning text-dark',
+                                        'rahasia' => 'bg-danger',
+                                        default => 'bg-success',
+                                    };
+                                @endphp
+                                <span class="badge rounded-pill {{ $badgeClass }}">
+                                    {{ ucfirst($surat->status) }}
+                                </span>
+                            </td>
+                            <td>{{ $surat->tujuan ?? '-' }}</td>
+                            <td>{{ $surat->dibuat_oleh ?? '-' }}</td>
+                            <td>{{ $surat->keterangan ?? '-' }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="8" class="text-center text-muted">
+                                Tidak ada data surat keluar.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
