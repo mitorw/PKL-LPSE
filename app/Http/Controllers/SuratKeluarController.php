@@ -67,7 +67,7 @@ class SuratKeluarController extends Controller
             'tanggal' => 'required|date',
             'dibuat_oleh' => 'required|max:50',
             'klasifikasi' => 'required|in:biasa,penting,rahasia',
-            'isi_surat' => 'required|mimes:pdf,png,jpg,jpeg,doc,docx|max:4096',
+            'isi_surat' => 'required|mimes:pdf,png,jpg,jpeg,doc,docx|max:5120',
             'isi_surat_original' => 'nullable|string|max:255',
         ]);
 
@@ -169,7 +169,7 @@ class SuratKeluarController extends Controller
             'tanggal' => 'required|date',
             'dibuat_oleh' => 'required|max:50',
             'klasifikasi' => 'required|in:biasa,penting,rahasia',
-            'isi_surat' => 'nullable|mimes:pdf,png,jpg,jpeg,doc,docx|max:4096',
+            'isi_surat' => 'nullable|mimes:pdf,png,jpg,jpeg,doc,docx|max:5120',
             'isi_surat_original' => 'nullable|string|max:255',
         ]);
 

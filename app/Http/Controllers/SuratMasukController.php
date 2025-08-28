@@ -160,7 +160,7 @@ class SuratMasukController extends Controller
                 }
 
                 $pdf = Pdf::loadHTML($html)->setPaper('a4', 'portrait');
-                $filename = 'surat_masuk/' . uniqid() . '.pdf';
+                $filename = 'surat_masuk/converted/' . uniqid() . '.pdf';
                 Storage::disk('public')->put($filename, $pdf->output());
                 $fileSuratPath = $filename;
             }
@@ -175,7 +175,7 @@ class SuratMasukController extends Controller
                 $phpWord = IOFactory::load($files[0]->getPathName());
                 $pdfWriter = IOFactory::createWriter($phpWord, 'PDF');
 
-                $filename = 'surat_masuk/converted' . uniqid() . '.pdf';
+                $filename = 'surat_masuk/converted/' . uniqid() . '.pdf';
                 $tempPath = storage_path('app/public/' . $filename);
                 $pdfWriter->save($tempPath);
 
@@ -216,7 +216,7 @@ class SuratMasukController extends Controller
             'tanggal_terima' => 'required|date',
             'perihal' => 'required|string',
             'klasifikasi' => 'required|in:Rahasia,Penting,Biasa',
-            'file_surat' => 'nullable|mimes:pdf,png,jpg,jpeg|max:2048',
+            'file_surat' => 'nullable|mimes:pdf,png,jpg,jpeg,doc,docx|max:5120',
             'file_surat_original' => 'nullable|string|max:255',
             // Tambahkan validasi untuk status disposisi
             'disposisi_status' => 'required|in:ada,tidak',
@@ -253,9 +253,9 @@ class SuratMasukController extends Controller
             }
         }
 
-        // ... (Logika update file Anda tetap sama) ...
         $fileSuratPath = $surat->file_surat;
-        $originalPath = $surat->isi_surat_original; // original
+        $originalPath = $surat->file_surat_original; // original
+
         if ($request->hasFile('file_surat')) {
             if ($fileSuratPath && Storage::disk('public')->exists($fileSuratPath)) {
                 Storage::disk('public')->delete($fileSuratPath);
@@ -263,37 +263,38 @@ class SuratMasukController extends Controller
             if ($originalPath && Storage::disk('public')->exists($originalPath)) {
                 Storage::disk('public')->delete($originalPath);
             }
-            $files = $request->file('file_surat');
-            $ext = strtolower($files->getClientOriginalExtension());
 
-            $originalPath = $files->store('surat_masuk/original', 'public');
+            $file = $request->file('file_surat');
+            $ext = strtolower($file->getClientOriginalExtension());
+
+            $originalPath = $file->store('surat_masuk/original', 'public');
             // Case 1: kalau sudah PDF → tidak perlu convert
             if ($ext === 'pdf') {
-                $filePath = $originalPath;
+                $fileSuratPath = $originalPath;
             }
             // Case 2: gambar → PDF
             elseif (in_array($ext, ['jpg', 'jpeg', 'png'])) {
                 $manager = new ImageManager(new Driver());
-                $image = $manager->read($files->getPathname())->toJpeg();
+                $image = $manager->read($file->getPathname())->toJpeg();
 
                 $html = '<div style="page-break-after: always; text-align:center;">
                 <img src="data:image/jpeg;base64,' . base64_encode($image) . '" style="max-width:100%;height:auto;">
             </div>';
 
                 $pdf = Pdf::loadHTML($html)->setPaper('a4', 'portrait');
-                $filePath = 'surat_masuk/converted/' . uniqid() . '.pdf';
-                Storage::disk('public')->put($filePath, $pdf->output());
+                $fileSuratPath = 'surat_masuk/converted/' . uniqid() . '.pdf';
+                Storage::disk('public')->put($fileSuratPath, $pdf->output());
             }
             // Case 3: Word → PDF
             elseif (in_array($ext, ['doc', 'docx'])) {
                 \PhpOffice\PhpWord\Settings::setPdfRendererName('DomPDF');
                 \PhpOffice\PhpWord\Settings::setPdfRendererPath(base_path('vendor/dompdf/dompdf'));
 
-                $phpWord = IOFactory::load($files->getPathname());
+                $phpWord = IOFactory::load($file->getPathname());
                 $pdfWriter = IOFactory::createWriter($phpWord, 'PDF');
 
-                $filePath = 'surat_masuk/converted/' . uniqid() . '.pdf';
-                $tempPdf = storage_path('app/public/' . $filePath);
+                $fileSuratPath = 'surat_masuk/converted/' . uniqid() . '.pdf';
+                $tempPdf = storage_path('app/public/' . $fileSuratPath);
                 $pdfWriter->save($tempPdf);
             }
         }
@@ -308,7 +309,7 @@ class SuratMasukController extends Controller
             'klasifikasi' => $request->klasifikasi,
             'id_disposisi' => $idDisposisi, // Simpan ID disposisi yang baru (atau null)
             'file_surat' => $fileSuratPath,
-            'file_surat_original' => $originalPath ?? null,
+            'file_surat_original' => $originalPath,
         ]);
 
         return redirect()->route('surat_masuk.index')->with('success', 'Surat masuk berhasil diperbarui');
@@ -328,6 +329,9 @@ class SuratMasukController extends Controller
         $surat = SuratMasuk::findOrFail($id);
         if ($surat->file_surat && Storage::disk('public')->exists($surat->file_surat)) {
             Storage::disk('public')->delete($surat->file_surat);
+        }
+        if ($surat->file_surat_original && Storage::disk('public')->exists($surat->file_surat_original)) {
+            Storage::disk('public')->delete($surat->file_surat_original);
         }
         $surat->delete();
         return redirect()->route('surat_masuk.index')->with('success', 'Surat berhasil dihapus');
