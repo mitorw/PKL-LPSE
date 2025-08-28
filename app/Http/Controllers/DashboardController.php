@@ -20,117 +20,105 @@ class DashboardController extends Controller
      */
     // ReportDashboardController.php
 
-public function index(Request $request)
-{
-    // ====== DATA KARTU & CHART ======
-    $suratMasukCount  = SuratMasuk::count();
-    $suratKeluarCount = SuratKeluar::count();
-    $penggunaCount    = User::count();
+    public function index(Request $request)
+    {
+        // Data untuk Kartu & Grafik
+        $suratMasukCount  = SuratMasuk::count();
+        $suratKeluarCount = SuratKeluar::count();
+        $penggunaCount    = User::count();
 
-    Carbon::setLocale('id');
-
-    $barChartLabels = [];
-    $suratMasukData = [];
-    $suratKeluarData = [];
-    for ($i = 5; $i >= 0; $i--) {
-        $date  = Carbon::now()->subMonths($i);
-        $bulan = $date->translatedFormat('F');
-        $tahun = $date->format('Y');
-
-        $barChartLabels[] = $bulan;
-
-        $suratMasukData[] = SuratMasuk::whereYear('tanggal_terima', $tahun)
-            ->whereMonth('tanggal_terima', $date->month)->count();
-        $suratKeluarData[] = SuratKeluar::whereYear('tanggal', $tahun)
-            ->whereMonth('tanggal', $date->month)->count();
-    }
-
-    $currentMonth = Carbon::now();
-    $pieChartData = [
-        SuratMasuk::whereYear('tanggal_terima', $currentMonth->year)
-            ->whereMonth('tanggal_terima', $currentMonth->month)->count(),
-        SuratKeluar::whereYear('tanggal', $currentMonth->year)
-            ->whereMonth('tanggal', $currentMonth->month)->count(),
-    ];
-    $totalSuratBulanIni = array_sum($pieChartData);
-    $namaBulanIni = $currentMonth->translatedFormat('F');
-
-    // ====== DATA TABEL LAPORAN (FILTER + UNION + PAGINATION) ======
-    $suratMasuk  = SuratMasuk::query();
-    $suratKeluar = SuratKeluar::query();
-
-    if ($request->filled('nomor_surat')) {
-        $nomor = $request->nomor_surat;
-        $suratMasuk->where('no_surat', 'like', "%{$nomor}%");
-        $suratKeluar->where('nomor_surat', 'like', "%{$nomor}%");
-    }
-    if ($request->filled('dari_tanggal')) {
-        $suratMasuk->whereDate('tanggal_terima', '>=', $request->dari_tanggal);
-        $suratKeluar->whereDate('tanggal', '>=', $request->dari_tanggal);
-    }
-    if ($request->filled('sampai_tanggal')) {
-        $suratMasuk->whereDate('tanggal_terima', '<=', $request->sampai_tanggal);
-        $suratKeluar->whereDate('tanggal', '<=', $request->sampai_tanggal);
-    }
-    if ($request->filled('status') && $request->status !== 'all') {
-        $suratMasuk->where('klasifikasi', $request->status);
-        $suratKeluar->where('klasifikasi', $request->status);
-    }
-    if ($request->filled('jenis_surat') && $request->jenis_surat !== 'all') {
-        if ($request->jenis_surat === 'masuk') {
-            $suratKeluar->whereRaw('1=0');
-        } elseif ($request->jenis_surat === 'keluar') {
-            $suratMasuk->whereRaw('1=0');
+        Carbon::setLocale('id');
+        $barChartLabels = [];
+        $suratMasukData = [];
+        $suratKeluarData = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $date = Carbon::now()->subMonths($i);
+            $barChartLabels[] = $date->translatedFormat('F');
+            $suratMasukData[] = SuratMasuk::whereYear('tanggal_terima', $date->year)->whereMonth('tanggal_terima', $date->month)->count();
+            $suratKeluarData[] = SuratKeluar::whereYear('tanggal', $date->year)->whereMonth('tanggal', $date->month)->count();
         }
+
+        $currentMonth = Carbon::now();
+        $pieChartData = [
+            SuratMasuk::whereYear('tanggal_terima', $currentMonth->year)->whereMonth('tanggal_terima', $currentMonth->month)->count(),
+            SuratKeluar::whereYear('tanggal', $currentMonth->year)->whereMonth('tanggal', $currentMonth->month)->count(),
+        ];
+        $totalSuratBulanIni = array_sum($pieChartData);
+        $namaBulanIni = $currentMonth->translatedFormat('F');
+
+        // Data untuk Tampilan Default Dashboard (5 Terakhir)
+        // 1. Ambil parameter sorting dari URL.
+        $sortColumn = $request->get('sort', 'tanggal');
+        $sortDirection = $request->get('direction', 'desc');
+
+        // 2. Mapping nama kolom agar sesuai untuk tiap tabel.
+        $sortMasukColumn = ($sortColumn == 'tanggal') ? 'tanggal_terima' : 'no_surat';
+        $sortKeluarColumn = ($sortColumn == 'tanggal') ? 'tanggal' : 'nomor_surat';
+
+        // 3. Terapkan sorting dinamis menggunakan orderBy().
+        $suratMasukTerakhir = SuratMasuk::orderBy($sortMasukColumn, $sortDirection)
+            ->paginate(5, ['*'], 'masuk_page')
+            ->appends(request()->query());
+
+        $suratKeluarTerakhir = SuratKeluar::orderBy($sortKeluarColumn, $sortDirection)
+            ->paginate(5, ['*'], 'keluar_page')
+            ->appends(request()->query());
+
+        // Logika untuk Fitur Filter
+        $isFiltering = $request->hasAny(['nomor_surat', 'dari_tanggal', 'sampai_tanggal', 'status', 'jenis_surat']);
+        $laporanSurat = $this->paginateCollection(collect(), 10);
+
+        if ($isFiltering) {
+            $queryMasuk  = SuratMasuk::query();
+            $queryKeluar = SuratKeluar::query();
+
+            if ($request->filled('nomor_surat')) {
+                $nomor = $request->nomor_surat;
+                $queryMasuk->where('no_surat', 'like', "%{$nomor}%");
+                $queryKeluar->where('nomor_surat', 'like', "%{$nomor}%");
+            }
+            if ($request->filled('dari_tanggal')) {
+                $queryMasuk->whereDate('tanggal_terima', '>=', $request->dari_tanggal);
+                $queryKeluar->whereDate('tanggal', '>=', $request->dari_tanggal);
+            }
+            if ($request->filled('sampai_tanggal')) {
+                $queryMasuk->whereDate('tanggal_terima', '<=', $request->sampai_tanggal);
+                $queryKeluar->whereDate('tanggal', '<=', $request->sampai_tanggal);
+            }
+            if ($request->filled('status') && $request->status !== 'all') {
+                $queryMasuk->where('klasifikasi', $request->status);
+                $queryKeluar->where('klasifikasi', $request->status);
+            }
+            if ($request->filled('jenis_surat') && $request->jenis_surat !== 'all') {
+                if ($request->jenis_surat === 'masuk') $queryKeluar->whereRaw('1=0');
+                elseif ($request->jenis_surat === 'keluar') $queryMasuk->whereRaw('1=0');
+            }
+
+            $suratMasukQuery = $queryMasuk->select('no_surat as nomor_surat', 'tanggal_terima as tanggal', 'perihal', 'klasifikasi as status', 'id_surat_masuk as id', 'asal_surat as asal', 'keterangan', DB::raw('NULL as tujuan'), DB::raw('NULL as dibuat_oleh'))->selectRaw("'masuk' as jenis_surat");
+            $suratKeluarQuery = $queryKeluar->select('nomor_surat', 'tanggal', 'perihal', 'klasifikasi as status', 'id', DB::raw('NULL as asal'), 'keterangan', 'tujuan', 'dibuat_oleh')->selectRaw("'keluar' as jenis_surat");
+
+            $query = $suratMasukQuery->unionAll($suratKeluarQuery);
+            $data = $query->orderBy($request->get('sort', 'tanggal'), $request->get('direction', 'desc'))->get();
+            $laporanSurat = $this->paginateCollection($data, 10, $request->page);
+        }
+
+        return view('admin.dashboard', [
+            'suratMasuk' => $suratMasukCount,
+            'suratKeluar' => $suratKeluarCount,
+            'pengguna' => $penggunaCount,
+            'barChartLabels' => $barChartLabels,
+            'suratMasukData' => $suratMasukData,
+            'suratKeluarData' => $suratKeluarData,
+            'pieChartData' => $pieChartData,
+            'totalSuratBulanIni' => $totalSuratBulanIni,
+            'namaBulanIni' => $namaBulanIni,
+            'pageTitle' => 'Dashboard',
+            'suratMasukTerakhir' => $suratMasukTerakhir,
+            'suratKeluarTerakhir' => $suratKeluarTerakhir,
+            'laporanSurat' => $laporanSurat,
+            'isFiltering' => $isFiltering,
+        ]);
     }
-
-    $suratMasukQuery = $suratMasuk->select(
-        'no_surat as nomor_surat',
-        'tanggal_terima as tanggal',
-        'perihal',
-        'klasifikasi as status',
-        'id_surat_masuk as id',
-        'asal_surat as asal',
-        'keterangan',
-        DB::raw('NULL as tujuan'),
-        DB::raw('NULL as dibuat_oleh')
-    )->selectRaw("'masuk' as jenis_surat");
-
-    $suratKeluarQuery = $suratKeluar->select(
-        'nomor_surat',
-        'tanggal',
-        'perihal',
-        'klasifikasi as status',
-        'id',
-        DB::raw('NULL as asal'),
-        'keterangan',
-        'tujuan',
-        'dibuat_oleh'
-    )->selectRaw("'keluar' as jenis_surat");
-
-    $query = $suratMasukQuery->unionAll($suratKeluarQuery);
-
-    $sortColumn = $request->get('sort', 'tanggal');
-    $sortDirection = $request->get('direction', 'desc');
-    $data = $query->orderBy($sortColumn, $sortDirection)->get();
-
-    $laporanSurat = $this->paginateCollection($data, 10, $request->page);
-
-    // ====== KIRIM KE VIEW ======
-    return view('admin.dashboard', [
-        'suratMasuk' => $suratMasukCount,
-        'suratKeluar' => $suratKeluarCount,
-        'pengguna' => $penggunaCount,
-        'barChartLabels' => $barChartLabels,
-        'suratMasukData' => $suratMasukData,
-        'suratKeluarData' => $suratKeluarData,
-        'pieChartData' => $pieChartData,
-        'totalSuratBulanIni' => $totalSuratBulanIni,
-        'namaBulanIni' => $namaBulanIni,
-        'laporanSurat' => $laporanSurat,   // <-- ini kuncinya
-        'pageTitle' => 'Dashboard',
-    ]);
-}
 
 
     /**
