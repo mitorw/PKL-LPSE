@@ -15,31 +15,6 @@
             overflow-x: hidden;
         }
 
-        .sidebar-brand {
-            height: 95px; /* Sama dengan tinggi .header-bar */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 10px; /* Sedikit padding horizontal */
-            margin-bottom: 10px; /* Jarak ke menu di bawahnya */
-        }
-
-        /* Style khusus untuk link di dalam wadah judul */
-        .sidebar-brand a {
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
-            text-align: center;
-            text-decoration: none;
-            line-height: 1.2; /* Mengatur jarak antar baris jika teksnya 2 baris */
-        }
-
-        /* Pastikan link judul tidak terpengaruh style flexbox dari link menu */
-        .sidebar-brand a:hover {
-            background-color: transparent; /* Hilangkan efek hover */
-        }
-
-
         .sidebar {
             width: 240px;
             height: 100vh;
@@ -188,10 +163,10 @@
 <body>
     {{-- Side Bar --}}
     <div class="sidebar">
-        <div class="sidebar-brand">
+        <div style="text-align: center; padding: 10px 0; border-bottom: 4px solid #3f51b5;">
             <h4>Sistem Inventaris Surat</h4>
         </div>
-        <a href="{{ route('dashboard') }}"><i class="fa fa-file-alt"></i> Dashboard</a>
+        <a href="{{ route('dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
         <a href="{{ route('surat_masuk.index') }}"><i class="fa fa-inbox"></i> Surat Masuk</a>
         <a href="{{ route('surat_keluar.index') }}"><i class="fa fa-paper-plane"></i> Surat Keluar</a>
         @auth
