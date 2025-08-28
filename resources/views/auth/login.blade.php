@@ -102,6 +102,13 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
+            {{-- checkbox show pass --}}
+            <div class="mb-3 form-check">
+                <input class="form-check-input" type="checkbox" id="showPassword">
+                <label class="form-check-label" for="showPassword">
+                    Tampilkan Password
+                </label>
+            </div>
 
 
             <!-- Actions -->
@@ -117,6 +124,22 @@
         </form>
     </div>
 </div>
+
+<script>
+    // Pastikan skrip berjalan setelah halaman dimuat sepenuhnya
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ambil elemen password dan checkbox berdasarkan ID-nya
+        const passwordInput = document.getElementById('password');
+        const showPasswordCheckbox = document.getElementById('showPassword');
+
+        // Tambahkan 'event listener' saat checkbox diubah (dicentang/tidak)
+        showPasswordCheckbox.addEventListener('change', function() {
+            // Ubah tipe input password berdasarkan status checkbox
+            // Jika dicentang (this.checked), tipe jadi 'text', jika tidak, jadi 'password'
+            passwordInput.type = this.checked ? 'text' : 'password';
+        });
+    });
+</script>
 
 
 </body>
