@@ -144,7 +144,17 @@
                         <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
                             {{ $surat->perihal }}</td>
                         <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
-                            {{ $surat->klasifikasi }}</td>
+                            @php
+                                $badgeClass = match (strtolower(trim($surat->klasifikasi))) {
+                                    'penting' => 'bg-warning text-dark',
+                                    'rahasia' => 'bg-danger',
+                                    default => 'bg-success',
+                                };
+                            @endphp
+
+                            {{-- Kode untuk menampilkan badge-nya, misalnya: --}}
+                            <span class="badge {{ $badgeClass }}">{{ $surat->klasifikasi }}</span>
+                        </td>
                         <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
                             {{ $surat->disposisi->dis_bagian ?? '-' }}</td>
                         <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">

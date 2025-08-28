@@ -111,8 +111,18 @@
                             {{ date('d/m/Y', strtotime($surat->tanggal)) }}</td>
                         <td data-bs-toggle="modal" data-bs-target="#detailSuratKeluarModal{{ $surat->id }}">
                             {{ $surat->dibuat_oleh }}</td>
-                        <td data-bs-toggle="modal" data-bs-target="#detailSuratKeluarModal{{ $surat->id }}">
-                            {{ ucfirst($surat->klasifikasi) }}</td>
+                        <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
+                            @php
+                                $badgeClass = match (strtolower(trim($surat->klasifikasi))) {
+                                    'penting' => 'bg-warning text-dark',
+                                    'rahasia' => 'bg-danger',
+                                    default => 'bg-success',
+                                };
+                            @endphp
+
+                            {{-- Kode untuk menampilkan badge-nya, misalnya: --}}
+                            <span class="badge {{ $badgeClass }}">{{ $surat->klasifikasi }}</span>
+                        </td>
                         <td>
                             @if ($surat->isi_surat)
                                 <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#pdfModal"
