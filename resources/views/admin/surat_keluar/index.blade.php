@@ -17,45 +17,49 @@
 
     <h2 class="mb-4">Daftar Surat Keluar</h2>
 
-    {{-- Form Filter dan Pencarian (Sudah Digabung) --}}
-    <form method="GET" action="{{ route('surat_keluar.index') }}" class="mb-3 row g-2">
-        {{-- Search --}}
-        <div class="col-md-3">
-            <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Cari...">
-        </div>
+     <div class="card">
+            <div class="card-body">
+                {{-- Form Filter dan Pencarian (Sudah Digabung) --}}
+                <form method="GET" action="{{ route('surat_keluar.index') }}" class=" row g-2">
+                    {{-- Search --}}
+                    <div class="col-md-3">
+                        <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Cari...">
+                    </div>
 
-        {{-- Filter Klasifikasi --}}
-        <div class="col-md-2">
-            <select name="klasifikasi" class="form-control">
-                <option value="">-- Semua Klasifikasi --</option>
-                <option value="biasa" {{ request('klasifikasi') == 'biasa' ? 'selected' : '' }}>Biasa</option>
-                <option value="penting" {{ request('klasifikasi') == 'penting' ? 'selected' : '' }}>Penting</option>
-                <option value="rahasia" {{ request('klasifikasi') == 'rahasia' ? 'selected' : '' }}>Rahasia</option>
-            </select>
-        </div>
+                    {{-- Filter Klasifikasi --}}
+                    <div class="col-md-2">
+                        <select name="klasifikasi" class="form-control">
+                            <option value="">-- Semua Klasifikasi --</option>
+                            <option value="biasa" {{ request('klasifikasi') == 'biasa' ? 'selected' : '' }}>Biasa</option>
+                            <option value="penting" {{ request('klasifikasi') == 'penting' ? 'selected' : '' }}>Penting</option>
+                            <option value="rahasia" {{ request('klasifikasi') == 'rahasia' ? 'selected' : '' }}>Rahasia</option>
+                        </select>
+                    </div>
 
-        {{-- Filter Tanggal --}}
-        <div class="col-md-2">
-            <input type="date" name="tanggal_awal" value="{{ request('tanggal_awal') }}" class="form-control">
-        </div>
-        <div class="col-md-2">
-            <input type="date" name="tanggal_akhir" value="{{ request('tanggal_akhir') }}" class="form-control">
-        </div>
+                    {{-- Filter Tanggal --}}
+                    <div class="col-md-2">
+                        <input type="date" name="tanggal_awal" value="{{ request('tanggal_awal') }}" class="form-control">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="date" name="tanggal_akhir" value="{{ request('tanggal_akhir') }}" class="form-control">
+                    </div>
 
-        {{-- Tombol Submit --}}
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-primary w-100">Filter</button>
-        </div>
+                    {{-- Tombol Submit --}}
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">Filter</button>
+                    </div>
 
-        {{-- Tombol Reset --}}
-        <div class="col-md-1">
-            <a href="{{ route('surat_keluar.index') }}" class="btn btn-secondary w-100">Reset</a>
-        </div>
-    </form>
+                    {{-- Tombol Reset --}}
+                    <div class="col-md-1">
+                        <a href="{{ route('surat_keluar.index') }}" class="btn btn-secondary w-100">Reset</a>
+                    </div>
+                </form>
+            </div>
+     </div>
 
     @auth
         @if (Auth::user()->role === 'admin')
-            <a href="{{ route('surat_keluar.create') }}" class="mb-3 btn btn-primary">Tambah Surat Keluar</a>
+            <a href="{{ route('surat_keluar.create') }}" class="mt-3 mb-3 btn btn-primary">Tambah Surat Keluar</a>
         @endif
     @endauth
 
