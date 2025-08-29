@@ -3,46 +3,6 @@
 @section('content')
     <h2>Profil Pengguna</h2>
 
-   {{-- ALERT BERHASIL --}}
-@if(session('success'))
-    <div class="mt-3 alert alert-success alert-dismissible fade show" role="alert">
-        {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-@endif
-
-{{-- ALERT GAGAL (custom dari controller) --}}
-@if(session('error'))
-    <div class="mt-3 alert alert-danger alert-dismissible fade show" role="alert">
-        {{ session('error') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-@endif
-
-{{-- ALERT VALIDASI LARAVEL --}}
-@if($errors->updatePassword->any())
-    <div class="mt-3 alert alert-danger alert-dismissible fade show" role="alert">
-        <ul class="mb-0">
-            @foreach($errors->updatePassword->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-@endif
-
-{{-- ALERT VALIDASI PROFIL --}}
-@if($errors->any())
-    <div class="mt-3 alert alert-danger alert-dismissible fade show" role="alert">
-        <ul class="mb-0">
-            @foreach($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-@endif
-
 
     <style>
         .profile-header {
@@ -188,7 +148,8 @@
                                 </div>
                             </div>
                             <div class="mb-3 row">
-                                <label for="password_confirmation" class="col-sm-3 col-form-label">Confirm Password</label>
+                                <label for="password_confirmation" class="col-sm-3 col-form-label">Confirm
+                                    Password</label>
                                 <div class="col-sm-9">
                                     <div class="input-group">
                                         <input id="password_confirmation" name="password_confirmation" type="password"
@@ -289,89 +250,96 @@
         });
     </script>
     <script>
-document.addEventListener('DOMContentLoaded', function() {
-    let croppieInstance;
-    const fileInput = document.getElementById('formFile');
-    const croppieContainer = document.getElementById('croppie-container');
-    const cropBtn = document.getElementById('crop-result');
+        document.addEventListener('DOMContentLoaded', function() {
+            let croppieInstance;
+            const fileInput = document.getElementById('formFile');
+            const croppieContainer = document.getElementById('croppie-container');
+            const cropBtn = document.getElementById('crop-result');
 
-    fileInput.addEventListener('change', function(event) {
-        const file = event.target.files[0];
+            fileInput.addEventListener('change', function(event) {
+                const file = event.target.files[0];
 
-        if (!file) return;
+                if (!file) return;
 
-        // ✅ Validasi ekstensi / MIME type
-        const validTypes = ["image/jpeg", "image/jpg", "image/png"];
-        if (!validTypes.includes(file.type)) {
-            alert("❌ Hanya file JPG, JPEG, atau PNG yang diperbolehkan!");
-            fileInput.value = ""; // reset input
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            croppieContainer.style.display = 'block';
-
-            // Hapus instance lama
-            if (croppieInstance) {
-                croppieInstance.destroy();
-            }
-
-            // Buat croppie baru
-            croppieInstance = new Croppie(croppieContainer, {
-                viewport: {
-                    width: 200,
-                    height: 200,
-                    type: 'circle'
-                },
-                boundary: {
-                    width: 300,
-                    height: 300
-                },
-                enableOrientation: true
-            });
-
-            croppieInstance.bind({
-                url: e.target.result
-            });
-        };
-        reader.readAsDataURL(file);
-    });
-
-    cropBtn.addEventListener('click', function() {
-        if (!croppieInstance) {
-            alert("⚠️ Silakan pilih foto dulu!");
-            return;
-        }
-
-        croppieInstance.result({
-            type: 'base64',
-            size: 'viewport'
-        }).then(function(base64) {
-            fetch("{{ route('profile.photo.update') }}", {
-                method: "POST",
-                headers: {
-                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    image: base64
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert("❌ Gagal menyimpan foto profil!");
+                // ✅ Validasi ekstensi / MIME type
+                const validTypes = ["image/jpeg", "image/jpg", "image/png"];
+                if (!validTypes.includes(file.type)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Format File Salah',
+                        text: 'Hanya file JPG, JPEG, atau PNG yang diperbolehkan!'
+                    });
+                    fileInput.value = ""; // reset input
+                    return;
                 }
-            })
-            .catch(() => {
-                alert("❌ Terjadi error saat mengirim data!");
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    croppieContainer.style.display = 'block';
+
+                    // Hapus instance lama
+                    if (croppieInstance) {
+                        croppieInstance.destroy();
+                    }
+
+                    // Buat croppie baru
+                    croppieInstance = new Croppie(croppieContainer, {
+                        viewport: {
+                            width: 200,
+                            height: 200,
+                            type: 'circle'
+                        },
+                        boundary: {
+                            width: 300,
+                            height: 300
+                        },
+                        enableOrientation: true
+                    });
+
+                    croppieInstance.bind({
+                        url: e.target.result
+                    });
+                };
+                reader.readAsDataURL(file);
+            });
+
+            cropBtn.addEventListener('click', function() {
+                if (!croppieInstance) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Perhatian',
+                        text: 'Silakan pilih foto terlebih dahulu!'
+                    });
+                    return;
+                }
+
+                croppieInstance.result({
+                    type: 'base64',
+                    size: 'viewport'
+                }).then(function(base64) {
+                    fetch("{{ route('profile.photo.update') }}", {
+                            method: "POST",
+                            headers: {
+                                "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                image: base64
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                location.reload();
+                            } else {
+                                alert("❌ Gagal menyimpan foto profil!");
+                            }
+                        })
+                        .catch(() => {
+                            alert("❌ Terjadi error saat mengirim data!");
+                        });
+                });
             });
         });
-    });
-});
-
     </script>
 @endpush

@@ -407,6 +407,14 @@
                 });
             @endif
 
+            @php
+                $allErrors = [];
+                foreach ($errors->getBags() as $bag) {
+                    $allErrors = array_merge($allErrors, $bag->all());
+                }
+                $errorList = implode('<br>', $allErrors);
+            @endphp
+
             @if ($errors->any())
                 @php
                     // Mengubah array error menjadi string dengan pemisah <br>

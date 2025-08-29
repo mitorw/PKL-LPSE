@@ -17,7 +17,7 @@
 
     <h2 class="mb-4">Daftar Surat Keluar</h2>
 
-     <div class="card">
+     <div class="card mb-4">
             <div class="card-body">
                 {{-- Form Filter dan Pencarian (Sudah Digabung) --}}
                 <form method="GET" action="{{ route('surat_keluar.index') }}" class=" row g-2">
