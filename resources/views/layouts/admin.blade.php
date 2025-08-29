@@ -235,6 +235,12 @@
 </head>
 
 <body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     {{-- Side Bar --}}
     <div class="sidebar">
         <div style="text-align: center; padding: 10px 0; border-bottom: 4px solid #3f51b5;">
@@ -331,13 +337,6 @@
     </div>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-
-    <!-- Croppie JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js"></script>
-
 
     {{-- SCRIPT BARU UNTUK FUNGSI TOGGLE SIDEBAR --}}
     <script>
@@ -407,10 +406,21 @@
                     }
                 });
             @endif
+
+            @if ($errors->any())
+                @php
+                    // Mengubah array error menjadi string dengan pemisah <br>
+                    $errorList = implode('<br>', $errors->all());
+                @endphp
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops... Ada yang salah!',
+                    // Gunakan 'html' agar tag <br> bisa dirender
+                    html: '{!! $errorList !!}',
+                });
+            @endif
         </script>
     @endpush
-
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     @stack('scripts')
 </body>
