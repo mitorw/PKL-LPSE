@@ -5,13 +5,11 @@
     <title>Sistem Manajemen Surat</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Croppie CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css" />
 
     <style>
         body {
             background-color: #f5f5f5;
-            /* Mencegah scroll horizontal saat sidebar transisi */
             overflow-x: hidden;
         }
 
@@ -19,21 +17,8 @@
             border-radius: 0.75rem !important;
             box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15) !important;
             border: none !important;
-            padding-top: 0;
-            padding-bottom: 0;
-            min-width: 280px;
-
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.2s ease-in-out;
         }
 
-        .dropdown-menu.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* Style untuk header di dalam dropdown */
         .dropdown-header-custom {
             padding: 1rem;
             border-bottom: 1px solid #e9ecef;
@@ -43,13 +28,10 @@
             font-weight: 600;
         }
 
-        /* Style untuk item menu */
         .dropdown-item {
             padding: 0.75rem 1.25rem;
             display: flex;
             align-items: center;
-            font-size: 1rem;
-            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
         }
 
         .dropdown-item i {
@@ -57,31 +39,18 @@
             color: #6c757d;
         }
 
-        .dropdown-item:hover i {
-            width: 20px;
+        .dropdown-item:hover {
+            background-color: #5c6bc0;
             color: #f5f5f5;
         }
 
-        .dropdown-item:hover {
-            background-color: #5c6bc0;
-            color: #f5f5f5
+        .dropdown-item:hover i {
+            color: #f5f5f5;
         }
 
         .dropdown-item.text-danger:hover,
         .dropdown-item.text-danger:hover i {
             color: white !important;
-            /* Tambahkan !important */
-        }
-
-
-        .dropdown-item:active {
-            transform: scale(0.98);
-            background-color: #e9ecef;
-        }
-
-        /* Style untuk garis pemisah */
-        .dropdown-divider {
-            margin: 0;
         }
 
         .sidebar {
@@ -91,10 +60,8 @@
             color: white;
             position: fixed;
             padding-top: 5px;
-            /* Menambahkan transisi untuk efek animasi yang mulus */
             transition: margin-left 0.3s ease-in-out;
             z-index: 1030;
-            /* Pastikan sidebar di atas konten lain */
         }
 
         .sidebar a {
@@ -104,32 +71,21 @@
             text-decoration: none;
             font-size: 18px;
             align-items: center;
-            /* Menyejajarkan ikon dan teks secara vertikal di tengah */
-            transition: background-color 0.2s transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
 
-        /* Memberi gaya pada ikon di dalam link */
         .sidebar a i {
             width: 40px;
-            /* Memberi lebar tetap agar semua teks lurus sejajar */
             margin-right: 8px;
-            /* Memberi sedikit jarak antara ikon dan teks */
             text-align: center;
-            /* Memastikan ikon berada di tengah area lebarnya */
-            font-size: 1.1em;
-            /* Sedikit menyesuaikan ukuran ikon */
         }
 
         .sidebar a:hover {
             background-color: #ffffff33;
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
         }
 
-        /* Wrapper untuk konten utama (header + content) */
         #content-wrapper {
             margin-left: 240px;
             padding-top: 0;
-            /* Header akan menangani padding atas */
             transition: margin-left 0.3s ease-in-out;
         }
 
@@ -141,7 +97,6 @@
             border-radius: 10px;
         }
 
-        /* Header bar yang menempel */
         .header-bar {
             color: white;
             height: 95px;
@@ -156,51 +111,30 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        /* Tombol untuk toggle sidebar */
         #sidebarToggle {
             background: transparent;
-            /* Latar belakang transparan */
             border: 1px solid rgba(255, 255, 255, 0.3);
-            /* Border tipis semi-transparan */
             color: white;
             font-size: 20px;
-            /* Sedikit diperkecil agar pas dengan padding */
             margin-right: 15px;
             padding: 6px 12px;
-            /* Memberi ruang di dalam tombol */
             border-radius: 8px;
-            /* Sudut yang sedikit melengkung */
             cursor: pointer;
-            /* Mengubah kursor menjadi tangan saat di-hover */
-
-            /* Menambahkan transisi untuk efek hover yang mulus */
-            transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
         }
 
-        /* Efek saat kursor mouse berada di atas tombol */
         #sidebarToggle:hover {
             background-color: rgba(255, 255, 255, 0.1);
-            /* Latar belakang sedikit menyala */
-            border-color: rgba(255, 255, 255, 0.7);
-            /* Border menjadi lebih jelas */
         }
 
-        /* === KONDISI KETIKA SIDEBAR DISEMBUNYIKAN === */
         body.sidebar-toggled .sidebar {
             margin-left: -240px;
-            /* Sembunyikan sidebar ke kiri */
         }
 
         body.sidebar-toggled #content-wrapper {
             margin-left: 0;
-            /* Konten utama memakai lebar penuh */
         }
 
-
-        /* === ATURAN RESPONSIVE UNTUK MOBILE === */
         @media (max-width: 768px) {
-
-            /* Secara default, sembunyikan sidebar di mobile */
             .sidebar {
                 margin-left: -240px;
             }
@@ -209,38 +143,18 @@
                 margin-left: 0;
             }
 
-            /* Saat di-toggle, tampilkan sidebar */
             body.sidebar-toggled .sidebar {
                 margin-left: 0;
             }
 
-            /* Di mobile, saat sidebar muncul, kita tidak ingin kontennya terdorong */
-            /* Ini akan membuat sidebar muncul di atas konten (overlay) */
             body.sidebar-toggled #content-wrapper {
                 margin-left: 0;
             }
-        }
-
-
-        .profile-link {
-            color: white;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .profile-link:hover {
-            color: #ffffff33;
         }
     </style>
 </head>
 
 <body>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     {{-- Side Bar --}}
     <div class="sidebar">
         <div style="text-align: center; padding: 10px 0; border-bottom: 4px solid #3f51b5;">
@@ -251,11 +165,9 @@
         <a href="{{ route('surat_keluar.index') }}"><i class="fa fa-paper-plane"></i> Surat Keluar</a>
         @auth
             @if (Auth::user()->role === 'admin')
-                <a href="{{ route('manajemen_akun.index') }}"><i class="fa fa-users-cog"></i> Manajemen
-                    Akun</a>
+                <a href="{{ route('manajemen_akun.index') }}"><i class="fa fa-users-cog"></i> Manajemen Akun</a>
             @endif
         @endauth
-
     </div>
 
     {{-- Wrapper untuk Konten Utama --}}
@@ -274,7 +186,6 @@
                         <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="Foto Profil"
                             class="rounded-circle" width="40" height="40" style="object-fit: cover;">
                     @else
-                        {{-- Fallback jika tidak ada foto profil --}}
                         <div class="rounded-circle d-flex justify-content-center align-items-center"
                             style="width: 40px; height: 40px; background-color: rgba(255,255,255,0.2);">
                             <i class="fa fa-user fa-lg"></i>
@@ -284,9 +195,7 @@
                         {{ Str::limit(Auth::user()->name, 10) }}</span>
                 </a>
 
-                {{-- KODE DROPDOWN YANG DIPERBARUI --}}
                 <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="profileDropdown">
-                    {{-- Header Dropdown --}}
                     <li class="dropdown-header-custom">
                         <div class="d-flex align-items-center">
                             @if (Auth::user()->profile_photo)
@@ -306,13 +215,9 @@
                             </div>
                         </div>
                     </li>
-
-                    {{-- Garis Pemisah --}}
                     <li>
                         <hr class="dropdown-divider">
                     </li>
-
-                    {{-- Item Menu --}}
                     <li>
                         <a class="dropdown-item" href="{{ route('profile.edit') }}">
                             <i class="fa fa-user-edit me-2"></i> Profile
@@ -337,110 +242,80 @@
     </div>
 
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    {{-- SCRIPT BARU UNTUK FUNGSI TOGGLE SIDEBAR --}}
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
             const sidebarToggle = document.getElementById('sidebarToggle');
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    document.body.classList.toggle('sidebar-toggled');
+                });
+            }
+
             const contentWrapper = document.getElementById('content-wrapper');
+            if (contentWrapper) {
+                contentWrapper.addEventListener('click', function() {
+                    if (window.innerWidth <= 768 && document.body.classList.contains('sidebar-toggled')) {
+                        document.body.classList.remove('sidebar-toggled');
+                    }
+                });
+            }
 
-            // Event listener untuk Tombol Hamburger
-            sidebarToggle.addEventListener('click', function(event) {
-                // HENTIKAN event agar tidak "menggelembung" ke content-wrapper
-                event.stopPropagation();
+            @if (session('success'))
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: '{{ session('success') }}',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            @endif
 
-                // Lakukan aksi seperti biasa
-                document.body.classList.toggle('sidebar-toggled');
-            });
+            @if (session('error'))
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: '{{ session('error') }}',
+                    showConfirmButton: false,
+                    timer: 4000,
+                    timerProgressBar: true
+                });
+            @endif
 
-            // Event listener untuk menutup sidebar saat klik di konten
-            contentWrapper.addEventListener('click', function() {
-                const isSidebarToggled = document.body.classList.contains('sidebar-toggled');
-                const isMobile = window.innerWidth <= 768;
-
-                if (isSidebarToggled && isMobile) {
-                    document.body.classList.remove('sidebar-toggled');
+            @php
+                $allErrors = [];
+                foreach ($errors->getBags() as $bag) {
+                    $allErrors = array_merge($allErrors, $bag->all());
                 }
-            });
+                $errorList = implode('<br>', $allErrors);
+            @endphp
 
+            @if (!empty($allErrors))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops... Ada yang salah!',
+                    html: '{!! $errorList !!}',
+                });
+            @endif
         });
     </script>
 
-    {{-- Script untuk menampilkan notifikasi toast --}}
-    @push('scripts')
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-
-                // --- SCRIPT UNTUK FUNGSI TOGGLE SIDEBAR ---
-                const sidebarToggle = document.getElementById('sidebarToggle');
-                if (sidebarToggle) {
-                    sidebarToggle.addEventListener('click', function(event) {
-                        event.stopPropagation();
-                        document.body.classList.toggle('sidebar-toggled');
-                    });
-                }
-
-                const contentWrapper = document.getElementById('content-wrapper');
-                if (contentWrapper) {
-                    contentWrapper.addEventListener('click', function() {
-                        if (window.innerWidth <= 768 && document.body.classList.contains('sidebar-toggled')) {
-                            document.body.classList.remove('sidebar-toggled');
-                        }
-                    });
-                }
-
-                // --- SCRIPT UNTUK SEMUA NOTIFIKASI SWEETALERT ---
-
-                // Notifikasi untuk session 'success'
-                @if (session('success'))
-                    Swal.fire({
-                        toast: true,
-                        position: 'top-end',
-                        icon: 'success',
-                        title: 'Berhasil!',
-                        text: '{{ session('success') }}',
-                        showConfirmButton: false,
-                        timer: 3000,
-                        timerProgressBar: true
-                    });
-                @endif
-
-                // Notifikasi untuk session 'error'
-                @if (session('error'))
-                    Swal.fire({
-                        toast: true,
-                        position: 'top-end',
-                        icon: 'error',
-                        title: 'Gagal!',
-                        text: '{{ session('error') }}',
-                        showConfirmButton: false,
-                        timer: 4000,
-                        timerProgressBar: true
-                    });
-                @endif
-
-                // Notifikasi untuk SEMUA Error Validasi Form
-                @php
-                    $allErrors = [];
-                    foreach ($errors->getBags() as $bag) {
-                        $allErrors = array_merge($allErrors, $bag->all());
-                    }
-                    $errorList = implode('<br>', $allErrors);
-                @endphp
-
-                @if (!empty($allErrors))
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops... Ada yang salah!',
-                        html: '{!! $errorList !!}',
-                    });
-                @endif
-            });
-        </script>
-    @endpush
 
     @stack('scripts')
+
 </body>
 
 </html>

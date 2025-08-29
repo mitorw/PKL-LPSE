@@ -17,45 +17,55 @@
 
     <h2 class="mb-4">Daftar Surat Keluar</h2>
 
-     <div class="card mb-4">
+    <form action="{{ route('surat_keluar.index') }}" method="GET" class="mb-4">
+        <div class="card">
             <div class="card-body">
-                {{-- Form Filter dan Pencarian (Sudah Digabung) --}}
-                <form method="GET" action="{{ route('surat_keluar.index') }}" class=" row g-2">
-                    {{-- Search --}}
-                    <div class="col-md-3">
-                        <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Cari...">
+                <div class="row g-3 align-items-end">
+                    {{-- Kolom Pencarian --}}
+                    <div class="col-md-12">
+                        <label for="search" class="form-label">Cari Surat</label>
+                        <div class="input-group">
+                            <input type="text" id="search" name="search" class="form-control"
+                                placeholder="No surat, tujuan, perihal, Lokasi Penyimpanan..."
+                                value="{{ request('search') }}">
+                            <button class="btn btn-primary" type="submit">Cari</button>
+                        </div>
                     </div>
 
-                    {{-- Filter Klasifikasi --}}
-                    <div class="col-md-2">
-                        <select name="klasifikasi" class="form-control">
-                            <option value="">-- Semua Klasifikasi --</option>
-                            <option value="biasa" {{ request('klasifikasi') == 'biasa' ? 'selected' : '' }}>Biasa</option>
-                            <option value="penting" {{ request('klasifikasi') == 'penting' ? 'selected' : '' }}>Penting</option>
-                            <option value="rahasia" {{ request('klasifikasi') == 'rahasia' ? 'selected' : '' }}>Rahasia</option>
+                    {{-- Kolom Filter Lanjutan --}}
+                    <div class="col-md-6">
+                        <label class="form-label">Tanggal Terima</label>
+                        <div class="input-group">
+                            <input type="date" name="tanggal_awal" class="form-control"
+                                value="{{ request('tanggal_awal') }}">
+                            <span class="input-group-text">s/d</span>
+                            <input type="date" name="tanggal_akhir" class="form-control" value="{{ request('tanggal_akhir') }}">
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="klasifikasi" class="form-label">Klasifikasi</label>
+                        <select id="klasifikasi" class="form-select" name="klasifikasi">
+                            <option value="">Semua</option>
+                            <option value="Rahasia" {{ request('klasifikasi') == 'Rahasia' ? 'selected' : '' }}>Rahasia
+                            </option>
+                            <option value="Penting" {{ request('klasifikasi') == 'Penting' ? 'selected' : '' }}>Penting
+                            </option>
+                            <option value="Biasa" {{ request('klasifikasi') == 'Biasa' ? 'selected' : '' }}>Biasa</option>
                         </select>
                     </div>
 
-                    {{-- Filter Tanggal --}}
-                    <div class="col-md-2">
-                        <input type="date" name="tanggal_awal" value="{{ request('tanggal_awal') }}" class="form-control">
-                    </div>
-                    <div class="col-md-2">
-                        <input type="date" name="tanggal_akhir" value="{{ request('tanggal_akhir') }}" class="form-control">
-                    </div>
 
-                    {{-- Tombol Submit --}}
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary w-100">Filter</button>
+                    <div class="col-md-2  d-grid">
+                        <div class="btn-group">
+                            <button class="btn btn-primary" type="submit">Filter</button>
+                            <a href="{{ route('surat_keluar.index') }}" class="btn btn-secondary">Reset</a>
+                        </div>
                     </div>
-
-                    {{-- Tombol Reset --}}
-                    <div class="col-md-1">
-                        <a href="{{ route('surat_keluar.index') }}" class="btn btn-secondary w-100">Reset</a>
-                    </div>
-                </form>
+                </div>
             </div>
-     </div>
+        </div>
+    </form>
 
     @auth
         @if (Auth::user()->role === 'admin')
@@ -147,7 +157,8 @@
                                 <td>
                                     <a href="{{ route('surat_keluar.edit', $surat->id) }}" class="btn btn-sm btn-warning"
                                         onclick="event.stopPropagation()">Edit</a>
-                                    <form class="delete-form" action="{{ route('surat_keluar.destroy', $surat->id) }}" method="POST" style="display:inline;" onclick="event.stopPropagation()">
+                                    <form class="delete-form" action="{{ route('surat_keluar.destroy', $surat->id) }}"
+                                        method="POST" style="display:inline;" onclick="event.stopPropagation()">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-danger">Delete</button>
@@ -205,7 +216,8 @@
                                 </tr>
                                 <tr>
                                     <th>Tanggal</th>
-                                    <td>{{ \Carbon\Carbon::parse($surat->tanggal)->locale('id')->translatedFormat('d F Y') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($surat->tanggal)->locale('id')->translatedFormat('d F Y') }}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <th>Perihal</th>
@@ -269,49 +281,49 @@
         });
     </script>
     @push('scripts')
-    <script>
-        // Menjalankan semua script setelah halaman dimuat sepenuhnya
-        document.addEventListener('DOMContentLoaded', function() {
+        <script>
+            // Menjalankan semua script setelah halaman dimuat sepenuhnya
+            document.addEventListener('DOMContentLoaded', function() {
 
-            // --- Script untuk PDF Modal ---
-            const pdfModal = document.getElementById('pdfModal');
-            if (pdfModal) {
-                pdfModal.addEventListener('show.bs.modal', function(event) {
-                    const button = event.relatedTarget;
-                    const fileUrl = button.getAttribute('data-file');
-                    const iframe = pdfModal.querySelector('#pdfFrame');
-                    iframe.src = fileUrl;
-                });
+                // --- Script untuk PDF Modal ---
+                const pdfModal = document.getElementById('pdfModal');
+                if (pdfModal) {
+                    pdfModal.addEventListener('show.bs.modal', function(event) {
+                        const button = event.relatedTarget;
+                        const fileUrl = button.getAttribute('data-file');
+                        const iframe = pdfModal.querySelector('#pdfFrame');
+                        iframe.src = fileUrl;
+                    });
 
-                pdfModal.addEventListener('hidden.bs.modal', function() {
-                    const iframe = pdfModal.querySelector('#pdfFrame');
-                    iframe.src = '';
-                });
-            }
+                    pdfModal.addEventListener('hidden.bs.modal', function() {
+                        const iframe = pdfModal.querySelector('#pdfFrame');
+                        iframe.src = '';
+                    });
+                }
 
-            // --- Script untuk SweetAlert Delete Confirmation ---
-            document.querySelectorAll('.delete-form').forEach(form => {
-                form.addEventListener('submit', function (event) {
-                    event.preventDefault();
+                // --- Script untuk SweetAlert Delete Confirmation ---
+                document.querySelectorAll('.delete-form').forEach(form => {
+                    form.addEventListener('submit', function(event) {
+                        event.preventDefault();
 
-                    Swal.fire({
-                        title: 'Apakah Anda yakin?',
-                        text: "Data yang dihapus tidak dapat dikembalikan!",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#28a745', // Contoh warna hijau
-                        cancelButtonColor: '#d33',  // Contoh warna abu-abu
-                        confirmButtonText: 'Ya, hapus!',
-                        cancelButtonText: 'Batal'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            this.submit();
-                        }
+                        Swal.fire({
+                            title: 'Apakah Anda yakin?',
+                            text: "Data yang dihapus tidak dapat dikembalikan!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#28a745', // Contoh warna hijau
+                            cancelButtonColor: '#d33', // Contoh warna abu-abu
+                            confirmButtonText: 'Ya, hapus!',
+                            cancelButtonText: 'Batal'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                this.submit();
+                            }
+                        });
                     });
                 });
-            });
 
-        });
-    </script>
+            });
+        </script>
     @endpush
 @endsection
