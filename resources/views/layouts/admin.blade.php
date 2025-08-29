@@ -56,6 +56,7 @@
             width: 20px;
             color: #6c757d;
         }
+
         .dropdown-item:hover i {
             width: 20px;
             color: #f5f5f5;
@@ -64,13 +65,12 @@
         .dropdown-item:hover {
             background-color: #5c6bc0;
             color: #f5f5f5
-
-
         }
 
         .dropdown-item.text-danger:hover,
         .dropdown-item.text-danger:hover i {
-            color: white !important; /* Tambahkan !important */
+            color: white !important;
+            /* Tambahkan !important */
         }
 
 
@@ -370,63 +370,73 @@
     {{-- Script untuk menampilkan notifikasi toast --}}
     @push('scripts')
         <script>
-            // Periksa apakah ada session 'success'
-            @if (session('success'))
-                // Jika ada, tampilkan notifikasi toast
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end', // Posisi di pojok kanan atas
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: '{{ session('success') }}', // Ambil pesan dari session
-                    showConfirmButton: false, // Sembunyikan tombol OK
-                    timer: 3000, // Hilang otomatis dalam 3 detik
-                    timerProgressBar: true, // Tampilkan progress bar waktu
-                    didOpen: (toast) => {
-                        toast.addEventListener('mouseenter', Swal.stopTimer)
-                        toast.addEventListener('mouseleave', Swal.resumeTimer)
-                    }
-                });
-            @endif
+            document.addEventListener('DOMContentLoaded', function() {
 
-            // Anda juga bisa menambahkan untuk session 'error'
-            @if (session('error'))
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'error',
-                    title: 'Gagal!',
-                    text: '{{ session('error') }}',
-                    showConfirmButton: false,
-                    timer: 4000, // Waktu lebih lama untuk pesan error
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                        toast.addEventListener('mouseenter', Swal.stopTimer)
-                        toast.addEventListener('mouseleave', Swal.resumeTimer)
-                    }
-                });
-            @endif
-
-            @php
-                $allErrors = [];
-                foreach ($errors->getBags() as $bag) {
-                    $allErrors = array_merge($allErrors, $bag->all());
+                // --- SCRIPT UNTUK FUNGSI TOGGLE SIDEBAR ---
+                const sidebarToggle = document.getElementById('sidebarToggle');
+                if (sidebarToggle) {
+                    sidebarToggle.addEventListener('click', function(event) {
+                        event.stopPropagation();
+                        document.body.classList.toggle('sidebar-toggled');
+                    });
                 }
-                $errorList = implode('<br>', $allErrors);
-            @endphp
 
-            @if ($errors->any())
+                const contentWrapper = document.getElementById('content-wrapper');
+                if (contentWrapper) {
+                    contentWrapper.addEventListener('click', function() {
+                        if (window.innerWidth <= 768 && document.body.classList.contains('sidebar-toggled')) {
+                            document.body.classList.remove('sidebar-toggled');
+                        }
+                    });
+                }
+
+                // --- SCRIPT UNTUK SEMUA NOTIFIKASI SWEETALERT ---
+
+                // Notifikasi untuk session 'success'
+                @if (session('success'))
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: '{{ session('success') }}',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true
+                    });
+                @endif
+
+                // Notifikasi untuk session 'error'
+                @if (session('error'))
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: '{{ session('error') }}',
+                        showConfirmButton: false,
+                        timer: 4000,
+                        timerProgressBar: true
+                    });
+                @endif
+
+                // Notifikasi untuk SEMUA Error Validasi Form
                 @php
-                    // Mengubah array error menjadi string dengan pemisah <br>
-                    $errorList = implode('<br>', $errors->all());
+                    $allErrors = [];
+                    foreach ($errors->getBags() as $bag) {
+                        $allErrors = array_merge($allErrors, $bag->all());
+                    }
+                    $errorList = implode('<br>', $allErrors);
                 @endphp
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops... Ada yang salah!',
-                    // Gunakan 'html' agar tag <br> bisa dirender
-                    html: '{!! $errorList !!}',
-                });
-            @endif
+
+                @if (!empty($allErrors))
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops... Ada yang salah!',
+                        html: '{!! $errorList !!}',
+                    });
+                @endif
+            });
         </script>
     @endpush
 
