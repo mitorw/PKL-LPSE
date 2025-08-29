@@ -90,7 +90,7 @@ class SuratKeluarController extends Controller
             // Case 1: langsung PDF
             if ($ext === 'pdf' && count($files) === 1) {
                 // Simpan file original PDF
-                $originalPath = $files[0]->store('surat_keluar/original', $baseOriginal, 'public');
+                $originalPath = $files[0]->storeAs('surat_keluar/original', $baseOriginal, 'public');
                 $filePath = $originalPath; // karena sudah PDF, hasil konversi = original
             }
 
