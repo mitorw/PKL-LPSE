@@ -15,6 +15,75 @@
             overflow-x: hidden;
         }
 
+        .dropdown-menu {
+            border-radius: 0.75rem !important;
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15) !important;
+            border: none !important;
+            padding-top: 0;
+            padding-bottom: 0;
+            min-width: 280px;
+
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease-in-out;
+        }
+
+        .dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Style untuk header di dalam dropdown */
+        .dropdown-header-custom {
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .dropdown-header-custom h6 {
+            font-weight: 600;
+        }
+
+        /* Style untuk item menu */
+        .dropdown-item {
+            padding: 0.75rem 1.25rem;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+        }
+
+        .dropdown-item i {
+            width: 20px;
+            color: #6c757d;
+        }
+        .dropdown-item:hover i {
+            width: 20px;
+            color: #f5f5f5;
+        }
+
+        .dropdown-item:hover {
+            background-color: #5c6bc0;
+            color: #f5f5f5
+
+
+        }
+
+        .dropdown-item.text-danger:hover,
+        .dropdown-item.text-danger:hover i {
+            color: white !important; /* Tambahkan !important */
+        }
+
+
+        .dropdown-item:active {
+            transform: scale(0.98);
+            background-color: #e9ecef;
+        }
+
+        /* Style untuk garis pemisah */
+        .dropdown-divider {
+            margin: 0;
+        }
+
         .sidebar {
             width: 240px;
             height: 100vh;
@@ -34,16 +103,21 @@
             padding: 10px 20px;
             text-decoration: none;
             font-size: 18px;
-            align-items: center; /* Menyejajarkan ikon dan teks secara vertikal di tengah */
+            align-items: center;
+            /* Menyejajarkan ikon dan teks secara vertikal di tengah */
             transition: background-color 0.2s transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
 
         /* Memberi gaya pada ikon di dalam link */
         .sidebar a i {
-            width: 40px;         /* Memberi lebar tetap agar semua teks lurus sejajar */
-            margin-right: 8px;   /* Memberi sedikit jarak antara ikon dan teks */
-            text-align: center;  /* Memastikan ikon berada di tengah area lebarnya */
-            font-size: 1.1em;    /* Sedikit menyesuaikan ukuran ikon */
+            width: 40px;
+            /* Memberi lebar tetap agar semua teks lurus sejajar */
+            margin-right: 8px;
+            /* Memberi sedikit jarak antara ikon dan teks */
+            text-align: center;
+            /* Memastikan ikon berada di tengah area lebarnya */
+            font-size: 1.1em;
+            /* Sedikit menyesuaikan ukuran ikon */
         }
 
         .sidebar a:hover {
@@ -171,8 +245,7 @@
         <a href="{{ route('surat_keluar.index') }}"><i class="fa fa-paper-plane"></i> Surat Keluar</a>
         @auth
             @if (Auth::user()->role === 'admin')
-                <a href="{{ route('manajemen_akun.index') }}"><i class="fa fa-users-cog"
-                        ></i> Manajemen
+                <a href="{{ route('manajemen_akun.index') }}"><i class="fa fa-users-cog"></i> Manajemen
                     Akun</a>
             @endif
         @endauth
@@ -188,35 +261,67 @@
                 <h2 class="mb-0">{{ $pageTitle ?? 'Halaman' }}</h2>
             </div>
 
-<div class="dropdown">
-    <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#" role="button"
-       id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="color: #f5f5f5">
-        @if (Auth::user()->profile_photo)
-            <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}"
-                 alt="Foto Profil" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
-        @else
-            <i class="fa fa-user-circle fa-2x text-secondary"></i>
-        @endif
-        <span class="ms-2" style="color: #f5f5f5">Hallo, {{ Auth::user()->name }}</span>
-    </a>
+            <div class="dropdown">
+                <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#" role="button"
+                    id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="color: #f5f5f5">
+                    @if (Auth::user()->profile_photo)
+                        <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="Foto Profil"
+                            class="rounded-circle" width="40" height="40" style="object-fit: cover;">
+                    @else
+                        {{-- Fallback jika tidak ada foto profil --}}
+                        <div class="rounded-circle d-flex justify-content-center align-items-center"
+                            style="width: 40px; height: 40px; background-color: rgba(255,255,255,0.2);">
+                            <i class="fa fa-user fa-lg"></i>
+                        </div>
+                    @endif
+                    <span class="ms-2 d-none d-md-inline" style="color: #f5f5f5">Hallo,
+                        {{ Str::limit(Auth::user()->name, 10) }}</span>
+                </a>
 
-    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-        <li>
-            <a class="dropdown-item" href="{{ route('profile.edit') }}">
-                <i class="fa fa-user me-2"></i> Profile
-            </a>
-        </li>
-        <li>
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="dropdown-item">
-                    <i class="fa fa-sign-out-alt me-2"></i> Logout
-                </button>
-            </form>
-        </li>
-    </ul>
-</div>
+                {{-- KODE DROPDOWN YANG DIPERBARUI --}}
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="profileDropdown">
+                    {{-- Header Dropdown --}}
+                    <li class="dropdown-header-custom">
+                        <div class="d-flex align-items-center">
+                            @if (Auth::user()->profile_photo)
+                                <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="Foto Profil"
+                                    class="rounded-circle me-2" width="50" height="50"
+                                    style="object-fit: cover;">
+                            @else
+                                <div class="rounded-circle d-flex justify-content-center align-items-center me-2"
+                                    style="width: 50px; height: 50px; background-color: #e9ecef;">
+                                    <i class="fa fa-user fa-2x text-secondary"></i>
+                                </div>
+                            @endif
+                            <div>
+                                <h6 class="mb-0">{{ Auth::user()->name }}</h6>
+                                <small class="text-muted">{{ Auth::user()->email }}</small><br>
+                                <small class="text-muted">{{ Auth::user()->role }}</small>
+                            </div>
+                        </div>
+                    </li>
 
+                    {{-- Garis Pemisah --}}
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+
+                    {{-- Item Menu --}}
+                    <li>
+                        <a class="dropdown-item" href="{{ route('profile.edit') }}">
+                            <i class="fa fa-user-edit me-2"></i> Profile
+                        </a>
+                    </li>
+                    <li>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="dropdown-item text-danger">
+                                <i class="fa fa-sign-out-alt me-2"></i> Logout
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
         </div>
 
         {{-- Konten Utama dari setiap halaman --}}
@@ -265,44 +370,44 @@
 
     {{-- Script untuk menampilkan notifikasi toast --}}
     @push('scripts')
-    <script>
-        // Periksa apakah ada session 'success'
-        @if (session('success'))
-            // Jika ada, tampilkan notifikasi toast
-            Swal.fire({
-                toast: true,
-                position: 'top-end', // Posisi di pojok kanan atas
-                icon: 'success',
-                title: 'Berhasil!',
-                text: '{{ session('success') }}', // Ambil pesan dari session
-                showConfirmButton: false, // Sembunyikan tombol OK
-                timer: 3000, // Hilang otomatis dalam 3 detik
-                timerProgressBar: true, // Tampilkan progress bar waktu
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-            });
-        @endif
+        <script>
+            // Periksa apakah ada session 'success'
+            @if (session('success'))
+                // Jika ada, tampilkan notifikasi toast
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end', // Posisi di pojok kanan atas
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: '{{ session('success') }}', // Ambil pesan dari session
+                    showConfirmButton: false, // Sembunyikan tombol OK
+                    timer: 3000, // Hilang otomatis dalam 3 detik
+                    timerProgressBar: true, // Tampilkan progress bar waktu
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                });
+            @endif
 
-        // Anda juga bisa menambahkan untuk session 'error'
-        @if (session('error'))
-            Swal.fire({
-                toast: true,
-                position: 'top-end',
-                icon: 'error',
-                title: 'Gagal!',
-                text: '{{ session('error') }}',
-                showConfirmButton: false,
-                timer: 4000, // Waktu lebih lama untuk pesan error
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-            });
-        @endif
-    </script>
+            // Anda juga bisa menambahkan untuk session 'error'
+            @if (session('error'))
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: '{{ session('error') }}',
+                    showConfirmButton: false,
+                    timer: 4000, // Waktu lebih lama untuk pesan error
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                });
+            @endif
+        </script>
     @endpush
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
