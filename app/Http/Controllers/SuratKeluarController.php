@@ -80,10 +80,17 @@ class SuratKeluarController extends Controller
 
             $ext = strtolower($files[0]->getClientOriginalExtension());
 
+            $noSurat = safeFileName($request->nomor_surat);
+            $tanggalSurat = \Carbon\Carbon::parse($request->tanggal)->format('d-m-Y');
+
+            // bikin nama dasar file
+            $baseFileName = $noSurat . '_' . $tanggalSurat . '.pdf';
+            $baseOriginal  = $noSurat . '_' . $tanggalSurat . '.' . $ext;
+
             // Case 1: langsung PDF
             if ($ext === 'pdf' && count($files) === 1) {
                 // Simpan file original PDF
-                $originalPath = $files[0]->store('surat_keluar/original', 'public');
+                $originalPath = $files[0]->store('surat_keluar/original', $baseOriginal, 'public');
                 $filePath = $originalPath; // karena sudah PDF, hasil konversi = original
             }
 
@@ -94,7 +101,7 @@ class SuratKeluarController extends Controller
 
                 foreach ($files as $file) {
                     // Simpan file original
-                    $originalPath = $file->store('surat_keluar/original', 'public');
+                    $originalPath = $file->storeAs('surat_keluar/original', $baseOriginal, 'public');
 
                     // Convert ke base64 untuk dimasukkan ke PDF
                     $image = $manager->read($file->getPathname())->toJpeg();
@@ -105,7 +112,7 @@ class SuratKeluarController extends Controller
 
                 // Buat PDF hasil konversi
                 $pdf = Pdf::loadHTML($html)->setPaper('a4', 'portrait');
-                $filename = 'surat_keluar/converted/' . uniqid() . '.pdf';
+                $filename = 'surat_keluar/converted/' . $baseFileName;
                 Storage::disk('public')->put($filename, $pdf->output());
                 $filePath = $filename;
             }
@@ -113,7 +120,7 @@ class SuratKeluarController extends Controller
             // Case 3: Word -> PDF
             elseif (in_array($ext, ['doc', 'docx']) && count($files) === 1) {
                 // Simpan file original Word
-                $originalPath = $files[0]->store('surat_keluar/original', 'public');
+                $originalPath = $files[0]->storeAs('surat_keluar/original', $baseOriginal, 'public');
 
                 // Set DomPDF sebagai renderer
                 \PhpOffice\PhpWord\Settings::setPdfRendererName('DomPDF');
@@ -125,7 +132,7 @@ class SuratKeluarController extends Controller
                 // Buat writer PDF
                 $pdfWriter = IOFactory::createWriter($phpWord, 'PDF');
 
-                $filename = 'surat_keluar/converted/' . uniqid() . '.pdf';
+                $filename = 'surat_keluar/converted/' . $baseFileName;
                 $tempPath = storage_path('app/public/' . $filename);
 
                 // Simpan hasil PDF
@@ -189,9 +196,15 @@ class SuratKeluarController extends Controller
 
             $file = $request->file('isi_surat');
             $ext  = strtolower($file->getClientOriginalExtension());
+            $noSurat = safeFileName($request->nomor_surat);
+            $tanggalSurat = \Carbon\Carbon::parse($request->tanggal)->format('d-m-Y');
+
+            // bikin nama dasar file
+            $baseFileName = $noSurat . '_' . $tanggalSurat . '.pdf';
+            $baseOriginal  = $noSurat . '_' . $tanggalSurat . '.' . $ext;
 
             // Simpan original dulu
-            $originalPath = $file->store('surat_keluar/original', 'public');
+            $originalPath = $file->storeAs('surat_keluar/original',$baseOriginal, 'public');
 
             // Case 1: kalau sudah PDF → tidak perlu convert
             if ($ext === 'pdf') {
@@ -207,7 +220,7 @@ class SuratKeluarController extends Controller
             </div>';
 
                 $pdf = Pdf::loadHTML($html)->setPaper('a4', 'portrait');
-                $filePath = 'surat_keluar/converted/' . uniqid() . '.pdf';
+                $filePath = 'surat_keluar/converted/' . $baseFileName;
                 Storage::disk('public')->put($filePath, $pdf->output());
             }
             // Case 3: Word → PDF
@@ -218,7 +231,7 @@ class SuratKeluarController extends Controller
                 $phpWord = IOFactory::load($file->getPathname());
                 $pdfWriter = IOFactory::createWriter($phpWord, 'PDF');
 
-                $filePath = 'surat_keluar/converted/' . uniqid() . '.pdf';
+                $filePath = 'surat_keluar/converted/' . $baseFileName;
                 $tempPdf = storage_path('app/public/' . $filePath);
                 $pdfWriter->save($tempPdf);
             }

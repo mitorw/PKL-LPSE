@@ -141,41 +141,44 @@ class SuratMasukController extends Controller
 
             $ext = strtolower($files[0]->getClientOriginalExtension());
 
-            // Case 1: PDF langsung
+            // ambil data dari request
+            $noSurat = safeFileName($request->no_surat);
+            $tanggalSurat = \Carbon\Carbon::parse($request->tanggal_terima)->format('d-m-Y');
+
+            // bikin nama dasar file
+            $baseFileName = $noSurat . '_' . $tanggalSurat . '.pdf';
+            $baseOriginal  = $noSurat . '_' . $tanggalSurat . '.' . $ext;
+
             if ($ext === 'pdf' && count($files) === 1) {
-                $originalPath = $files[0]->store('surat_masuk/original', 'public');
+                // simpan original pakai nama khusus
+                $originalPath = $files[0]->storeAs('surat_masuk/original', $baseOriginal, 'public');
                 $fileSuratPath = $originalPath;
-            }
-            // Case 2: banyak gambar -> PDF multi halaman
-            elseif (in_array($ext, ['jpg', 'jpeg', 'png'])) {
+            } elseif (in_array($ext, ['jpg', 'jpeg', 'png'])) {
                 $html = '';
                 $manager = new ImageManager(new Driver());
 
                 foreach ($files as $file) {
-                    $originalPath = $files[0]->store('surat_masuk/original', 'public');
+                    $originalPath = $file->storeAs('surat_masuk/original',$baseOriginal, 'public');
                     $image = $manager->read($file->getPathname())->toJpeg();
                     $html .= '<div style="page-break-after: always; text-align:center;">
-                            <img src="data:image/jpeg;base64,' . base64_encode($image) . '" style="max-width:100%;height:auto;">
-                          </div>';
+                    <img src="data:image/jpeg;base64,' . base64_encode($image) . '" style="max-width:100%;height:auto;">
+                  </div>';
                 }
 
                 $pdf = Pdf::loadHTML($html)->setPaper('a4', 'portrait');
-                $filename = 'surat_masuk/converted/' . uniqid() . '.pdf';
+                $filename = 'surat_masuk/converted/' . $baseFileName;
                 Storage::disk('public')->put($filename, $pdf->output());
                 $fileSuratPath = $filename;
-            }
-            // Case 3: Word -> PDF
-            elseif (in_array($ext, ['doc', 'docx']) && count($files) === 1) {
-                $originalPath = $files[0]->store('surat_masuk/original', 'public');
+            } elseif (in_array($ext, ['doc', 'docx']) && count($files) === 1) {
+                $originalPath = $files[0]->storeAs('surat_masuk/original', $baseOriginal, 'public');
 
                 \PhpOffice\PhpWord\Settings::setPdfRendererName('DomPDF');
                 \PhpOffice\PhpWord\Settings::setPdfRendererPath(base_path('vendor/dompdf/dompdf'));
 
-
                 $phpWord = IOFactory::load($files[0]->getPathName());
                 $pdfWriter = IOFactory::createWriter($phpWord, 'PDF');
 
-                $filename = 'surat_masuk/converted/' . uniqid() . '.pdf';
+                $filename = 'surat_masuk/converted/' . $baseFileName;
                 $tempPath = storage_path('app/public/' . $filename);
                 $pdfWriter->save($tempPath);
 
@@ -256,7 +259,10 @@ class SuratMasukController extends Controller
         $fileSuratPath = $surat->file_surat;
         $originalPath = $surat->file_surat_original; // original
 
+
+
         if ($request->hasFile('file_surat')) {
+            // Hapus file lama jika ada
             if ($fileSuratPath && Storage::disk('public')->exists($fileSuratPath)) {
                 Storage::disk('public')->delete($fileSuratPath);
             }
@@ -267,24 +273,36 @@ class SuratMasukController extends Controller
             $file = $request->file('file_surat');
             $ext = strtolower($file->getClientOriginalExtension());
 
-            $originalPath = $file->store('surat_masuk/original', 'public');
-            // Case 1: kalau sudah PDF → tidak perlu convert
+            // Ambil data dari request
+            $noSurat       = safeFileName($request->no_surat);
+            $tanggalSurat  = \Carbon\Carbon::parse($request->tanggal_terima)->format('d-m-Y');
+
+            // Nama file dasar
+            $baseFileName  = $noSurat . '_' . $tanggalSurat . '.pdf';
+            $baseOriginal  = $noSurat . '_' . $tanggalSurat . '.' . $ext;
+
+            // Simpan file original
+            $originalPath = $file->storeAs('surat_masuk/original', $baseOriginal, 'public');
+
+            // Case 1: PDF asli
             if ($ext === 'pdf') {
                 $fileSuratPath = $originalPath;
             }
-            // Case 2: gambar → PDF
+
+            // Case 2: Gambar → PDF
             elseif (in_array($ext, ['jpg', 'jpeg', 'png'])) {
                 $manager = new ImageManager(new Driver());
                 $image = $manager->read($file->getPathname())->toJpeg();
 
                 $html = '<div style="page-break-after: always; text-align:center;">
-                <img src="data:image/jpeg;base64,' . base64_encode($image) . '" style="max-width:100%;height:auto;">
-            </div>';
+            <img src="data:image/jpeg;base64,' . base64_encode($image) . '" style="max-width:100%;height:auto;">
+        </div>';
 
                 $pdf = Pdf::loadHTML($html)->setPaper('a4', 'portrait');
-                $fileSuratPath = 'surat_masuk/converted/' . uniqid() . '.pdf';
+                $fileSuratPath = 'surat_masuk/converted/' . $baseFileName;
                 Storage::disk('public')->put($fileSuratPath, $pdf->output());
             }
+
             // Case 3: Word → PDF
             elseif (in_array($ext, ['doc', 'docx'])) {
                 \PhpOffice\PhpWord\Settings::setPdfRendererName('DomPDF');
@@ -293,11 +311,16 @@ class SuratMasukController extends Controller
                 $phpWord = IOFactory::load($file->getPathname());
                 $pdfWriter = IOFactory::createWriter($phpWord, 'PDF');
 
-                $fileSuratPath = 'surat_masuk/converted/' . uniqid() . '.pdf';
+                $fileSuratPath = 'surat_masuk/converted/' . $baseFileName;
                 $tempPdf = storage_path('app/public/' . $fileSuratPath);
                 $pdfWriter->save($tempPdf);
             }
+
+            // Simpan ke database
+            $surat->file_surat = $fileSuratPath;
+            $surat->file_surat_original = $originalPath;
         }
+
 
         // Update data surat masuk
         $surat->update([
