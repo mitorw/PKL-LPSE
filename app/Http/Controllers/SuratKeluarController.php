@@ -6,10 +6,8 @@ use App\Models\SuratKeluar;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use PhpOffice\PhpWord\IOFactory;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
-use Dompdf\Dompdf;
 
 class SuratKeluarController extends Controller
 {
@@ -67,7 +65,7 @@ class SuratKeluarController extends Controller
             'tanggal' => 'required|date',
             'dibuat_oleh' => 'required|max:50',
             'klasifikasi' => 'required|in:biasa,penting,rahasia',
-            'isi_surat' => 'required|mimes:pdf,png,jpg,jpeg,doc,docx|max:5120',
+            'isi_surat' => 'required|mimes:pdf,png,jpg,jpeg|max:5120',
             'isi_surat_original' => 'nullable|string|max:255',
         ]);
 
@@ -116,30 +114,6 @@ class SuratKeluarController extends Controller
                 Storage::disk('public')->put($filename, $pdf->output());
                 $filePath = $filename;
             }
-
-            // Case 3: Word -> PDF
-            elseif (in_array($ext, ['doc', 'docx']) && count($files) === 1) {
-                // Simpan file original Word
-                $originalPath = $files[0]->storeAs('surat_keluar/original', $baseOriginal, 'public');
-
-                // Set DomPDF sebagai renderer
-                \PhpOffice\PhpWord\Settings::setPdfRendererName('DomPDF');
-                \PhpOffice\PhpWord\Settings::setPdfRendererPath(base_path('vendor/dompdf/dompdf'));
-
-                // Load dokumen Word
-                $phpWord = IOFactory::load($files[0]->getPathName());
-
-                // Buat writer PDF
-                $pdfWriter = IOFactory::createWriter($phpWord, 'PDF');
-
-                $filename = 'surat_keluar/converted/' . $baseFileName;
-                $tempPath = storage_path('app/public/' . $filename);
-
-                // Simpan hasil PDF
-                $pdfWriter->save($tempPath);
-
-                $filePath = $filename;
-            }
         }
 
         SuratKeluar::create([
@@ -176,7 +150,7 @@ class SuratKeluarController extends Controller
             'tanggal' => 'required|date',
             'dibuat_oleh' => 'required|max:50',
             'klasifikasi' => 'required|in:biasa,penting,rahasia',
-            'isi_surat' => 'nullable|mimes:pdf,png,jpg,jpeg,doc,docx|max:5120',
+            'isi_surat' => 'nullable|mimes:pdf,png,jpg,jpeg|max:5120',
             'isi_surat_original' => 'nullable|string|max:255',
         ]);
 
@@ -222,18 +196,6 @@ class SuratKeluarController extends Controller
                 $pdf = Pdf::loadHTML($html)->setPaper('a4', 'portrait');
                 $filePath = 'surat_keluar/converted/' . $baseFileName;
                 Storage::disk('public')->put($filePath, $pdf->output());
-            }
-            // Case 3: Word → PDF
-            elseif (in_array($ext, ['doc', 'docx'])) {
-                \PhpOffice\PhpWord\Settings::setPdfRendererName('DomPDF');
-                \PhpOffice\PhpWord\Settings::setPdfRendererPath(base_path('vendor/dompdf/dompdf'));
-
-                $phpWord = IOFactory::load($file->getPathname());
-                $pdfWriter = IOFactory::createWriter($phpWord, 'PDF');
-
-                $filePath = 'surat_keluar/converted/' . $baseFileName;
-                $tempPdf = storage_path('app/public/' . $filePath);
-                $pdfWriter->save($tempPdf);
             }
         }
 

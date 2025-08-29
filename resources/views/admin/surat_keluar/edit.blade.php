@@ -54,7 +54,7 @@
                 </div>
                 <!-- File Surat -->
                 <div class="mb-3">
-                <label class="form-label">File Surat (PDF/PNG/JPG/DOC) <span style="color: crimson">*Kosongkan jika tidak ingin diubah</span></label>
+                <label class="form-label">File Surat (PDF/PNG/JPG) <span style="color: crimson">*Kosongkan jika tidak ingin diubah</span></label>
 
                     @if ($surat->isi_surat)
                         <p>File sekarang: <a href="{{ asset('storage/' . $surat->isi_surat) }}" target="_blank">Lihat File</a></p>

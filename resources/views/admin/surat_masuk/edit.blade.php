@@ -55,7 +55,7 @@
             <hr>
 
             <div class="mb-3">
-                <label class="form-label">File Surat (PDF/PNG/JPG/DOC) <span style="color: crimson">*Kosongkan jika tidak ingin diubah</span></label>
+                <label class="form-label">File Surat (PDF/PNG/JPG) <span style="color: crimson">*Kosongkan jika tidak ingin diubah</span></label>
                 @if($surat->file_surat)
                     <p class="mt-2">File sekarang: <a href="{{ asset('storage/'. $surat->file_surat) }}" target="_blank">Lihat File</a></p>
                 @endif

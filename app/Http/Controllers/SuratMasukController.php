@@ -8,10 +8,8 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
-use PhpOffice\PhpWord\IOFactory;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;   // kalau pakai GD
-use Dompdf\Dompdf;
 
 
 class SuratMasukController extends Controller
@@ -117,7 +115,7 @@ class SuratMasukController extends Controller
             'tanggal_terima' => 'required|date',
             'perihal' => 'required|string',
             'klasifikasi' => 'required|in:Rahasia,Penting,Biasa',
-            'file_surat' => 'required|mimes:pdf,png,jpg,jpeg,doc,docx|max:5120',
+            'file_surat' => 'required|mimes:pdf,png,jpg,jpeg|max:5120',
             'dis_bagian' => 'nullable|in:Bagian Layanan Pengadaan Secara Elektronik,Bagian Advokasi dan Pembinaan,Bagian Pengelolaan Pengadaan Barang dan Jasa',
             'file_surat_original' => 'nullable|string|max:255',
         ]);
@@ -169,20 +167,6 @@ class SuratMasukController extends Controller
                 $filename = 'surat_masuk/converted/' . $baseFileName;
                 Storage::disk('public')->put($filename, $pdf->output());
                 $fileSuratPath = $filename;
-            } elseif (in_array($ext, ['doc', 'docx']) && count($files) === 1) {
-                $originalPath = $files[0]->storeAs('surat_masuk/original', $baseOriginal, 'public');
-
-                \PhpOffice\PhpWord\Settings::setPdfRendererName('DomPDF');
-                \PhpOffice\PhpWord\Settings::setPdfRendererPath(base_path('vendor/dompdf/dompdf'));
-
-                $phpWord = IOFactory::load($files[0]->getPathName());
-                $pdfWriter = IOFactory::createWriter($phpWord, 'PDF');
-
-                $filename = 'surat_masuk/converted/' . $baseFileName;
-                $tempPath = storage_path('app/public/' . $filename);
-                $pdfWriter->save($tempPath);
-
-                $fileSuratPath = $filename;
             }
         }
 
@@ -219,7 +203,7 @@ class SuratMasukController extends Controller
             'tanggal_terima' => 'required|date',
             'perihal' => 'required|string',
             'klasifikasi' => 'required|in:Rahasia,Penting,Biasa',
-            'file_surat' => 'nullable|mimes:pdf,png,jpg,jpeg,doc,docx|max:5120',
+            'file_surat' => 'nullable|mimes:pdf,png,jpg,jpeg|max:5120',
             'file_surat_original' => 'nullable|string|max:255',
             // Tambahkan validasi untuk status disposisi
             'disposisi_status' => 'required|in:ada,tidak',
@@ -301,19 +285,6 @@ class SuratMasukController extends Controller
                 $pdf = Pdf::loadHTML($html)->setPaper('a4', 'portrait');
                 $fileSuratPath = 'surat_masuk/converted/' . $baseFileName;
                 Storage::disk('public')->put($fileSuratPath, $pdf->output());
-            }
-
-            // Case 3: Word → PDF
-            elseif (in_array($ext, ['doc', 'docx'])) {
-                \PhpOffice\PhpWord\Settings::setPdfRendererName('DomPDF');
-                \PhpOffice\PhpWord\Settings::setPdfRendererPath(base_path('vendor/dompdf/dompdf'));
-
-                $phpWord = IOFactory::load($file->getPathname());
-                $pdfWriter = IOFactory::createWriter($phpWord, 'PDF');
-
-                $fileSuratPath = 'surat_masuk/converted/' . $baseFileName;
-                $tempPdf = storage_path('app/public/' . $fileSuratPath);
-                $pdfWriter->save($tempPdf);
             }
 
             // Simpan ke database
