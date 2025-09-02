@@ -8,52 +8,59 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Illuminate\Validation\Rule; // <-- Ini tambahan baru
 
 class ProfileController extends Controller
 {
 
-public function updateBasic(Request $request): RedirectResponse
-{
-    try {
-        // ✅ Validasi langsung di controller
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'min:4'],
-            'email' => ['required', 'string', 'email:rfc,dns'],
-        ], [
-            'name.required' => 'Nama wajib diisi.',
-            'name.min' => 'Nama minimal 4 karakter.',
-            'email.required' => 'Email wajib diisi.',
-            'email.email' => 'Format email tidak valid, gunakan format seperti nama@gmail.com.',
-        ]);
+    public function updateBasic(Request $request): RedirectResponse
+    {
+        try {
+            $user = $request->user(); // Dapatkan user untuk validasi
 
-        // ✅ Update data user
-        $request->user()->fill($validated);
+            // ✅ Perbaikan: Tambahkan aturan unique dengan mengabaikan ID user saat ini
+            $validated = $request->validate([
+                'name' => ['required', 'string', 'min:4'],
+                'email' => [
+                    'required',
+                    'string',
+                    'email:rfc,dns',
+                    Rule::unique('users')->ignore($user->id),
+                ],
+            ], [
+                'name.required' => 'Nama wajib diisi.',
+                'name.min' => 'Nama minimal 4 karakter.',
+                'email.required' => 'Email wajib diisi.',
+                'email.email' => 'Format email tidak valid, gunakan format seperti nama@gmail.com.',
+                'email.unique' => 'Email ini sudah digunakan oleh pengguna lain.', // Pesan kesalahan kustom
+            ]);
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+            // ✅ Update data user
+            $user->fill($validated);
+
+            if ($user->isDirty('email')) {
+                $user->email_verified_at = null;
+            }
+
+            $user->save();
+
+            return Redirect::route('profile.edit')
+                ->with('success', 'Profil berhasil diperbarui!');
+        } catch (\Exception $e) {
+            return Redirect::route('profile.edit')
+                ->with('error', 'Gagal memperbarui profil: ' . $e->getMessage());
         }
-
-        $request->user()->save();
-
-        return Redirect::route('profile.edit')
-            ->with('success', 'Profil berhasil diperbarui!');
-    } catch (\Exception $e) {
-        return Redirect::route('profile.edit')
-            ->with('error', 'Gagal memperbarui profil: ' . $e->getMessage());
     }
-}
 
     /**
      * Display the user's profile form.
      */
     public function edit(Request $request): View
     {
-        // Mendefinisikan variabel $pageTitle
         $pageTitle = 'Profil';
 
         return view('profile.edit', [
             'user' => $request->user(),
-            // Mengirimkan variabel $pageTitle ke view
             'pageTitle' => $pageTitle,
         ]);
     }
@@ -62,27 +69,36 @@ public function updateBasic(Request $request): RedirectResponse
      * Update the user's profile information.
      */
     public function update(Request $request): RedirectResponse
-{
-    $validated = $request->validate([
-        'name' => ['required', 'string', 'min:4'],
-        'email' => ['required', 'string', 'email:rfc,dns'],
-    ], [
-        'name.required' => 'Nama wajib diisi.',
-        'name.min' => 'Nama minimal 4 karakter.',
-        'email.required' => 'Email wajib diisi.',
-        'email.email' => 'Format email tidak valid, gunakan format seperti nama@gmail.com.',
-    ]);
+    {
+        $user = $request->user(); // Dapatkan user untuk validasi
 
-    $request->user()->fill($validated);
+        // ✅ Perbaikan: Tambahkan aturan unique dengan mengabaikan ID user saat ini
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'min:4'],
+            'email' => [
+                'required',
+                'string',
+                'email:rfc,dns',
+                Rule::unique('users')->ignore($user->id),
+            ],
+        ], [
+            'name.required' => 'Nama wajib diisi.',
+            'name.min' => 'Nama minimal 4 karakter.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid, gunakan format seperti nama@gmail.com.',
+            'email.unique' => 'Email ini sudah digunakan oleh pengguna lain.', // Pesan kesalahan kustom
+        ]);
 
-    if ($request->user()->isDirty('email')) {
-        $request->user()->email_verified_at = null;
+        $user->fill($validated);
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
+
+        return Redirect::route('profile.edit')->with('success', 'Profil berhasil diperbarui!');
     }
-
-    $request->user()->save();
-
-    return Redirect::route('profile.edit')->with('success', 'Profil berhasil diperbarui!');
-}
 
 
     /**
@@ -105,6 +121,7 @@ public function updateBasic(Request $request): RedirectResponse
 
         return Redirect::to('/');
     }
+
     public function updatePhoto(Request $request)
     {
         $request->validate([
