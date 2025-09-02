@@ -201,14 +201,14 @@
 
     <!-- Modal Preview PDF -->
     <div class="modal fade" id="pdfModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
+        <div class="modal-dialog modal-xl" style="max-width:90vw;">
+            <div class="modal-content" style="height: 90vh;">
                 <div class="modal-header">
                     <h5 class="modal-title">Preview Surat</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    <iframe id="pdfViewer" src="" width="100%" height="600px" style="border:none;"></iframe>
+                <div class="modal-body" style="height: 80vh;">
+                    <iframe id="pdfViewer" src="" frameborder="0" style="width:100%; height:100%;"></iframe>
                 </div>
             </div>
         </div>

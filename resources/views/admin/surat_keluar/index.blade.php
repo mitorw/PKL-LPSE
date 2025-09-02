@@ -69,7 +69,7 @@
 
     @auth
         @if (Auth::user()->role === 'admin')
-            <a href="{{ route('surat_keluar.create') }}" class="mt-3 mb-3 btn btn-primary">Tambah Surat Keluar</a>
+            <a href="{{ route('surat_keluar.create') }}" class="mb-3 btn btn-primary">+ Tambah Surat Keluar</a>
         @endif
     @endauth
 
