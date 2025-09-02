@@ -59,7 +59,7 @@ class SuratKeluarController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nomor_surat' => 'required|max:50',
+            'nomor_surat' => 'required|max:50|unique:surat_keluar,nomor_surat',
             'perihal' => 'required|max:255',
             'tujuan' => 'required|max:255',
             'tanggal' => 'required|date',

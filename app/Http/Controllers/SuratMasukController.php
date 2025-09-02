@@ -110,7 +110,7 @@ class SuratMasukController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'no_surat' => 'required|string|max:255',
+            'no_surat' => 'required|string|max:255|unique:surat_masuk,no_surat',
             'asal_surat' => 'required|string|max:255',
             'tanggal_terima' => 'required|date',
             'perihal' => 'required|string',
