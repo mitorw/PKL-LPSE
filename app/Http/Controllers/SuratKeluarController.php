@@ -72,12 +72,9 @@ class SuratKeluarController extends Controller
 
         $filePath = null;
         if ($request->hasFile('isi_surat')) {
-            $files = $request->file('isi_surat');
-            if (!is_array($files)) {
-                $files = [$files];
-            }
+            $file = $request->file('isi_surat');
 
-            $ext = strtolower($files[0]->getClientOriginalExtension());
+            $ext = strtolower($file->getClientOriginalExtension());
 
             $noSurat = safeFileName($request->nomor_surat);
             $tanggalSurat = \Carbon\Carbon::parse($request->tanggal)->format('d-m-Y');
@@ -87,27 +84,41 @@ class SuratKeluarController extends Controller
             $baseOriginal  = $noSurat . '_' . $tanggalSurat . '.' . $ext;
 
             // Case 1: langsung PDF
-            if ($ext === 'pdf' && count($files) === 1) {
+            if ($ext === 'pdf') {
                 // Simpan file original PDF
-                $originalPath = $files[0]->storeAs('surat_keluar/original', $baseOriginal, 'public');
+                $originalPath = $file->storeAs('surat_keluar/original', $baseOriginal, 'public');
                 $filePath = $originalPath; // karena sudah PDF, hasil konversi = original
             }
 
             // Case 2: banyak gambar -> PDF multi halaman
             elseif (in_array($ext, ['jpg', 'jpeg', 'png'])) {
-                $html = '';
                 $manager = new ImageManager(new Driver());
 
-                foreach ($files as $file) {
                     // Simpan file original
                     $originalPath = $file->storeAs('surat_keluar/original', $baseOriginal, 'public');
 
                     // Convert ke base64 untuk dimasukkan ke PDF
                     $image = $manager->read($file->getPathname())->toJpeg();
-                    $html .= '<div style="page-break-after: always; text-align:center;">
-                    <img src="data:image/jpeg;base64,' . base64_encode($image) . '" style="max-width:100%;height:auto;">
-                  </div>';
-                }
+                    $html = '
+                        <html>
+                        <head>
+                            <style>
+                                body {
+                                    margin: 0;
+                                    padding: 0;
+                                    text-align: center;
+                                }
+                                img {
+                                    max-width: 100%;
+                                    max-height: 100%;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <img src="data:image/jpeg;base64,' . base64_encode($image) . '">
+                        </body>
+                        </html>';
+
 
                 // Buat PDF hasil konversi
                 $pdf = Pdf::loadHTML($html)->setPaper('a4', 'portrait');
@@ -197,9 +208,25 @@ class SuratKeluarController extends Controller
                 $manager = new ImageManager(new Driver());
                 $image = $manager->read($file->getPathname())->toJpeg();
 
-                $html = '<div style="page-break-after: always; text-align:center;">
-                <img src="data:image/jpeg;base64,' . base64_encode($image) . '" style="max-width:100%;height:auto;">
-            </div>';
+                $html = '
+                        <html>
+                        <head>
+                            <style>
+                                body {
+                                    margin: 0;
+                                    padding: 0;
+                                    text-align: center;
+                                }
+                                img {
+                                    max-width: 100%;
+                                    max-height: 100%;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <img src="data:image/jpeg;base64,' . base64_encode($image) . '">
+                        </body>
+                        </html>';
 
                 $pdf = Pdf::loadHTML($html)->setPaper('a4', 'portrait');
                 $filePath = 'surat_keluar/converted/' . $baseFileName;

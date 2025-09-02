@@ -133,12 +133,9 @@ class SuratMasukController extends Controller
 
         $fileSuratPath = null;
         if ($request->hasFile('file_surat')) {
-            $files = $request->file('file_surat');
-            if (!is_array($files)) {
-                $files = [$files];
-            }
+            $file = $request->file('file_surat');
 
-            $ext = strtolower($files[0]->getClientOriginalExtension());
+            $ext = strtolower($file->getClientOriginalExtension());
 
             // ambil data dari request
             $noSurat = safeFileName($request->no_surat);
@@ -148,21 +145,36 @@ class SuratMasukController extends Controller
             $baseFileName = $noSurat . '_' . $tanggalSurat . '.pdf';
             $baseOriginal  = $noSurat . '_' . $tanggalSurat . '.' . $ext;
 
-            if ($ext === 'pdf' && count($files) === 1) {
+            if ($ext === 'pdf') {
                 // simpan original pakai nama khusus
-                $originalPath = $files[0]->storeAs('surat_masuk/original', $baseOriginal, 'public');
+                $originalPath = $file->storeAs('surat_masuk/original', $baseOriginal, 'public');
                 $fileSuratPath = $originalPath;
             } elseif (in_array($ext, ['jpg', 'jpeg', 'png'])) {
                 $html = '';
                 $manager = new ImageManager(new Driver());
 
-                foreach ($files as $file) {
-                    $originalPath = $file->storeAs('surat_masuk/original', $baseOriginal, 'public');
-                    $image = $manager->read($file->getPathname())->toJpeg();
-                    $html .= '<div style="page-break-after: always; text-align:center;">
-                    <img src="data:image/jpeg;base64,' . base64_encode($image) . '" style="max-width:100%;height:auto;">
-                  </div>';
-                }
+                $originalPath = $file->storeAs('surat_masuk/original', $baseOriginal, 'public');
+                $image = $manager->read($file->getPathname())->toJpeg();
+                $html = '
+                        <html>
+                        <head>
+                            <style>
+                                body {
+                                    margin: 0;
+                                    padding: 0;
+                                    text-align: center;
+                                }
+                                img {
+                                    max-width: 100%;
+                                    max-height: 100%;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <img src="data:image/jpeg;base64,' . base64_encode($image) . '">
+                        </body>
+                        </html>';
+
 
                 $pdf = Pdf::loadHTML($html)->setPaper('a4', 'portrait');
                 $filename = 'surat_masuk/converted/' . $baseFileName;
@@ -286,9 +298,25 @@ class SuratMasukController extends Controller
                 $manager = new ImageManager(new Driver());
                 $image = $manager->read($file->getPathname())->toJpeg();
 
-                $html = '<div style="page-break-after: always; text-align:center;">
-            <img src="data:image/jpeg;base64,' . base64_encode($image) . '" style="max-width:100%;height:auto;">
-        </div>';
+                $html = '
+                        <html>
+                        <head>
+                            <style>
+                                body {
+                                    margin: 0;
+                                    padding: 0;
+                                    text-align: center;
+                                }
+                                img {
+                                    max-width: 100%;
+                                    max-height: 100%;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <img src="data:image/jpeg;base64,' . base64_encode($image) . '">
+                        </body>
+                        </html>';
 
                 $pdf = Pdf::loadHTML($html)->setPaper('a4', 'portrait');
                 $fileSuratPath = 'surat_masuk/converted/' . $baseFileName;
