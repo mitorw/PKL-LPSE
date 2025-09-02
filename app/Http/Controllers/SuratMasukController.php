@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;   // kalau pakai GD
+use Illuminate\Validation\Rule;
 
 
 class SuratMasukController extends Controller
@@ -156,7 +157,7 @@ class SuratMasukController extends Controller
                 $manager = new ImageManager(new Driver());
 
                 foreach ($files as $file) {
-                    $originalPath = $file->storeAs('surat_masuk/original',$baseOriginal, 'public');
+                    $originalPath = $file->storeAs('surat_masuk/original', $baseOriginal, 'public');
                     $image = $manager->read($file->getPathname())->toJpeg();
                     $html .= '<div style="page-break-after: always; text-align:center;">
                     <img src="data:image/jpeg;base64,' . base64_encode($image) . '" style="max-width:100%;height:auto;">
@@ -197,8 +198,16 @@ class SuratMasukController extends Controller
 
     public function update(Request $request, $id)
     {
+        $surat = SuratMasuk::findOrFail($id);   // converted (PDF)
+
         $request->validate([
-            'no_surat' => 'required|string|max:255',
+            'no_surat' => [
+                'required',
+                'string',
+                'max:255',
+                // Aturan ini memastikan no_surat unik, dengan mengabaikan data surat yang sedang kita edit.
+                Rule::unique('surat_masuk', 'no_surat')->ignore($surat->id_surat_masuk, 'id_surat_masuk')
+            ],
             'asal_surat' => 'required|string|max:255',
             'tanggal_terima' => 'required|date',
             'perihal' => 'required|string',
@@ -210,7 +219,6 @@ class SuratMasukController extends Controller
             'dis_bagian' => 'nullable|required_if:disposisi_status,ada|in:Bagian Layanan Pengadaan Secara Elektronik,Bagian Advokasi dan Pembinaan,Bagian Pengelolaan Pengadaan Barang dan Jasa',
         ]);
 
-        $surat = SuratMasuk::findOrFail($id);   // converted (PDF)
 
         $idDisposisi = $surat->id_disposisi;
 

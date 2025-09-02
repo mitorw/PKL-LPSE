@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
+use Illuminate\Validation\Rule;
 
 class SuratKeluarController extends Controller
 {
@@ -143,8 +144,16 @@ class SuratKeluarController extends Controller
 
     public function update(Request $request, $id)
     {
+        $surat = SuratKeluar::findOrFail($id);
+
         $request->validate([
-            'nomor_surat' => 'required|max:50',
+            'nomor_surat' => [
+                'required',
+                'max:50',
+                // Aturan ini memastikan nomor_surat unik di tabel surat_keluar,
+                // dengan mengabaikan data surat yang ID-nya sedang diedit.
+                Rule::unique('surat_keluar')->ignore($surat->id)
+            ],
             'perihal' => 'required|max:255',
             'tujuan' => 'required|max:255',
             'tanggal' => 'required|date',
@@ -154,7 +163,6 @@ class SuratKeluarController extends Controller
             'isi_surat_original' => 'nullable|string|max:255',
         ]);
 
-        $surat = SuratKeluar::findOrFail($id);
 
         $filePath = $surat->isi_surat;             // converted (PDF)
         $originalPath = $surat->isi_surat_original; // original
@@ -178,7 +186,7 @@ class SuratKeluarController extends Controller
             $baseOriginal  = $noSurat . '_' . $tanggalSurat . '.' . $ext;
 
             // Simpan original dulu
-            $originalPath = $file->storeAs('surat_keluar/original',$baseOriginal, 'public');
+            $originalPath = $file->storeAs('surat_keluar/original', $baseOriginal, 'public');
 
             // Case 1: kalau sudah PDF → tidak perlu convert
             if ($ext === 'pdf') {

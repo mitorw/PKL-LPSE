@@ -8,12 +8,16 @@
         <h4>Edit Surat Masuk</h4>
     </div>
     <div class="card-body">
-        <form action="{{ route('surat_masuk.update', $surat->id_surat_masuk) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('surat_masuk.update', $surat->id_surat_masuk) }}" method="POST" enctype="multipart/form-data" id="form-edit-surat">
             @csrf
             @method('PUT')
 
             {{-- Data Surat Utama --}}
-            <div class="mb-3"><label class="form-label">No Surat</label><input type="text" name="no_surat" class="form-control" value="{{ old('no_surat', $surat->no_surat) }}"></div>
+            <div class="mb-3"><label class="form-label">No Surat</label><input type="text" name="no_surat" class="form-control" value="{{ old('no_surat', $surat->no_surat) }}">
+                @error('no_surat')
+                    <div class="text-danger mt-1">{{ $message }}</div>
+                @enderror
+            </div>
             <div class="mb-3"><label class="form-label">Asal Surat</label><input type="text" name="asal_surat" class="form-control" value="{{ old('asal_surat', $surat->asal_surat) }}"></div>
             <div class="mb-3" style="width: 250px;"><label class="form-label">Tanggal Terima</label><input type="date" name="tanggal_terima" class="form-control" value="{{ old('tanggal_terima', $surat->tanggal_terima) }}"></div>
             <div class="mb-3"><label class="form-label">Perihal</label><input type="text" name="perihal" class="form-control" value="{{ old('perihal', $surat->perihal) }}"></div>
@@ -62,7 +66,7 @@
                 <input type="file" name="file_surat" class="form-control">
             </div>
 
-            <button class="btn btn-success" type="submit">Simpan Perubahan</button>
+            <button class="btn btn-success" type="submit" id="tombol-simpan">Simpan Perubahan</button>
             <a href="{{ route('surat_masuk.index') }}" class="btn btn-secondary">Batal</a>
         </form>
     </div>
@@ -83,5 +87,13 @@ document.addEventListener('DOMContentLoaded', function() {
     toggleDisposisiFields();
     statusSelect.addEventListener('change', toggleDisposisiFields);
 });
+</script>
+
+<script>
+    document.getElementById('form-edit-surat').addEventListener('submit', function() {
+        const tombolSimpan = document.getElementById('tombol-simpan');
+        tombolSimpan.disabled = true;
+        tombolSimpan.innerText = 'Menyimpan...';
+    });
 </script>
 @endpush
