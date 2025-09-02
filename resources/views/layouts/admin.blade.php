@@ -216,9 +216,6 @@
                         </div>
                     </li>
                     <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li>
                         <a class="dropdown-item" href="{{ route('profile.edit') }}">
                             <i class="fa fa-user-edit me-2"></i> Profile
                         </a>
