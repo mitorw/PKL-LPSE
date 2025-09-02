@@ -25,7 +25,8 @@ class UserController extends Controller
 
         $users = User::all();
         return view(
-            'manajemen_akun.index', compact('users')
+            'manajemen_akun.index',
+            compact('users')
         )->with('pageTitle', $pageTitle);
     }
 
@@ -90,6 +91,15 @@ class UserController extends Controller
         // Proteksi manual: Hanya admin yang bisa mengakses.
         if (Auth::user()->role !== 'admin') {
             return redirect('/');
+        }
+
+        $request->validate([
+            'role' => 'required|in:admin,user',
+        ]);
+
+        if ($user->role === $request->role) {
+            // Jika sama, kembalikan dengan pesan "info" dan hentikan proses.
+            return redirect()->route('manajemen_akun.index')->with('info', 'Tidak ada perubahan role yang dilakukan.');
         }
 
         $user->role = $request->role;

@@ -29,7 +29,7 @@
             <h4>Tambah Akun</h4>
         </div>
         <div class="card-body">
-            <form action="{{ route('manajemen_akun.store') }}" method="POST">
+            <form action="{{ route('manajemen_akun.store') }}" method="POST" id="form-tambah-akun">
                 @csrf
                 <div class="mb-3">
                     <label>Nama</label>
@@ -70,7 +70,7 @@
                     </select>
                 </div>
 
-                <button type="submit" class="btn btn-success">Simpan</button>
+                <button type="submit" class="btn btn-success" id="tombol-simpan">Simpan</button>
                 <a href="{{ route('manajemen_akun.index') }}" class="btn btn-secondary">Kembali</a>
             </form>
         </div>
@@ -112,6 +112,14 @@
                     });
                 });
 
+            });
+        </script>
+
+        <script>
+            document.getElementById('form-tambah-akun').addEventListener('submit', function() {
+                const tombolSimpan = document.getElementById('tombol-simpan');
+                tombolSimpan.disabled = true;
+                tombolSimpan.innerText = 'Menyimpan...';
             });
         </script>
     @endpush

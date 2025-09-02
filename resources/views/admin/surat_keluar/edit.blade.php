@@ -74,8 +74,8 @@
 
             </form>
         </div>
-        
-        {{-- MODIFIKASI 3: JavaScript untuk mencegah klik ganda --}}
+
+        {{-- Script Menyimpan --}}
         <script>
             document.getElementById('form-edit-surat').addEventListener('submit', function() {
                 const tombolSimpan = document.getElementById('tombol-simpan');

@@ -295,6 +295,19 @@
                 });
             @endif
 
+            @if (session('info'))
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'info',
+                    title: 'Informasi',
+                    text: '{{ session('info') }}',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            @endif
+
             @php
                 $allErrors = [];
                 foreach ($errors->getBags() as $bag) {

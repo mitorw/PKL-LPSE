@@ -31,24 +31,32 @@
                             </td>
                             <td>
                                 <div class="d-flex flex-wrap gap-2">
-                                    <form action="{{ route('manajemen_akun.updateRole', $user) }}" method="POST">
+                                    {{-- MODIFIKASI 1: Menambahkan class pada form --}}
+                                    <form action="{{ route('manajemen_akun.updateRole', $user) }}" method="POST"
+                                        class="form-ubah-role">
                                         @csrf
                                         <div class="input-group input-group-sm">
                                             <select name="role" class="form-select">
-                                                <option value="user" {{ $user->role == 'user' ? 'selected' : '' }}>User</option>
-                                                <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
+                                                <option value="user" {{ $user->role == 'user' ? 'selected' : '' }}>User
+                                                </option>
+                                                <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin
+                                                </option>
                                             </select>
-                                            <button type="submit" class="btn btn-success">Ubah</button>
+                                            {{-- MODIFIKASI 2: Menambahkan class pada tombol --}}
+                                            <button type="submit" class="btn btn-success btn-ubah-role">Ubah</button>
                                         </div>
                                     </form>
 
-                                    <form class="reset-password-form" action="{{ route('manajemen_akun.resetPassword', $user) }}" method="POST">
+                                    <form class="reset-password-form"
+                                        action="{{ route('manajemen_akun.resetPassword', $user) }}" method="POST">
                                         @csrf
                                         <button type="submit" class="btn btn-sm btn-warning">Reset Pass</button>
                                     </form>
 
-                                    @if (Auth::id() !== $user->id) {{-- Sembunyikan tombol hapus untuk diri sendiri --}}
-                                        <form class="delete-form" action="{{ route('manajemen_akun.destroy', $user) }}" method="POST">
+                                    @if (Auth::id() !== $user->id)
+                                        {{-- Sembunyikan tombol hapus untuk diri sendiri --}}
+                                        <form class="delete-form" action="{{ route('manajemen_akun.destroy', $user) }}"
+                                            method="POST">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
@@ -64,52 +72,64 @@
     </div>
 
     @push('scripts')
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
 
-        // --- Script untuk Konfirmasi Reset Password ---
-        document.querySelectorAll('.reset-password-form').forEach(form => {
-            form.addEventListener('submit', function(event) {
-                event.preventDefault();
-                Swal.fire({
-                    title: 'Reset Password?',
-                    text: 'Anda yakin ingin mereset password akun ini?',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#ffc107', // Warna kuning warning
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Ya, reset!',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        this.submit();
-                    }
+                // --- Script untuk Konfirmasi Reset Password ---
+                document.querySelectorAll('.reset-password-form').forEach(form => {
+                    form.addEventListener('submit', function(event) {
+                        event.preventDefault();
+                        Swal.fire({
+                            title: 'Reset Password?',
+                            text: 'Anda yakin ingin mereset password akun ini?',
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: '#ffc107', // Warna kuning warning
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Ya, reset!',
+                            cancelButtonText: 'Batal'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                this.submit();
+                            }
+                        });
+                    });
                 });
-            });
-        });
 
-        // --- Script untuk Konfirmasi Hapus Akun ---
-        document.querySelectorAll('.delete-form').forEach(form => {
-            form.addEventListener('submit', function(event) {
-                event.preventDefault();
-                Swal.fire({
-                    title: 'PERINGATAN!',
-                    text: 'Aksi ini akan menghapus akun secara permanen. Lanjutkan?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33', // Warna merah danger
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Ya, hapus permanen!',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        this.submit();
-                    }
+                // --- Script untuk Konfirmasi Hapus Akun ---
+                document.querySelectorAll('.delete-form').forEach(form => {
+                    form.addEventListener('submit', function(event) {
+                        event.preventDefault();
+                        Swal.fire({
+                            title: 'PERINGATAN!',
+                            text: 'Aksi ini akan menghapus akun secara permanen. Lanjutkan?',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#d33', // Warna merah danger
+                            cancelButtonColor: '#3085d6',
+                            confirmButtonText: 'Ya, hapus permanen!',
+                            cancelButtonText: 'Batal'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                this.submit();
+                            }
+                        });
+                    });
                 });
-            });
-        });
 
-    });
-    </script>
+                // --- MODIFIKASI 3: Script untuk Mencegah Spam Klik Ubah Role ---
+                document.querySelectorAll('.form-ubah-role').forEach(form => {
+                    form.addEventListener('submit', function(event) {
+                        // Temukan tombol di dalam form yang sedang di-submit
+                        const tombolUbah = form.querySelector('.btn-ubah-role');
+                        if (tombolUbah) {
+                            tombolUbah.disabled = true;
+                            tombolUbah.innerText = '...';
+                        }
+                    });
+                });
+
+            });
+        </script>
     @endpush
 @endsection
