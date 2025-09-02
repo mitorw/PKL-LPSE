@@ -7,7 +7,7 @@
     {{-- CARD RINGKASAN --}}
     <div class="row mb-4">
         <div class="col-md-4">
-            <div class="card shadow text-center p-3">
+            <div class="card text-center p-3">
                 <h5>SURAT MASUK</h5>
                 <h2 class="text-primary">{{ $suratMasuk }}</h2>
                 <i class="fa fa-envelope fa-2x text-primary"></i>
@@ -15,7 +15,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card shadow text-center p-3">
+            <div class="card text-center p-3">
                 <h5>SURAT KELUAR</h5>
                 <h2 class="text-success">{{ $suratKeluar }}</h2>
                 <i class="fa fa-briefcase fa-2x text-success"></i>
@@ -23,7 +23,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card shadow text-center p-3">
+            <div class="card text-center p-3">
                 <h5>PENGGUNA</h5>
                 <h2 class="text-secondary">{{ $pengguna }}</h2>
                 <i class="fa fa-user fa-2x text-secondary"></i>
@@ -33,7 +33,7 @@
     </div>
 
     {{-- SELAMAT DATANG + CHART --}}
-    <div class="card shadow text-center p-3 mb-4">
+    <div class="card text-center p-3 mb-4">
         <div class="row mt-2">
             <div>
                 <h4 class="mb-2">Selamat Datang, {{ Auth::user()->name }}!</h4>
@@ -41,14 +41,14 @@
             </div>
             {{-- Bar Chart --}}
             <div class="col-md-8">
-                <div class="card shadow p-3">
+                <div class="card p-3">
                     <h5>Statistik Surat 6 Bulan Terakhir</h5>
                     <canvas id="barChart"></canvas>
                 </div>
             </div>
             {{-- Pie Chart --}}
             <div class="col-md-4">
-                <div class="card shadow p-3">
+                <div class="card p-3">
                     <h5>Proporsi Surat Bulan {{ $namaBulanIni }}</h5>
                     <canvas id="pieChart"></canvas>
                     <h6 class="mt-1">Total Surat Bulan {{ $namaBulanIni }} : {{ $totalSuratBulanIni }} Surat</h6>

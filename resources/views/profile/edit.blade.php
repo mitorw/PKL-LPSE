@@ -304,42 +304,82 @@
             });
 
             cropBtn.addEventListener('click', function() {
-                if (!croppieInstance) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Perhatian',
-                        text: 'Silakan pilih foto terlebih dahulu!'
-                    });
-                    return;
-                }
+    if (!croppieInstance) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Perhatian',
+            text: 'Silakan pilih foto terlebih dahulu!'
+        });
+        return;
+    }
 
-                croppieInstance.result({
-                    type: 'base64',
-                    size: 'viewport'
-                }).then(function(base64) {
-                    fetch("{{ route('profile.photo.update') }}", {
-                            method: "POST",
-                            headers: {
-                                "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify({
-                                image: base64
-                            })
-                        })
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.success) {
-                                location.reload();
-                            } else {
-                                alert("❌ Gagal menyimpan foto profil!");
-                            }
-                        })
-                        .catch(() => {
-                            alert("❌ Terjadi error saat mengirim data!");
-                        });
+    // Tampilkan loading screen SweetAlert
+    Swal.fire({
+        title: 'Mohon tunggu...',
+        text: 'Sedang menyimpan foto profil.',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    croppieInstance.result({
+        type: 'base64',
+        size: 'viewport'
+    }).then(function(base64) {
+        fetch("{{ route('profile.photo.update') }}", {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    image: base64
+                })
+            })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Terjadi error saat mengirim data.');
+                }
+                return res.json();
+            })
+            .then(data => {
+                // Tutup SweetAlert loading
+                Swal.close();
+                
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: data.message || 'Foto profil berhasil diperbarui.',
+                        showConfirmButton: false,
+                        timer: 2500
+                    }).then(() => {
+                        // Reload halaman setelah SweetAlert selesai
+                        location.reload();
+                    });
+                } else {
+                    // Tampilkan pesan error
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops... Ada yang salah!',
+                        text: data.message || 'Gagal menyimpan foto profil.'
+                    });
+                }
+            })
+            .catch(error => {
+                // Tutup SweetAlert loading
+                Swal.close();
+                
+                // Tangani error jaringan atau server
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: error.message || 'Terjadi error saat mengirim data!'
                 });
             });
+    });
+});
         });
     </script>
 @endpush
