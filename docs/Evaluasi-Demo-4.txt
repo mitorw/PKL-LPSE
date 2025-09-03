@@ -1,0 +1,8 @@
+apk demo 4 (29 Agustus 2025)
+
+- eror upload word "zip archive not found" (saat edit)
+- Filter di surat keluar disamaain sm filter di surat masuk
+- Eror input word, input jpeg (dianggap bukan format di minta) , dan input jpg (tidak dapat di decode). (160-166 di surat masuk controler
+- udah file input cukup (pdf, png, jpg, jpeg).
+- pixel a4 di max (2480 x 3508 px)
+- benerin layout untuk sidebarnya tidak bisa di pencet.

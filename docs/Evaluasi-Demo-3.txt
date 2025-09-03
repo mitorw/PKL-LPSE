@@ -1,0 +1,14 @@
+demo 3 (26 Agustus 2025)
+
+- Jpg, png to pdf (gas)
+- Di surat keluar, jangan auto reset (kosong) field nya. jika terjadi restrictions
+- Tambah format word di inputan fileny.
+- tulisan edit (dari lihat pdf -> lihat file)
+- alert ganti jadi modal.
+- pindah chart di bawah setelah surat masuk/keluar/disposisi
+- nama pak puadi (bold)
+- urutan surat masuk (no surat, perihal, tanggal, tujuan/asal, klasifikasi, keterangan, disposisi/dibuat oleh)
+- keterangan diganti menjadu lokasi penyimpanan
+- disposisi tambah lokasi penyimpanan
+- log out pindah ke profile ( di drop down aja )
+- judul pdfnya, harus di tambahkan sesuai perioddenya (laporan inventaris 22)

@@ -1,0 +1,7 @@
+Evaluasi Demo 1 - Aplikasi Inventarisasi Surat
+
+Evaluasi
+- Preview document masih belum bisa di buka (403 forbidden)-> sudah di selesaikan, link to storage
+- Tambah format upload di surat masuk (Jpg, Png, pdf)
+- Mengubah template laporan surat, logo di login dan di surat
+- Warna "klasifikasi" dari surat keluar tidak sesuai dengan ketentuan, -> Biasa (hijau), Penting (kuning), Rahasia(merah)

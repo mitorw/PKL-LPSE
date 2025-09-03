@@ -1,0 +1,6 @@
+demo 5 (2 September 2025)
+
+- Jika kosong table nya tidak tertutup jika ada yang kosong (table keluar dan disposisi)
+- Disesuaikan urutan tabelnya (no surat, perihal, tanggal, tujuan/asal, klasifikasi, keterangan, disposisi/dibuat oleh)
+- tambahkan note password default = password@12345
+- dokumen dengan nomor surat sudah terdapat di sistem, klik disini untuk melihat file (saat eror no surat) langsung pop up di no surat yang sudah ada. tambah link or button untuk direct ke surat yang sudah ada
