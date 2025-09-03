@@ -53,34 +53,44 @@
                 {{-- Pilihan Ada / Tidak Disposisi --}}
                 <div class="mb-3">
                     <label>Disposisi</label>
-                    <select id="disposisi_status" class="form-control">
-                        <option value="tidak">Tidak Ada</option>
-                        <option value="ada">Ada</option>
+                    {{-- Tambahkan atribut 'name' agar nilainya bisa dikirim dan diingat --}}
+                    <select id="disposisi_status" name="disposisi_status" class="form-control">
+                        <option value="tidak" {{ old('disposisi_status', 'tidak') == 'tidak' ? 'selected' : '' }}>Tidak
+                            Ada</option>
+                        <option value="ada" {{ old('disposisi_status') == 'ada' ? 'selected' : '' }}>Ada</option>
                     </select>
                 </div>
 
                 {{-- Form Disposisi Tambahan --}}
-                <div id="disposisi_fields" style="display: none;">
+                {{-- Logika untuk menampilkan form jika 'old' adalah 'ada' --}}
+                <div id="disposisi_fields" style="{{ old('disposisi_status') == 'ada' ? '' : 'display: none;' }}">
                     <div class="mb-3">
                         <label>Bagian Tujuan</label>
                         <select name="dis_bagian" class="form-control">
                             <option value="">-- Pilih Bagian --</option>
-                            <option value="Bagian Layanan Pengadaan Secara Elektronik">Bagian Layanan Pengadaan Secara
-                                Elektronik
+                            <option value="Bagian Layanan Pengadaan Secara Elektronik"
+                                {{ old('dis_bagian') == 'Bagian Layanan Pengadaan Secara Elektronik' ? 'selected' : '' }}>
+                                Bagian Layanan Pengadaan Secara Elektronik
                             </option>
-                            <option value="Bagian Advokasi dan Pembinaan">Bagian Advokasi dan Pembinaan</option>
-                            <option value="Bagian Pengelolaan Pengadaan Barang dan Jasa">Bagian Pengelolaan Pengadaan Barang
-                                dan
-                                Jasa</option>
+                            <option value="Bagian Advokasi dan Pembinaan"
+                                {{ old('dis_bagian') == 'Bagian Advokasi dan Pembinaan' ? 'selected' : '' }}>
+                                Bagian Advokasi dan Pembinaan
+                            </option>
+                            <option value="Bagian Pengelolaan Pengadaan Barang dan Jasa"
+                                {{ old('dis_bagian') == 'Bagian Pengelolaan Pengadaan Barang dan Jasa' ? 'selected' : '' }}>
+                                Bagian Pengelolaan Pengadaan Barang dan Jasa
+                            </option>
                         </select>
                     </div>
                     <div class="mb-3">
                         <label>Catatan</label>
-                        <textarea name="catatan" class="form-control"></textarea>
+                        {{-- Untuk textarea, old() diletakkan di antara tag --}}
+                        <textarea name="catatan" class="form-control">{{ old('catatan') }}</textarea>
                     </div>
                     <div class="mb-3">
                         <label>Instruksi</label>
-                        <input type="text" name="instruksi" class="form-control">
+                        {{-- Untuk input, old() diletakkan di dalam atribut value --}}
+                        <input type="text" name="instruksi" class="form-control" value="{{ old('instruksi') }}">
                     </div>
                 </div>
 
@@ -114,6 +124,21 @@
                 const tombolSimpan = document.getElementById('tombol-simpan');
                 tombolSimpan.disabled = true;
                 tombolSimpan.innerText = 'Menyimpan...';
+            });
+        </script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const disposisiStatus = document.getElementById('disposisi_status');
+                const disposisiFields = document.getElementById('disposisi_fields');
+
+                disposisiStatus.addEventListener('change', function() {
+                    if (this.value === 'ada') {
+                        disposisiFields.style.display = 'block';
+                    } else {
+                        disposisiFields.style.display = 'none';
+                    }
+                });
             });
         </script>
     @endsection
