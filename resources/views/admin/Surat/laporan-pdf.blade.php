@@ -110,7 +110,7 @@
 </div>
 
 
-    {{-- SURAT MASUK --}}
+
 {{-- SURAT MASUK --}}
 <div class="subjudul">A. Surat Masuk</div>
 <table>
@@ -156,6 +156,7 @@
     </tbody>
 </table>
 
+
 {{-- SURAT KELUAR --}}
 <div class="subjudul">B. Surat Keluar</div>
 <table>
@@ -188,14 +189,15 @@
             </tr>
         @empty
             <tr>
-                <td colspan="7" style="text-align:center;">Tidak ada data surat keluar.</td>
+                <td colspan="8" style="text-align:center;">Tidak ada data surat keluar.</td>
             </tr>
         @endforelse
     </tbody>
 </table>
 
 
-   <h3>C. Laporan Disposisi</h3>
+{{-- LAPORAN DISPOSISI --}}
+<h3>C. Laporan Disposisi</h3>
 <table border="1" cellspacing="0" cellpadding="5" width="100%">
     <thead>
         <tr>
@@ -211,7 +213,7 @@
     </thead>
     <tbody>
         @php $no=1; @endphp
-        @foreach($disposisiSurat as $sm)
+        @forelse($disposisiSurat as $sm)
             <tr>
                 <td style="text-align:center;">{{ $no++ }}</td>
                 <td>{{ $sm->no_surat }}</td>
@@ -224,7 +226,6 @@
                     <td>{{ $sm->disposisi->dis_bagian }}</td>
                     <td>{{ $sm->disposisi->catatan }}</td>
                     <td>{{ $sm->disposisi->instruksi }}</td>
-
                 @else
                     <td style="text-align:center;">Tidak Ada</td>
                     <td>-</td>
@@ -233,9 +234,14 @@
                 @endif
                 <td>{{ $sm->keterangan ?? '-' }}</td>
             </tr>
-        @endforeach
+        @empty
+            <tr>
+                <td colspan="8" style="text-align:center;">Tidak ada data disposisi.</td>
+            </tr>
+        @endforelse
     </tbody>
 </table>
+
 
 {{-- PIE CHART SURAT --}}
 <div class="subjudul">D.Grafik Inventaris Surat</div>
