@@ -80,7 +80,7 @@
                     <th>
                         <a class="text-decoration-none text-dark sortable-link"
                             href="{{ route('surat_keluar.index', array_merge(request()->query(), ['sort' => 'nomor_surat', 'direction' => request('direction') == 'asc' ? 'desc' : 'asc'])) }}">
-                            Nomor Surat
+                            No Surat
                             @if (request('sort') == 'nomor_surat')
                                 <i class="ms-1 fas fa-{{ request('direction') == 'asc' ? 'arrow-up' : 'arrow-down' }}"></i>
                             @else
@@ -89,7 +89,6 @@
                         </a>
                     </th>
                     <th>Perihal</th>
-                    <th>Tujuan</th>
                     <th>
                         <a class="text-decoration-none text-dark sortable-link"
                             href="{{ route('surat_keluar.index', array_merge(request()->query(), ['sort' => 'tanggal', 'direction' => request('direction') == 'asc' ? 'desc' : 'asc'])) }}">
@@ -101,8 +100,10 @@
                             @endif
                         </a>
                     </th>
-                    <th>Dibuat Oleh</th>
+                    <th>Tujuan</th>
                     <th>Klasifikasi</th>
+                    <th>Lokasi Penyimpanan</th>
+                    <th>Dibuat Oleh</th>
                     <th>File</th>
                     @auth
                         @if (Auth::user()->role === 'admin')
@@ -120,12 +121,10 @@
                         <td data-bs-toggle="modal" data-bs-target="#detailSuratKeluarModal{{ $surat->id }}">
                             {{ $surat->perihal }}</td>
                         <td data-bs-toggle="modal" data-bs-target="#detailSuratKeluarModal{{ $surat->id }}">
-                            {{ $surat->tujuan }}</td>
-                        <td data-bs-toggle="modal" data-bs-target="#detailSuratKeluarModal{{ $surat->id }}">
                             {{ date('d/m/Y', strtotime($surat->tanggal)) }}</td>
                         <td data-bs-toggle="modal" data-bs-target="#detailSuratKeluarModal{{ $surat->id }}">
-                            {{ $surat->dibuat_oleh }}</td>
-                        <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
+                            {{ $surat->tujuan }}</td>
+                        <td class="text-center" data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id }}">
                             @php
                                 $badgeClass = match (strtolower(trim($surat->klasifikasi))) {
                                     'penting' => 'bg-warning text-dark',
@@ -137,9 +136,13 @@
                             {{-- Kode untuk menampilkan badge-nya, misalnya: --}}
                             <span class="badge {{ $badgeClass }}">{{ $surat->klasifikasi }}</span>
                         </td>
+                        <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id}}">
+                            {{ $surat->keterangan }}</td>
+                        <td data-bs-toggle="modal" data-bs-target="#detailSuratKeluarModal{{ $surat->id }}">
+                            {{ $surat->dibuat_oleh }}</td>
                         <td>
                             @if ($surat->isi_surat)
-                                <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#pdfModal"
+                                <button class="my-2 btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#pdfModal"
                                     data-file="{{ asset('storage/' . $surat->isi_surat) }}"
                                     onclick="event.stopPropagation()">
                                     Preview
@@ -155,7 +158,7 @@
                         @auth
                             @if (Auth::user()->role === 'admin')
                                 <td>
-                                    <a href="{{ route('surat_keluar.edit', $surat->id) }}" class="btn btn-sm btn-warning"
+                                    <a href="{{ route('surat_keluar.edit', $surat->id) }}" class="my-2 btn btn-sm btn-warning"
                                         onclick="event.stopPropagation()">Edit</a>
                                     <form class="delete-form" action="{{ route('surat_keluar.destroy', $surat->id) }}"
                                         method="POST" style="display:inline;" onclick="event.stopPropagation()">

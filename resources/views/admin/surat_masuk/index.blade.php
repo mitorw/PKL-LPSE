@@ -25,7 +25,9 @@
                     <div class="col-md-12">
                         <label for="search" class="form-label">Cari Surat</label>
                         <div class="input-group">
-                            <input type="text" id="search" name="search" class="form-control" placeholder="No surat, asal surat, perihal, Lokasi Penyimpanan..." value="{{ request('search') }}">
+                            <input type="text" id="search" name="search" class="form-control"
+                                placeholder="No surat, asal surat, perihal, Lokasi Penyimpanan..."
+                                value="{{ request('search') }}">
                             <button class="btn btn-primary" type="submit">Cari</button>
                         </div>
                     </div>
@@ -34,7 +36,8 @@
                     <div class="col-md-4">
                         <label class="form-label">Tanggal Terima</label>
                         <div class="input-group">
-                            <input type="date" name="start_date" class="form-control" value="{{ request('start_date') }}">
+                            <input type="date" name="start_date" class="form-control"
+                                value="{{ request('start_date') }}">
                             <span class="input-group-text">s/d</span>
                             <input type="date" name="end_date" class="form-control" value="{{ request('end_date') }}">
                         </div>
@@ -44,8 +47,10 @@
                         <label for="klasifikasi" class="form-label">Klasifikasi</label>
                         <select id="klasifikasi" class="form-select" name="klasifikasi">
                             <option value="">Semua</option>
-                            <option value="Rahasia" {{ request('klasifikasi') == 'Rahasia' ? 'selected' : '' }}>Rahasia</option>
-                            <option value="Penting" {{ request('klasifikasi') == 'Penting' ? 'selected' : '' }}>Penting</option>
+                            <option value="Rahasia" {{ request('klasifikasi') == 'Rahasia' ? 'selected' : '' }}>Rahasia
+                            </option>
+                            <option value="Penting" {{ request('klasifikasi') == 'Penting' ? 'selected' : '' }}>Penting
+                            </option>
                             <option value="Biasa" {{ request('klasifikasi') == 'Biasa' ? 'selected' : '' }}>Biasa</option>
                         </select>
                     </div>
@@ -55,15 +60,19 @@
                         <div class="input-group">
                             <select id="disposisi_status_filter" class="form-select" name="disposisi_status">
                                 <option value="">Semua Status</option>
-                                <option value="ada" {{ request('disposisi_status') == 'ada' ? 'selected' : '' }}>Ada Disposisi</option>
-                                <option value="tidak_ada" {{ request('disposisi_status') == 'tidak_ada' ? 'selected' : '' }}>Belum Disposisi</option>
+                                <option value="ada" {{ request('disposisi_status') == 'ada' ? 'selected' : '' }}>Ada
+                                    Disposisi</option>
+                                <option value="tidak_ada"
+                                    {{ request('disposisi_status') == 'tidak_ada' ? 'selected' : '' }}>Belum Disposisi
+                                </option>
                             </select>
 
                             {{-- BARU: Dropdown untuk Bagian, awalnya tersembunyi --}}
                             <select name="dis_bagian" id="bagian_filter" class="form-select" style="display: none;">
                                 <option value="">Semua Bagian</option>
                                 @foreach ($daftarBagian as $bagian)
-                                    <option value="{{ $bagian->dis_bagian }}" {{ request('dis_bagian') == $bagian->dis_bagian ? 'selected' : '' }}>
+                                    <option value="{{ $bagian->dis_bagian }}"
+                                        {{ request('dis_bagian') == $bagian->dis_bagian ? 'selected' : '' }}>
                                         {{ $bagian->dis_bagian }}
                                     </option>
                                 @endforeach
@@ -104,7 +113,7 @@
 
                         </a>
                     </th>
-                    <th>Asal Surat</th>
+                    <th>Perihal</th>
                     <th>
                         <a class="text-decoration-none text-dark sortable-link"
                             href="{{ route('surat_masuk.index', array_merge(request()->query(), ['sort' => 'tanggal_terima', 'direction' => request('direction') == 'asc' ? 'desc' : 'asc'])) }}">
@@ -116,10 +125,10 @@
                             @endif
                         </a>
                     </th>
-                    <th>Perihal</th>
+                    <th>Asal Surat</th>
                     <th>Klasifikasi</th>
-                    <th>Disposisi</th>
                     <th>Lokasi Penyimpanan</th>
+                    <th>Disposisi</th>
                     <th>File Surat</th>
                     @auth
                         @if (Auth::user()->role === 'admin')
@@ -138,12 +147,12 @@
                         <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
                             {{ $surat->no_surat }}</td>
                         <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
-                            {{ $surat->asal_surat }}</td>
+                            {{ $surat->perihal }}</td>
                         <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
                             {{ date('d/m/Y', strtotime($surat->tanggal_terima)) }}</td>
                         <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
-                            {{ $surat->perihal }}</td>
-                        <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
+                            {{ $surat->asal_surat }}</td>
+                        <td class="text-center" data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
                             @php
                                 $badgeClass = match (strtolower(trim($surat->klasifikasi))) {
                                     'penting' => 'bg-warning text-dark',
@@ -156,9 +165,9 @@
                             <span class="badge {{ $badgeClass }}">{{ $surat->klasifikasi }}</span>
                         </td>
                         <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
-                            {{ $surat->disposisi->dis_bagian ?? '-' }}</td>
-                        <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
                             {{ $surat->keterangan }}</td>
+                        <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
+                            {{ $surat->disposisi->dis_bagian ?? '-' }}</td>
                         <td>
                             @if ($surat->file_surat)
                                 <button class="my-2 btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#pdfModal"
@@ -180,7 +189,9 @@
                                     <a href="{{ route('surat_masuk.edit', $surat->id_surat_masuk) }}"
                                         class="my-2 btn btn-sm btn-warning" onclick="event.stopPropagation()">Edit</a>
 
-                                    <form class="delete-form" action="{{ route('surat_masuk.destroy', $surat->id_surat_masuk) }}" method="POST" style="display:inline;">
+                                    <form class="delete-form"
+                                        action="{{ route('surat_masuk.destroy', $surat->id_surat_masuk) }}" method="POST"
+                                        style="display:inline;">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-danger">Delete</button>
@@ -258,7 +269,8 @@
                                     </tr>
                                     <tr>
                                         <th>Tanggal Terima</th>
-                                        <td>{{ \Carbon\Carbon::parse($surat->tanggal_terima)->locale('id')->translatedFormat('d F Y') }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($surat->tanggal_terima)->locale('id')->translatedFormat('d F Y') }}
+                                        </td>
                                     </tr>
                                     <tr>
                                         <th>Perihal</th>
@@ -331,58 +343,57 @@
         });
     </script>
 
-@push('scripts')
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const statusFilter = document.getElementById('disposisi_status_filter');
-        const bagianFilter = document.getElementById('bagian_filter');
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const statusFilter = document.getElementById('disposisi_status_filter');
+                const bagianFilter = document.getElementById('bagian_filter');
 
-        function toggleBagianFilter() {
-            // Jika "Ada Disposisi" dipilih, tampilkan filter bagian
-            if (statusFilter.value === 'ada') {
-                bagianFilter.style.display = 'block';
-            } else {
-                // Jika tidak, sembunyikan dan kosongkan nilainya agar tidak ikut terfilter
-                bagianFilter.style.display = 'none';
-                bagianFilter.value = '';
-            }
-        }
-
-        // Jalankan fungsi saat halaman dimuat untuk memeriksa kondisi awal
-        // (Penting jika halaman dimuat ulang dengan filter yang sudah aktif)
-        toggleBagianFilter();
-
-        // Jalankan fungsi setiap kali nilai filter status berubah
-        statusFilter.addEventListener('change', toggleBagianFilter);
-    });
-    </script>
-
-    <script>
-        // Dengarkan event 'submit' pada semua form dengan class 'delete-form'
-        document.querySelectorAll('.delete-form').forEach(form => {
-            form.addEventListener('submit', function (event) {
-                // Hentikan aksi default form (yaitu submit langsung)
-                event.preventDefault();
-
-                Swal.fire({
-                    title: 'Apakah Anda yakin?',
-                    text: "Data yang dihapus tidak dapat dikembalikan!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#28a745',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Ya, hapus!',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    // Jika pengguna menekan tombol "Ya, hapus!"
-                    if (result.isConfirmed) {
-                        // Lanjutkan submit form
-                        this.submit();
+                function toggleBagianFilter() {
+                    // Jika "Ada Disposisi" dipilih, tampilkan filter bagian
+                    if (statusFilter.value === 'ada') {
+                        bagianFilter.style.display = 'block';
+                    } else {
+                        // Jika tidak, sembunyikan dan kosongkan nilainya agar tidak ikut terfilter
+                        bagianFilter.style.display = 'none';
+                        bagianFilter.value = '';
                     }
+                }
+
+                // Jalankan fungsi saat halaman dimuat untuk memeriksa kondisi awal
+                // (Penting jika halaman dimuat ulang dengan filter yang sudah aktif)
+                toggleBagianFilter();
+
+                // Jalankan fungsi setiap kali nilai filter status berubah
+                statusFilter.addEventListener('change', toggleBagianFilter);
+            });
+        </script>
+
+        <script>
+            // Dengarkan event 'submit' pada semua form dengan class 'delete-form'
+            document.querySelectorAll('.delete-form').forEach(form => {
+                form.addEventListener('submit', function(event) {
+                    // Hentikan aksi default form (yaitu submit langsung)
+                    event.preventDefault();
+
+                    Swal.fire({
+                        title: 'Apakah Anda yakin?',
+                        text: "Data yang dihapus tidak dapat dikembalikan!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#28a745',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Ya, hapus!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        // Jika pengguna menekan tombol "Ya, hapus!"
+                        if (result.isConfirmed) {
+                            // Lanjutkan submit form
+                            this.submit();
+                        }
+                    });
                 });
             });
-        });
-    </script>
-@endpush
-
+        </script>
+    @endpush
 @endsection
