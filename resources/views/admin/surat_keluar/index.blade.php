@@ -62,6 +62,7 @@
     <h2 class="mb-4">Daftar Surat Keluar</h2>
 
     <form action="{{ route('surat_keluar.index') }}" method="GET" class="mb-4">
+        
         <div class="card">
             <div class="card-body">
                 <div class="row g-3 align-items-end">
@@ -124,6 +125,10 @@
 
         {{-- Dropdown show per page di kanan --}}
         <form method="GET" action="{{ route('surat_keluar.index') }}" class="d-flex align-items-center" >
+                        @foreach (request()->except('per_page', 'page') as $key => $val)
+                <input type="hidden" name="{{ $key }}" value="{{ $val }}">
+            @endforeach
+
             <label for="per_page" class="me-2">Tampilkan per halaman:</label>
             <select name="per_page" id="per_page" class="form-select" style="width:auto;" onchange="this.form.submit()">
                 <option value="5" {{ request('per_page') == 5 ? 'selected' : '' }}>5</option>

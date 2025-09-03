@@ -146,9 +146,13 @@
 
         {{-- Dropdown show per page di kanan --}}
         <form method="GET" action="{{ route('surat_masuk.index') }}" class="d-flex align-items-center">
+            {{-- Pertahankan query string lainnya --}}
+            @foreach (request()->except('per_page', 'page') as $key => $val)
+                <input type="hidden" name="{{ $key }}" value="{{ $val }}">
+            @endforeach
+
             <label for="per_page" class="me-2">Tampilkan per halaman:</label>
-            <select name="per_page" id="per_page" class="form-select" style="width:auto;" onchange="this.form.submit()" placeholder="10">
-                {{-- Pertahankan query string lainnya saat mengubah per_page --}}
+            <select name="per_page" id="per_page" class="form-select" style="width:auto;" onchange="this.form.submit()">
                 <option value="5" {{ request('per_page') == 5 ? 'selected' : '' }}>5</option>
                 <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
                 <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
@@ -156,6 +160,7 @@
                 <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
             </select>
         </form>
+
     </div>
 
     <div class="table-responsive card">

@@ -43,7 +43,7 @@ class SuratKeluarController extends Controller
         } else {
         }
         $perPage = $request->input('per_page', 10);
-        $suratKeluar = SuratKeluar::paginate($perPage);
+        $suratKeluar = $query->paginate($perPage)->appends($request->query());
 
         return view('admin.surat_keluar.index', [
             'pageTitle' => 'Surat Keluar',
