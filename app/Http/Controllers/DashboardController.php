@@ -22,6 +22,10 @@ class DashboardController extends Controller
 
     public function index(Request $request)
     {
+
+        // Ambil nilai per_page dari request, default = 10
+        $perPageMasuk = $request->get('per_page_masuk', 5);
+        $perPageKeluar = $request->get('per_page_keluar', 5);
         // Data untuk Kartu & Grafik
         $suratMasukCount  = SuratMasuk::count();
         $suratKeluarCount = SuratKeluar::count();
@@ -57,11 +61,11 @@ class DashboardController extends Controller
 
         // 3. Terapkan sorting dinamis menggunakan orderBy().
         $suratMasukTerakhir = SuratMasuk::orderBy($sortMasukColumn, $sortDirection)
-            ->paginate(5, ['*'], 'masuk_page')
+            ->paginate($perPageMasuk, ['*'], 'masuk_page')
             ->appends(request()->query());
 
         $suratKeluarTerakhir = SuratKeluar::orderBy($sortKeluarColumn, $sortDirection)
-            ->paginate(5, ['*'], 'keluar_page')
+            ->paginate($perPageKeluar, ['*'], 'keluar_page')
             ->appends(request()->query());
 
         // Logika untuk Fitur Filter
@@ -208,10 +212,22 @@ class DashboardController extends Controller
         if (!$startDate && !$endDate && $request->filled('periode')) {
             $today = Carbon::today();
             switch ($request->periode) {
-                case '1hari': $startDate = $today->toDateString(); $endDate = $startDate; break;
-                case '7hari': $startDate = $today->copy()->subDays(6)->toDateString(); $endDate = $today->toDateString(); break;
-                case '14hari': $startDate = $today->copy()->subDays(13)->toDateString(); $endDate = $today->toDateString(); break;
-                case '1bulan': $startDate = $today->copy()->startOfMonth()->toDateString(); $endDate = $today->copy()->endOfMonth()->toDateString(); break;
+                case '1hari':
+                    $startDate = $today->toDateString();
+                    $endDate = $startDate;
+                    break;
+                case '7hari':
+                    $startDate = $today->copy()->subDays(6)->toDateString();
+                    $endDate = $today->toDateString();
+                    break;
+                case '14hari':
+                    $startDate = $today->copy()->subDays(13)->toDateString();
+                    $endDate = $today->toDateString();
+                    break;
+                case '1bulan':
+                    $startDate = $today->copy()->startOfMonth()->toDateString();
+                    $endDate = $today->copy()->endOfMonth()->toDateString();
+                    break;
             }
         }
 

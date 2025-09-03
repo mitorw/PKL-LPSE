@@ -87,7 +87,8 @@ class SuratMasukController extends Controller
 
         // Eksekusi query dengan PAGINATION di akhir
         // appends($request->query()) penting agar filter tetap aktif saat pindah halaman
-        $data = $query->latest()->paginate(10)->appends($request->query());
+        $perPage = $request->get('per_page', 10); // Ambil nilai per_page dari request, default 10
+        $data = SuratMasuk::paginate($perPage);
 
         // Kembalikan view dengan data yang sudah benar
         return view('admin.surat_masuk.index', [

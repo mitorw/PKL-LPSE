@@ -134,11 +134,29 @@
         </div>
     </form>
 
-    @auth
-        @if (Auth::user()->role === 'admin')
-            <a href="{{ route('surat_masuk.create') }}" class="mb-3 btn btn-primary">+ Tambah Surat Masuk</a>
-        @endif
-    @endauth
+
+
+    <div class="mb-3 d-flex justify-content-between align-items-center">
+        {{-- Tombol tambah di kiri --}}
+        @auth
+            @if (Auth::user()->role === 'admin')
+                <a href="{{ route('surat_masuk.create') }}" class="mb-3 btn btn-primary">+ Tambah Surat Masuk</a>
+            @endif
+        @endauth
+
+        {{-- Dropdown show per page di kanan --}}
+        <form method="GET" action="{{ route('surat_masuk.index') }}" class="d-flex align-items-center">
+            <label for="per_page" class="me-2">Tampilkan per halaman:</label>
+            <select name="per_page" id="per_page" class="form-select" style="width:auto;" onchange="this.form.submit()" placeholder="10">
+                {{-- Pertahankan query string lainnya saat mengubah per_page --}}
+                <option value="5" {{ request('per_page') == 5 ? 'selected' : '' }}>5</option>
+                <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
+                <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
+            </select>
+        </form>
+    </div>
 
     <div class="table-responsive card">
         <table class="table align-middle table-hover">
@@ -218,8 +236,8 @@
                             {{ $surat->disposisi->dis_bagian ?? '-' }}</td>
                         <td>
                             @if ($surat->file_surat)
-                                <button class="my-2 btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#pdfModal"
-                                    data-file="{{ asset('storage/' . $surat->file_surat) }}"
+                                <button class="my-2 btn btn-sm btn-info" data-bs-toggle="modal"
+                                    data-bs-target="#pdfModal" data-file="{{ asset('storage/' . $surat->file_surat) }}"
                                     onclick="event.stopPropagation()">
                                     Preview
                                 </button>

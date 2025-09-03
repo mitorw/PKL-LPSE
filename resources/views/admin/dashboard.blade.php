@@ -5,50 +5,50 @@
     <h1 class="mb-4 h3 fw-semibold">Dashboard</h1>
 
     {{-- CARD RINGKASAN --}}
-    <div class="row mb-4">
+    <div class="mb-4 row">
         <div class="col-md-4">
-            <div class="card text-center p-3">
+            <div class="p-3 text-center card">
                 <h5>SURAT MASUK</h5>
                 <h2 class="text-primary">{{ $suratMasuk }}</h2>
                 <i class="fa fa-envelope fa-2x text-primary"></i>
-                <a href="{{ route('surat_masuk.index') }}" class="btn btn-success btn-sm mt-3">Lihat</a>
+                <a href="{{ route('surat_masuk.index') }}" class="mt-3 btn btn-success btn-sm">Lihat</a>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card text-center p-3">
+            <div class="p-3 text-center card">
                 <h5>SURAT KELUAR</h5>
                 <h2 class="text-success">{{ $suratKeluar }}</h2>
                 <i class="fa fa-briefcase fa-2x text-success"></i>
-                <a href="{{ route('surat_keluar.index') }}" class="btn btn-success btn-sm mt-3">Lihat</a>
+                <a href="{{ route('surat_keluar.index') }}" class="mt-3 btn btn-success btn-sm">Lihat</a>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card text-center p-3">
+            <div class="p-3 text-center card">
                 <h5>PENGGUNA</h5>
                 <h2 class="text-secondary">{{ $pengguna }}</h2>
                 <i class="fa fa-user fa-2x text-secondary"></i>
-                <a href="{{ route('manajemen_akun.index') }}" class="btn btn-success btn-sm mt-3">Lihat</a>
+                <a href="{{ route('manajemen_akun.index') }}" class="mt-3 btn btn-success btn-sm">Lihat</a>
             </div>
         </div>
     </div>
 
     {{-- SELAMAT DATANG + CHART --}}
-    <div class="card text-center p-3 mb-4">
-        <div class="row mt-2">
+    <div class="p-3 mb-4 text-center card">
+        <div class="mt-2 row">
             <div>
                 <h4 class="mb-2">Selamat Datang, {{ Auth::user()->name }}!</h4>
                 <p class="text-muted">Berikut adalah ringkasan data inventaris surat.</p>
             </div>
             {{-- Bar Chart --}}
             <div class="col-md-8">
-                <div class="card p-3">
+                <div class="p-3 card">
                     <h5>Statistik Surat 6 Bulan Terakhir</h5>
                     <canvas id="barChart"></canvas>
                 </div>
             </div>
             {{-- Pie Chart --}}
             <div class="col-md-4">
-                <div class="card p-3">
+                <div class="p-3 card">
                     <h5>Proporsi Surat Bulan {{ $namaBulanIni }}</h5>
                     <canvas id="pieChart"></canvas>
                     <h6 class="mt-1">Total Surat Bulan {{ $namaBulanIni }} : {{ $totalSuratBulanIni }} Surat</h6>
@@ -109,7 +109,7 @@
 
     @if ($isFiltering)
     {{-- Tampilan Hasil Filter --}}
-    <div class="card mb-4">
+    <div class="mb-4 card">
         <div class="card-body">
             <h2 class="mb-3 h5 fw-bold">Hasil Filter Laporan Surat</h2>
             <div class="table-responsive">
@@ -185,9 +185,24 @@
     </div>
 @else
     {{-- Tampilan Default Dashboard --}}
-    <div class="card mb-4">
+    <div class="mb-4 card">
     <div class="card-body">
-        <h2 class="mb-3 h5 fw-bold">Daftar Surat Masuk</h2>
+        <div class="mb-3 d-flex justify-content-between align-items-center">
+            <h2 class="h5 fw-bold">Daftar Surat Masuk</h2>
+            <form method="GET" action="{{ route('dashboard') }}" class="d-flex align-items-center">
+                @foreach(request()->except('per_page_masuk', 'masuk_page') as $key => $val)
+                    <input type="hidden" name="{{ $key }}" value="{{ $val }}">
+                @endforeach
+                <label for="per_page_masuk" class="me-2">Tampilkan per halaman:</label>
+                <select name="per_page_masuk" id="per_page_masuk" class="form-select form-select-sm" style="width: auto;"
+                        onchange="this.form.submit()">
+                    <option value="5" {{ request('per_page_masuk', 5) == 5 ? 'selected' : '' }}>5</option>
+                    <option value="10" {{ request('per_page_masuk') == 10 ? 'selected' : '' }}>10</option>
+                    <option value="25" {{ request('per_page_masuk') == 25 ? 'selected' : '' }}>25</option>
+                    <option value="50" {{ request('per_page_masuk') == 50 ? 'selected' : '' }}>50</option>
+                </select>
+            </form>
+        </div>
         <div class="table-responsive">
             <table class="table align-middle table-hover">
                 <thead class="table-light">
@@ -259,7 +274,22 @@
 
 <div class="card">
     <div class="card-body">
-        <h2 class="mb-3 h5 fw-bold">Daftar Surat Keluar</h2>
+        <div class="mb-3 d-flex justify-content-between align-items-center">
+            <h2 class="h5 fw-bold">Daftar Surat Keluar</h2>
+            <form method="GET" action="{{ route('dashboard') }}" class="d-flex align-items-center">
+                @foreach(request()->except('per_page_keluar', 'keluar_page') as $key => $val)
+                    <input type="hidden" name="{{ $key }}" value="{{ $val }}">
+                @endforeach
+                <label for="per_page_keluar" class="me-2">Tampilkan per halaman:</label>
+                <select name="per_page_keluar" id="per_page_keluar" class="form-select form-select-sm" style="width: auto;"
+                        onchange="this.form.submit()">
+                    <option value="5" {{ request('per_page_keluar', 5) == 5 ? 'selected' : '' }}>5</option>
+                    <option value="10" {{ request('per_page_keluar') == 10 ? 'selected' : '' }}>10</option>
+                    <option value="25" {{ request('per_page_keluar') == 25 ? 'selected' : '' }}>25</option>
+                    <option value="50" {{ request('per_page_keluar') == 50 ? 'selected' : '' }}>50</option>
+                </select>
+            </form>
+        </div>
         <div class="table-responsive">
             <table class="table align-middle table-hover">
                 <thead class="table-light">

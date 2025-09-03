@@ -101,7 +101,7 @@
                     </div>
 
 
-                    <div class="col-md-2  d-grid">
+                    <div class="col-md-2 d-grid">
                         <div class="btn-group">
                             <button class="btn btn-primary" type="submit">Filter</button>
                             <a href="{{ route('surat_keluar.index') }}" class="btn btn-secondary">Reset</a>
@@ -112,11 +112,30 @@
         </div>
     </form>
 
-    @auth
-        @if (Auth::user()->role === 'admin')
-            <a href="{{ route('surat_keluar.create') }}" class="mb-3 btn btn-primary">+ Tambah Surat Keluar</a>
-        @endif
-    @endauth
+    <div class="mb-3 d-flex justify-content-between align-items-center">
+        {{-- Tombol tambah di kiri --}}
+        @auth
+            @if (Auth::user()->role === 'admin')
+                <a href="{{ route('surat_keluar.create') }}" class="btn btn-primary">
+                    + Tambah Surat Keluar
+                </a>
+            @endif
+        @endauth
+
+        {{-- Dropdown show per page di kanan --}}
+        <form method="GET" action="{{ route('surat_keluar.index') }}" class="d-flex align-items-center" >
+            <label for="per_page" class="me-2">Tampilkan per halaman:</label>
+            <select name="per_page" id="per_page" class="form-select" style="width:auto;" onchange="this.form.submit()">
+                <option value="5" {{ request('per_page') == 5 ? 'selected' : '' }}>5</option>
+                <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
+                <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
+            </select>
+        </form>
+    </div>
+
+
 
     <div class="table-responsive card">
         <table class="table align-middle table-hover">
@@ -207,8 +226,8 @@
                         @auth
                             @if (Auth::user()->role === 'admin')
                                 <td>
-                                    <a href="{{ route('surat_keluar.edit', $surat->id) }}" class="my-2 btn btn-sm btn-warning"
-                                        onclick="event.stopPropagation()">Edit</a>
+                                    <a href="{{ route('surat_keluar.edit', $surat->id) }}"
+                                        class="my-2 btn btn-sm btn-warning" onclick="event.stopPropagation()">Edit</a>
                                     <form class="delete-form" action="{{ route('surat_keluar.destroy', $surat->id) }}"
                                         method="POST" style="display:inline;" onclick="event.stopPropagation()">
                                         @csrf

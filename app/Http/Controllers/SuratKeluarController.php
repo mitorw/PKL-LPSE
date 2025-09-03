@@ -42,8 +42,8 @@ class SuratKeluarController extends Controller
             $query->orderBy($request->input('sort'), $request->input('direction'));
         } else {
         }
-
-        $suratKeluar = $query->latest()->paginate(10)->appends($request->query());
+        $perPage = $request->input('per_page', 10);
+        $suratKeluar = SuratKeluar::paginate($perPage);
 
         return view('admin.surat_keluar.index', [
             'pageTitle' => 'Surat Keluar',
