@@ -4,9 +4,14 @@
     <div class="container mt-4">
 
         @if (Auth::user()->role === 'admin')
-            <a href="{{ route('manajemen_akun.create') }}" class="mb-3 btn btn-primary">
-                + Tambah Akun
-            </a>
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <a href="{{ route('manajemen_akun.create') }}" class="btn btn-primary">
+                    + Tambah Akun
+                </a>
+                <small class="text-muted">
+                    <em>Password default = <strong style="color: red">password@12345</strong></em>
+                </small>
+            </div>
         @endif
 
         <div class="table-responsive">
@@ -31,7 +36,6 @@
                             </td>
                             <td>
                                 <div class="d-flex flex-wrap gap-2">
-                                    {{-- MODIFIKASI 1: Menambahkan class pada form --}}
                                     <form action="{{ route('manajemen_akun.updateRole', $user) }}" method="POST"
                                         class="form-ubah-role">
                                         @csrf
@@ -42,7 +46,6 @@
                                                 <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin
                                                 </option>
                                             </select>
-                                            {{-- MODIFIKASI 2: Menambahkan class pada tombol --}}
                                             <button type="submit" class="btn btn-success btn-ubah-role">Ubah</button>
                                         </div>
                                     </form>
@@ -54,7 +57,6 @@
                                     </form>
 
                                     @if (Auth::id() !== $user->id)
-                                        {{-- Sembunyikan tombol hapus untuk diri sendiri --}}
                                         <form class="delete-form" action="{{ route('manajemen_akun.destroy', $user) }}"
                                             method="POST">
                                             @csrf
@@ -74,8 +76,7 @@
     @push('scripts')
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-
-                // --- Script untuk Konfirmasi Reset Password ---
+                // --- Script Reset Password ---
                 document.querySelectorAll('.reset-password-form').forEach(form => {
                     form.addEventListener('submit', function(event) {
                         event.preventDefault();
@@ -84,7 +85,7 @@
                             text: 'Anda yakin ingin mereset password akun ini?',
                             icon: 'question',
                             showCancelButton: true,
-                            confirmButtonColor: '#ffc107', // Warna kuning warning
+                            confirmButtonColor: '#ffc107',
                             cancelButtonColor: '#d33',
                             confirmButtonText: 'Ya, reset!',
                             cancelButtonText: 'Batal'
@@ -96,7 +97,7 @@
                     });
                 });
 
-                // --- Script untuk Konfirmasi Hapus Akun ---
+                // --- Script Hapus Akun ---
                 document.querySelectorAll('.delete-form').forEach(form => {
                     form.addEventListener('submit', function(event) {
                         event.preventDefault();
@@ -105,7 +106,7 @@
                             text: 'Aksi ini akan menghapus akun secara permanen. Lanjutkan?',
                             icon: 'warning',
                             showCancelButton: true,
-                            confirmButtonColor: '#d33', // Warna merah danger
+                            confirmButtonColor: '#d33',
                             cancelButtonColor: '#3085d6',
                             confirmButtonText: 'Ya, hapus permanen!',
                             cancelButtonText: 'Batal'
@@ -117,10 +118,9 @@
                     });
                 });
 
-                // --- MODIFIKASI 3: Script untuk Mencegah Spam Klik Ubah Role ---
+                // --- Mencegah Spam Klik Ubah Role ---
                 document.querySelectorAll('.form-ubah-role').forEach(form => {
                     form.addEventListener('submit', function(event) {
-                        // Temukan tombol di dalam form yang sedang di-submit
                         const tombolUbah = form.querySelector('.btn-ubah-role');
                         if (tombolUbah) {
                             tombolUbah.disabled = true;
@@ -128,7 +128,6 @@
                         }
                     });
                 });
-
             });
         </script>
     @endpush
