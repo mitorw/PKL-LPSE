@@ -1,4 +1,4 @@
-demo 2 :
+demo 2 (22 Agustus 2025):
     - input file di surat masuk dn keluar, not nullable (harus isi)
     - restrictions di input foto profil
     - alert saat buat akun baru, atau respon setelah buat akun.
