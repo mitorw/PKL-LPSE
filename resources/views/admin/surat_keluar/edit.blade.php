@@ -70,7 +70,7 @@
                 </div>
 
                 <button class="btn btn-success" type="submit" id="tombol-simpan">Simpan Perubahan</button>
-                <a href="{{ route('surat_masuk.index') }}" class="btn btn-secondary">Batal</a>
+                <a href="{{ route('surat_keluar.index') }}" class="btn btn-secondary">Batal</a>
 
             </form>
         </div>

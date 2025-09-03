@@ -13,6 +13,50 @@
         .clickable-row {
             cursor: pointer;
         }
+
+
+        /* Highlight no surat yang sudah ada */
+        /* 1. Jadikan setiap sel (td) di baris highlight sebagai 'kanvas' */
+        .row-highlight td {
+            position: relative;
+        }
+
+        /* 2. Buat lapisan overlay kuning untuk setiap sel */
+        .row-highlight td::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #3f51b5;
+            /* Warna kuning */
+            z-index: 1;
+            /* Posisikan lapisan di atas background sel */
+
+            /* Terapkan animasi pada lapisan ini */
+            animation: fadeOutOverlay 3s ease-out forwards;
+        }
+
+        /* 3. Pastikan konten asli sel (teks, tombol) tetap di atas lapisan & bisa di-klik */
+        .row-highlight td>* {
+            position: relative;
+            z-index: 2;
+            /* Posisikan konten di atas lapisan kuning */
+        }
+
+        /* 4. Definisikan animasi untuk menghilangkan lapisan */
+        @keyframes fadeOutOverlay {
+            from {
+                opacity: 0.7;
+                /* Mulai dari 70% terlihat */
+            }
+
+            to {
+                opacity: 0;
+                /* Hilang sepenuhnya */
+            }
+        }
     </style>
 
     <h2 class="mb-4">Daftar Surat Keluar</h2>
@@ -39,7 +83,8 @@
                             <input type="date" name="tanggal_awal" class="form-control"
                                 value="{{ request('tanggal_awal') }}">
                             <span class="input-group-text">s/d</span>
-                            <input type="date" name="tanggal_akhir" class="form-control" value="{{ request('tanggal_akhir') }}">
+                            <input type="date" name="tanggal_akhir" class="form-control"
+                                value="{{ request('tanggal_akhir') }}">
                         </div>
                     </div>
 
@@ -115,7 +160,10 @@
             </thead>
             <tbody>
                 @foreach ($suratKeluar as $surat)
-                    <tr class="clickable-row">
+                    @php
+                        $isHighlighted = request('highlight') == $surat->id;
+                    @endphp
+                    <tr class="clickable-row {{ $isHighlighted ? 'row-highlight' : '' }}">
                         <td data-bs-toggle="modal" data-bs-target="#detailSuratKeluarModal{{ $surat->id }}">
                             {{ $surat->nomor_surat }}</td>
                         <td data-bs-toggle="modal" data-bs-target="#detailSuratKeluarModal{{ $surat->id }}">
@@ -124,7 +172,8 @@
                             {{ date('d/m/Y', strtotime($surat->tanggal)) }}</td>
                         <td data-bs-toggle="modal" data-bs-target="#detailSuratKeluarModal{{ $surat->id }}">
                             {{ $surat->tujuan }}</td>
-                        <td class="text-center" data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id }}">
+                        <td class="text-center" data-bs-toggle="modal"
+                            data-bs-target="#detailSuratModal{{ $surat->id }}">
                             @php
                                 $badgeClass = match (strtolower(trim($surat->klasifikasi))) {
                                     'penting' => 'bg-warning text-dark',
@@ -136,7 +185,7 @@
                             {{-- Kode untuk menampilkan badge-nya, misalnya: --}}
                             <span class="badge {{ $badgeClass }}">{{ $surat->klasifikasi }}</span>
                         </td>
-                        <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id}}">
+                        <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id }}">
                             {{ $surat->keterangan }}</td>
                         <td data-bs-toggle="modal" data-bs-target="#detailSuratKeluarModal{{ $surat->id }}">
                             {{ $surat->dibuat_oleh }}</td>

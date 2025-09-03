@@ -60,7 +60,7 @@ class SuratKeluarController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nomor_surat' => 'required|max:50|unique:surat_keluar,nomor_surat',
+            'nomor_surat' => 'required|max:50',
             'perihal' => 'required|max:255',
             'tujuan' => 'required|max:255',
             'tanggal' => 'required|date',
@@ -69,6 +69,25 @@ class SuratKeluarController extends Controller
             'isi_surat' => 'required|mimes:pdf,png,jpg,jpeg|max:5120',
             'isi_surat_original' => 'nullable|string|max:255',
         ]);
+
+        $nomorSuratInput = $request->input('nomor_surat');
+        $existingSurat = SuratKeluar::where('nomor_surat', $nomorSuratInput)->first();
+
+        if ($existingSurat) {
+            // JIKA DITEMUKAN DUPLIKAT
+            // Buat URL yang akan mengarah ke halaman index dengan penanda
+            $redirectUrl = route('surat_keluar.index', [
+                'search' => $existingSurat->nomor_surat,       // Parameter untuk mengisi kolom search
+                'highlight' => $existingSurat->id            // Parameter untuk highlight & scroll
+            ]);
+
+            return redirect()->back()
+                ->withInput()
+                ->with('duplicate_found', [
+                    'no_surat' => $existingSurat->nomor_surat,
+                    'redirect_url' => $redirectUrl
+                ]);
+        }
 
         $filePath = null;
         if ($request->hasFile('isi_surat')) {
@@ -94,12 +113,12 @@ class SuratKeluarController extends Controller
             elseif (in_array($ext, ['jpg', 'jpeg', 'png'])) {
                 $manager = new ImageManager(new Driver());
 
-                    // Simpan file original
-                    $originalPath = $file->storeAs('surat_keluar/original', $baseOriginal, 'public');
+                // Simpan file original
+                $originalPath = $file->storeAs('surat_keluar/original', $baseOriginal, 'public');
 
-                    // Convert ke base64 untuk dimasukkan ke PDF
-                    $image = $manager->read($file->getPathname())->toJpeg();
-                    $html = '
+                // Convert ke base64 untuk dimasukkan ke PDF
+                $image = $manager->read($file->getPathname())->toJpeg();
+                $html = '
                         <html>
                         <head>
                             <style>
@@ -158,13 +177,6 @@ class SuratKeluarController extends Controller
         $surat = SuratKeluar::findOrFail($id);
 
         $request->validate([
-            'nomor_surat' => [
-                'required',
-                'max:50',
-                // Aturan ini memastikan nomor_surat unik di tabel surat_keluar,
-                // dengan mengabaikan data surat yang ID-nya sedang diedit.
-                Rule::unique('surat_keluar')->ignore($surat->id)
-            ],
             'perihal' => 'required|max:255',
             'tujuan' => 'required|max:255',
             'tanggal' => 'required|date',
@@ -173,6 +185,27 @@ class SuratKeluarController extends Controller
             'isi_surat' => 'nullable|mimes:pdf,png,jpg,jpeg|max:5120',
             'isi_surat_original' => 'nullable|string|max:255',
         ]);
+
+        $nomorSuratInput = $request->input('nomor_surat');
+        // Cari surat lain yang memiliki nomor_surat yang sama, TAPI bukan surat yang sedang kita edit
+        $existingSurat = SuratKeluar::where('nomor_surat', $nomorSuratInput)
+            ->where('id', '!=', $id)
+            ->first();
+
+        if ($existingSurat) {
+            // JIKA DITEMUKAN DUPLIKAT
+            $redirectUrl = route('surat_keluar.index', [
+                'search' => $existingSurat->nomor_surat,
+                'highlight' => $existingSurat->id
+            ]);
+
+            return redirect()->back()
+                ->withInput()
+                ->with('duplicate_found', [
+                    'no_surat' => $existingSurat->nomor_surat,
+                    'redirect_url' => $redirectUrl
+                ]);
+        }
 
 
         $filePath = $surat->isi_surat;             // converted (PDF)

@@ -13,6 +13,49 @@
         .clickable-row {
             cursor: pointer;
         }
+
+        /* Highlight no surat yang sudah ada */
+        /* 1. Jadikan setiap sel (td) di baris highlight sebagai 'kanvas' */
+        .row-highlight td {
+            position: relative;
+        }
+
+        /* 2. Buat lapisan overlay kuning untuk setiap sel */
+        .row-highlight td::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #3f51b5;
+            /* Warna kuning */
+            z-index: 1;
+            /* Posisikan lapisan di atas background sel */
+
+            /* Terapkan animasi pada lapisan ini */
+            animation: fadeOutOverlay 3s ease-out forwards;
+        }
+
+        /* 3. Pastikan konten asli sel (teks, tombol) tetap di atas lapisan & bisa di-klik */
+        .row-highlight td>* {
+            position: relative;
+            z-index: 2;
+            /* Posisikan konten di atas lapisan kuning */
+        }
+
+        /* 4. Definisikan animasi untuk menghilangkan lapisan */
+        @keyframes fadeOutOverlay {
+            from {
+                opacity: 0.7;
+                /* Mulai dari 70% terlihat */
+            }
+
+            to {
+                opacity: 0;
+                /* Hilang sepenuhnya */
+            }
+        }
     </style>
     <h2 class="mb-4">Daftar Surat Masuk</h2>
 
@@ -142,7 +185,11 @@
             {{-- Table hover bisa menjadi view --}}
             <tbody>
                 @foreach ($data as $surat)
-                    <tr class="clickable-row">
+                    @php
+                        // Cek apakah ID surat ini sama dengan ID yang ada di URL
+                        $isHighlighted = request('highlight') == $surat->id_surat_masuk;
+                    @endphp
+                    <tr class="clickable-row {{ $isHighlighted ? 'row-highlight' : '' }}">
 
                         <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
                             {{ $surat->no_surat }}</td>
@@ -152,7 +199,8 @@
                             {{ date('d/m/Y', strtotime($surat->tanggal_terima)) }}</td>
                         <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
                             {{ $surat->asal_surat }}</td>
-                        <td class="text-center" data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
+                        <td class="text-center" data-bs-toggle="modal"
+                            data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
                             @php
                                 $badgeClass = match (strtolower(trim($surat->klasifikasi))) {
                                     'penting' => 'bg-warning text-dark',
@@ -344,6 +392,20 @@
     </script>
 
     @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Cari baris yang ditandai
+                const highlightedRow = document.querySelector('.table-warning');
+
+                // Jika ada, scroll ke baris tersebut agar langsung terlihat
+                if (highlightedRow) {
+                    highlightedRow.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center' // Posisikan di tengah layar
+                    });
+                }
+            });
+        </script>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const statusFilter = document.getElementById('disposisi_status_filter');

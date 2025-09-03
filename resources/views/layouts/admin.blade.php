@@ -305,6 +305,21 @@
                 });
             @endif
 
+            @if (session('duplicate_found'))
+                @php
+                    $duplicateData = session('duplicate_found');
+                @endphp
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Dokumen Sudah Ada!',
+                    // Pesan HTML dengan link yang mengarah ke halaman index
+                    html: `Dokumen dengan nomor <strong>{{ $duplicateData['no_surat'] }}</strong> sudah ada di sistem.` +
+                        `<br><br><a href="{{ $duplicateData['redirect_url'] }}" class="text-primary">Klik di sini untuk melihat dokumen</a>`,
+                    confirmButtonText: 'OK'
+                });
+            @endif
+
             @php
                 $allErrors = [];
                 foreach ($errors->getBags() as $bag) {

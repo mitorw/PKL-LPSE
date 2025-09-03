@@ -110,16 +110,36 @@ class SuratMasukController extends Controller
 
     public function store(Request $request)
     {
+        // Validasi semua field kecuali no_surat terlebih dahulu
         $request->validate([
-            'no_surat' => 'required|string|max:255|unique:surat_masuk,no_surat',
             'asal_surat' => 'required|string|max:255',
             'tanggal_terima' => 'required|date',
             'perihal' => 'required|string',
             'klasifikasi' => 'required|in:Rahasia,Penting,Biasa',
             'file_surat' => 'required|mimes:pdf,png,jpg,jpeg|max:5120',
-            'dis_bagian' => 'nullable|in:Bagian Layanan Pengadaan Secara Elektronik,Bagian Advokasi dan Pembinaan,Bagian Pengelolaan Pengadaan Barang dan Jasa',
-            'file_surat_original' => 'nullable|string|max:255',
+            // ... validasi lain tanpa no_surat
         ]);
+
+        // Cek no_surat secara manual
+        $noSuratInput = $request->input('no_surat');
+        $existingSurat = SuratMasuk::where('no_surat', $noSuratInput)->first();
+
+        if ($existingSurat) {
+            // JIKA DITEMUKAN DUPLIKAT
+
+            // MODIFIKASI UTAMA: Buat URL yang mengisi pencarian DAN memberi penanda highlight
+            $redirectUrl = route('surat_masuk.index', [
+                'search' => $existingSurat->no_surat,       // Parameter untuk mengisi kolom search
+                'highlight' => $existingSurat->id_surat_masuk // Parameter untuk highlight & scroll
+            ]);
+
+            return redirect()->back()
+                ->withInput()
+                ->with('duplicate_found', [
+                    'no_surat' => $existingSurat->no_surat,
+                    'redirect_url' => $redirectUrl // Kirim URL yang sudah cerdas ini
+                ]);
+        }
 
         $idDisposisi = null;
         if ($request->filled('dis_bagian')) {
@@ -213,13 +233,6 @@ class SuratMasukController extends Controller
         $surat = SuratMasuk::findOrFail($id);   // converted (PDF)
 
         $request->validate([
-            'no_surat' => [
-                'required',
-                'string',
-                'max:255',
-                // Aturan ini memastikan no_surat unik, dengan mengabaikan data surat yang sedang kita edit.
-                Rule::unique('surat_masuk', 'no_surat')->ignore($surat->id_surat_masuk, 'id_surat_masuk')
-            ],
             'asal_surat' => 'required|string|max:255',
             'tanggal_terima' => 'required|date',
             'perihal' => 'required|string',
@@ -230,6 +243,27 @@ class SuratMasukController extends Controller
             'disposisi_status' => 'required|in:ada,tidak',
             'dis_bagian' => 'nullable|required_if:disposisi_status,ada|in:Bagian Layanan Pengadaan Secara Elektronik,Bagian Advokasi dan Pembinaan,Bagian Pengelolaan Pengadaan Barang dan Jasa',
         ]);
+
+        $noSuratInput = $request->input('no_surat');
+        // Cari surat lain yang memiliki no_surat yang sama, TAPI bukan surat yang sedang kita edit
+        $existingSurat = SuratMasuk::where('no_surat', $noSuratInput)
+            ->where('id_surat_masuk', '!=', $id)
+            ->first();
+
+        if ($existingSurat) {
+            // JIKA DITEMUKAN DUPLIKAT
+            $redirectUrl = route('surat_masuk.index', [
+                'search' => $existingSurat->no_surat,
+                'highlight' => $existingSurat->id_surat_masuk
+            ]);
+
+            return redirect()->back()
+                ->withInput()
+                ->with('duplicate_found', [
+                    'no_surat' => $existingSurat->no_surat,
+                    'redirect_url' => $redirectUrl
+                ]);
+        }
 
 
         $idDisposisi = $surat->id_disposisi;
