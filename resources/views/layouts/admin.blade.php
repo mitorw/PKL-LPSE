@@ -63,6 +63,11 @@
             transition: margin-left 0.3s ease-in-out;
             z-index: 1030;
         }
+        .sidebar img {
+            max-width: 200px;
+            margin-top: 9px;
+            margin-bottom: 24px;
+        }
 
         .sidebar a {
             color: white;
@@ -158,7 +163,7 @@
     {{-- Side Bar --}}
     <div class="sidebar">
         <div style="text-align: center; padding: 10px 0; border-bottom: 4px solid #3f51b5;">
-            <h4>Sistem Inventaris Surat</h4>
+            <img src="storage/assets/simantap.png" alt="Logo">
         </div>
         <a href="{{ route('dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
         <a href="{{ route('surat_masuk.index') }}"><i class="fa fa-inbox"></i> Surat Masuk</a>

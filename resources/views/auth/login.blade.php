@@ -30,8 +30,8 @@
             padding: 25px 20px;
         }
         .login-header img {
-            max-width: 70px;
-            margin-bottom: 10px;
+            max-width: 150px;
+            margin-bottom: 4px;
         }
         .btn-custom {
             background-color: #3f51b5;
@@ -69,8 +69,8 @@
 <div class="login-card">
     <div class="login-header">
         <!-- Ganti URL logo sesuai kebutuhan -->
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Arsenal_FC.svg/800px-Arsenal_FC.svg.png" alt="Logo">
-        <h3>Welcome Back</h3>
+        <img src="storage/assets/simantap.png" alt="Logo">
+        <h3 class="mt-2">Welcome Back</h3>
         <p class="mb-0">Please login to your account</p>
     </div>
     <div class="p-4">
