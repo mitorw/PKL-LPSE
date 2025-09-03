@@ -163,7 +163,7 @@
     {{-- Side Bar --}}
     <div class="sidebar">
         <div style="text-align: center; padding: 10px 0; border-bottom: 4px solid #3f51b5;">
-            <img src="storage/assets/simantap.png" alt="Logo">
+            <img src="../storage/assets/simantap.png" alt="Logo">
         </div>
         <a href="{{ route('dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
         <a href="{{ route('surat_masuk.index') }}"><i class="fa fa-inbox"></i> Surat Masuk</a>
