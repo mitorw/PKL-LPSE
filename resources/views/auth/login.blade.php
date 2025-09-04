@@ -69,7 +69,7 @@
 <div class="login-card">
     <div class="login-header">
         <!-- Ganti URL logo sesuai kebutuhan -->
-        <img src="storage/assets/simantap.png" alt="Logo">
+        <img src="../storage/assets/simantap.png" alt="Logo">
         <h3 class="mt-2">Welcome Back</h3>
         <p class="mb-0">Please login to your account</p>
     </div>
@@ -112,7 +112,7 @@
 
 
             <!-- Actions -->
-            <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="mb-3 d-flex justify-content-between align-items-center">
 
                     <a class="forgot-link">
                         Lupa Password? Silakan Hubungi Admin!
@@ -120,7 +120,7 @@
             </div>
 
             <!-- Button -->
-            <button type="submit" class="btn btn-custom w-100 py-2">Log In</button>
+            <button type="submit" class="py-2 btn btn-custom w-100">Log In</button>
         </form>
     </div>
 </div>
