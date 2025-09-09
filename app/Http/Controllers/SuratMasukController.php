@@ -119,6 +119,7 @@ class SuratMasukController extends Controller
             'perihal' => 'required|string',
             'klasifikasi' => 'required|in:Rahasia,Penting,Biasa',
             'file_surat' => 'required|mimes:pdf,png,jpg,jpeg|max:5120',
+            'file_surat_original' => 'nullable|string|max:255',
             // ... validasi lain tanpa no_surat
         ]);
 

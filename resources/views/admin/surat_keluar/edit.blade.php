@@ -16,7 +16,7 @@
                     <input type="text" name="nomor_surat" class="form-control"
                         value="{{ old('nomor_surat', $surat->nomor_surat) }}" required>
                     @error('nomor_surat')
-                        <div class="text-danger mt-1">{{ $message }}</div>
+                        <div class="mt-1 text-danger">{{ $message }}</div>
                     @enderror
                 </div>
 
@@ -59,7 +59,7 @@
                 </div>
                 <!-- File Surat -->
                 <div class="mb-3">
-                    <label class="form-label">File Surat (PDF/PNG/JPG) <span style="color: crimson">*Kosongkan jika tidak
+                    <label class="form-label">File Surat (PDF/PNG/JPG) [Max 5 MB]<span style="color: crimson">*Kosongkan jika tidak
                             ingin diubah</span></label>
 
                     @if ($surat->isi_surat)

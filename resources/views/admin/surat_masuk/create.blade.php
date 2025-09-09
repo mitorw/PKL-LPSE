@@ -15,7 +15,7 @@
                     <input type="text" name="no_surat" class="form-control" value="{{ old('no_surat') }}" required>
 
                     @error('no_surat')
-                        <div class="text-danger mt-1">{{ $message }}</div>
+                        <div class="mt-1 text-danger">{{ $message }}</div>
                     @enderror
                 </div>
 
@@ -96,7 +96,7 @@
 
                 {{-- Upload PDF --}}
                 <div class="mb-3">
-                    <label>Upload Scan Surat (PDF/PNG/JPG)</label>
+                    <label>Upload Scan Surat (PDF/PNG/JPG) [Max 5 MB]</label>
                     <input type="file" name="file_surat" class="form-control" accept=".pdf,.png,.jpg,.jpeg" required>
                 </div>
 

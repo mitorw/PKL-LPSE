@@ -15,7 +15,7 @@
             {{-- Data Surat Utama --}}
             <div class="mb-3"><label class="form-label">No Surat</label><input type="text" name="no_surat" class="form-control" value="{{ old('no_surat', $surat->no_surat) }}">
                 @error('no_surat')
-                    <div class="text-danger mt-1">{{ $message }}</div>
+                    <div class="mt-1 text-danger">{{ $message }}</div>
                 @enderror
             </div>
             <div class="mb-3"><label class="form-label">Asal Surat</label><input type="text" name="asal_surat" class="form-control" value="{{ old('asal_surat', $surat->asal_surat) }}"></div>
@@ -59,7 +59,7 @@
             <hr>
 
             <div class="mb-3">
-                <label class="form-label">File Surat (PDF/PNG/JPG) <span style="color: crimson">*Kosongkan jika tidak ingin diubah</span></label>
+                <label class="form-label">File Surat (PDF/PNG/JPG) [Max 5 MB]<span style="color: crimson">*Kosongkan jika tidak ingin diubah</span></label>
                 @if($surat->file_surat)
                     <p class="mt-2">File sekarang: <a href="{{ asset('storage/'. $surat->file_surat) }}" target="_blank">Lihat File</a></p>
                 @endif
