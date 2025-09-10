@@ -140,7 +140,7 @@
         {{-- Tombol tambah di kiri --}}
         @auth
             @if (Auth::user()->role === 'admin')
-                <a href="{{ route('surat_masuk.create') }}" class="mb-3 btn btn-primary">+ Tambah Surat Masuk</a>
+                <a href="{{ route('surat_masuk.create') }}" class="mb-3 btn btn-primary mx-2">+ Tambah Surat Masuk</a>
             @endif
         @endauth
 

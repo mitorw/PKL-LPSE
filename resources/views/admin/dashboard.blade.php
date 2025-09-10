@@ -8,7 +8,7 @@
     <div class="mb-4 row">
         {{-- Jika role admin, tampilkan 3 card --}}
         @if (Auth::user()->role === 'admin')
-            <div class="col-md-4">
+            <div class="col-md-4 mb-2">
                 <div class="p-3 text-center card">
                     <h5>SURAT MASUK</h5>
                     <h2 class="text-primary">{{ $suratMasuk }}</h2>
@@ -16,7 +16,7 @@
                     <a href="{{ route('surat_masuk.index') }}" class="mt-3 btn btn-success btn-sm">Lihat</a>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4 mb-2">
                 <div class="p-3 text-center card">
                     <h5>SURAT KELUAR</h5>
                     <h2 class="text-success">{{ $suratKeluar }}</h2>
@@ -24,7 +24,7 @@
                     <a href="{{ route('surat_keluar.index') }}" class="mt-3 btn btn-success btn-sm">Lihat</a>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4 mb-2">
                 <div class="p-3 text-center card">
                     <h5>PENGGUNA</h5>
                     <h2 class="text-secondary">{{ $pengguna }}</h2>
@@ -36,7 +36,7 @@
 
         {{-- Jika role user, hanya tampilkan 2 card --}}
         @if (Auth::user()->role === 'user')
-            <div class="col-md-6">
+            <div class="col-md-6 mb-2">
                 <div class="p-3 text-center card">
                     <h5>SURAT MASUK</h5>
                     <h2 class="text-primary">{{ $suratMasuk }}</h2>
@@ -44,7 +44,7 @@
                     <a href="{{ route('surat_masuk.index') }}" class="mt-3 btn btn-success btn-sm">Lihat</a>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 mb-2">
                 <div class="p-3 text-center card">
                     <h5>SURAT KELUAR</h5>
                     <h2 class="text-success">{{ $suratKeluar }}</h2>
@@ -63,7 +63,7 @@
                 <p class="text-muted">Berikut adalah ringkasan data inventaris surat.</p>
             </div>
             {{-- Bar Chart --}}
-            <div class="col-md-8">
+            <div class="col-md-8 mb-2">
                 <div class="p-3 card">
                     <h5>Statistik Surat 6 Bulan Terakhir</h5>
                     <canvas id="barChart"></canvas>

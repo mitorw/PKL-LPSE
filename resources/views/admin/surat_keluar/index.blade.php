@@ -62,7 +62,7 @@
     <h2 class="mb-4">Daftar Surat Keluar</h2>
 
     <form action="{{ route('surat_keluar.index') }}" method="GET" class="mb-4">
-        
+
         <div class="card">
             <div class="card-body">
                 <div class="row g-3 align-items-end">
@@ -117,7 +117,7 @@
         {{-- Tombol tambah di kiri --}}
         @auth
             @if (Auth::user()->role === 'admin')
-                <a href="{{ route('surat_keluar.create') }}" class="btn btn-primary">
+                <a href="{{ route('surat_keluar.create') }}" class="btn btn-primary mx-2">
                     + Tambah Surat Keluar
                 </a>
             @endif

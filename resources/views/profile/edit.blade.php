@@ -58,7 +58,7 @@
         }
     </style>
 
-    <div class="container mt-4">
+    <div class="container mt-4 ">
         <div class="profile-header">
             <div class="profile-avatar">
                 @if (Auth::user()->profile_photo)
@@ -77,9 +77,49 @@
         </div>
 
         <div class="row">
+            {{-- Ubah Foto Profil --}}
+            <div class="col-lg-5 col-md-5 mb-4">
+                <div class="mb-4 card card-custom h-100">
+                    <div class="card-header">
+                        <i class="fa fa-image me-2"></i> Ubah Foto Profil
+                    </div>
+                    <div class="text-center card-body d-flex flex-column justify-content-center">
+                        <form method="POST" action="{{ route('profile.photo.update') }}" enctype="multipart/form-data">
+                            @csrf
+                            <div class="mb-3 d-flex justify-content-center">
+                                <div class="profile-avatar">
+                                    @if (Auth::user()->profile_photo)
+                                        <img src="{{ Auth::user()->profile_photo
+                                            ? asset('storage/' . Auth::user()->profile_photo)
+                                            : 'https://via.placeholder.com/150' }}"
+                                            alt="Foto Profil" class="rounded-circle" width="100" height="100"
+                                            style="object-fit: cover;">
+                                    @else
+                                        <i class="fa fa-user"></i>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <input class="form-control" type="file" name="profile_photo" id="formFile"
+                                    accept="image/*" required>
+
+                                <!-- Area Cropping -->
+                                <div id="croppie-container"
+                                    style="width: 100%; height: 300px; margin-top: 15px; display: none;"></div>
+
+
+
+                            </div>
+                            <div class="mt-5">
+                                <button type="button" id="crop-result" class="btn btn-primary">Simpan Foto</button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
 
             <div class="col-lg-7 col-md-7">
-
                 {{-- Edit Profile --}}
                 <div class="mb-4 card card-custom">
                     <div class="card-header">
@@ -170,47 +210,7 @@
                 </div>
             </div>
 
-            {{-- Ubah Foto Profil --}}
-            <div class="col-lg-5 col-md-5 ">
-                <div class="mb-4 card card-custom h-100">
-                    <div class="card-header">
-                        <i class="fa fa-image me-2"></i> Ubah Foto Profil
-                    </div>
-                    <div class="text-center card-body d-flex flex-column justify-content-center">
-                        <form method="POST" action="{{ route('profile.photo.update') }}" enctype="multipart/form-data">
-                            @csrf
-                            <div class="mb-3 d-flex justify-content-center">
-                                <div class="profile-avatar">
-                                    @if (Auth::user()->profile_photo)
-                                        <img src="{{ Auth::user()->profile_photo
-                                            ? asset('storage/' . Auth::user()->profile_photo)
-                                            : 'https://via.placeholder.com/150' }}"
-                                            alt="Foto Profil" class="rounded-circle" width="100" height="100"
-                                            style="object-fit: cover;">
-                                    @else
-                                        <i class="fa fa-user"></i>
-                                    @endif
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <input class="form-control" type="file" name="profile_photo" id="formFile"
-                                    accept="image/*" required>
 
-                                <!-- Area Cropping -->
-                                <div id="croppie-container"
-                                    style="width: 100%; height: 300px; margin-top: 15px; display: none;"></div>
-
-
-
-                            </div>
-                            <div class="mt-5">
-                                <button type="button" id="crop-result" class="btn btn-primary">Simpan Foto</button>
-                            </div>
-                        </form>
-
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 @endsection
