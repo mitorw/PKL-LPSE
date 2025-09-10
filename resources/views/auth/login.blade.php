@@ -69,7 +69,7 @@
 <div class="login-card">
     <div class="login-header">
         <!-- Ganti URL logo sesuai kebutuhan -->
-        <img src="../storage/assets/simantap.png" alt="Logo">
+        <img src="/simantap.png" alt="Logo">
         <h3 class="mt-2">Welcome Back</h3>
         <p class="mb-0">Please login to your account</p>
     </div>

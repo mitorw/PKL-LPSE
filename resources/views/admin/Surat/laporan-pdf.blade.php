@@ -74,7 +74,7 @@
     <table width="100%" style="border: none; border-collapse: collapse;">
         <tr>
             <td width="15%" style="text-align:center; border:none;">
-                <img src="{{ public_path('storage/assets/logo-lampung.png') }}" alt="Logo"
+                <img src="{{ public_path('logo-lampung.png') }}" alt="Logo"
                     style="width:90px; height:auto;">
             </td>
             <td width="85%" style="text-align:center; border:none;">
