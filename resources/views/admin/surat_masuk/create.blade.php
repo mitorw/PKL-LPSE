@@ -47,6 +47,7 @@
                         <option value="Biasa" {{ old('klasifikasi') == 'Biasa' ? 'selected' : '' }}>Biasa</option>
                         <option value="Penting" {{ old('klasifikasi') == 'Penting' ? 'selected' : '' }}>Penting</option>
                         <option value="Rahasia" {{ old('klasifikasi') == 'Rahasia' ? 'selected' : '' }}>Rahasia</option>
+                        <option value="Segera" {{ old('klasifikasi') == 'Segera' ? 'selected' : '' }}>Segera</option>
                     </select>
                 </div>
 

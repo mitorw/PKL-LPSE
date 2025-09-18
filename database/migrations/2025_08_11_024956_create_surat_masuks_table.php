@@ -18,7 +18,7 @@ return new class extends Migration
             $table->date('tanggal_terima');
             $table->string('perihal', 255);
             $table->text('keterangan')->nullable();
-            $table->enum('klasifikasi', ['Rahasia', 'Penting', 'Biasa']);
+            $table->enum('klasifikasi', ['Rahasia', 'Penting', 'Biasa', 'Segera']);
             $table->unsignedBigInteger('id_disposisi')->nullable();
             $table->unsignedBigInteger('user_id');
             $table->timestamps();

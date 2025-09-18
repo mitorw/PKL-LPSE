@@ -110,7 +110,7 @@ class SuratMasukController extends Controller
             'asal_surat' => 'required|string|max:255',
             'tanggal_terima' => 'required|date',
             'perihal' => 'required|string',
-            'klasifikasi' => 'required|in:Rahasia,Penting,Biasa',
+            'klasifikasi' => 'required|in:Rahasia,Penting,Biasa,Segera',
             'file_surat' => 'required|mimes:pdf,png,jpg,jpeg|max:5120',
             'file_surat_original' => 'nullable|string|max:255',
             // ... validasi lain tanpa no_surat
@@ -237,7 +237,7 @@ class SuratMasukController extends Controller
             'asal_surat' => 'required|string|max:255',
             'tanggal_terima' => 'required|date',
             'perihal' => 'required|string',
-            'klasifikasi' => 'required|in:Rahasia,Penting,Biasa',
+            'klasifikasi' => 'required|in:Rahasia,Penting,Biasa,Segera',
             'file_surat' => 'nullable|mimes:pdf,png,jpg,jpeg|max:5120',
             'file_surat_original' => 'nullable|string|max:255',
         ]);

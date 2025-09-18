@@ -22,7 +22,7 @@
             <div class="mb-3" style="width: 250px;"><label class="form-label">Tanggal Terima</label><input type="date" name="tanggal_terima" class="form-control" value="{{ old('tanggal_terima', $surat->tanggal_terima) }}"></div>
             <div class="mb-3"><label class="form-label">Perihal</label><input type="text" name="perihal" class="form-control" value="{{ old('perihal', $surat->perihal) }}"></div>
             <div class="mb-3"><label class="form-label">Keterangan</label><textarea name="keterangan" class="form-control">{{ old('keterangan', $surat->keterangan) }}</textarea></div>
-            <div class="mb-3"><label class="form-label">Klasifikasi</label><select name="klasifikasi" class="form-select"><option value="Rahasia" {{ old('klasifikasi', $surat->klasifikasi) == 'Rahasia' ? 'selected' : '' }}>Rahasia</option><option value="Penting" {{ old('klasifikasi', $surat->klasifikasi) == 'Penting' ? 'selected' : '' }}>Penting</option><option value="Biasa" {{ old('klasifikasi', $surat->klasifikasi) == 'Biasa' ? 'selected' : '' }}>Biasa</option></select></div>
+            <div class="mb-3"><label class="form-label">Klasifikasi</label><select name="klasifikasi" class="form-select"><option value="Rahasia" {{ old('klasifikasi', $surat->klasifikasi) == 'Rahasia' ? 'selected' : '' }}>Rahasia</option><option value="Penting" {{ old('klasifikasi', $surat->klasifikasi) == 'Penting' ? 'selected' : '' }}>Penting</option><option value="Biasa" {{ old('klasifikasi', $surat->klasifikasi) == 'Biasa' ? 'selected' : '' }}>Biasa</option><option value="Segera" {{ old('klasifikasi', $surat->klasifikasi) == 'Segera' ? 'selected' : '' }}>Segera</option></select></div>
 
             <hr>
             <h5>Disposisi</h5>

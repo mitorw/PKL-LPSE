@@ -19,7 +19,7 @@ return new class extends Migration
             $table->date('tanggal');
             $table->string('dibuat_oleh', 50);
             $table->text('keterangan')->nullable();
-            $table->enum('klasifikasi', ['biasa', 'penting', 'rahasia'])->default('biasa');
+            $table->enum('klasifikasi', ['biasa', 'penting', 'rahasia', 'segera'])->default('biasa');
             $table->string('isi_surat')->nullable(); // nama file lampiran (pdf, png, jpg)
             $table->timestamps(); // created_at & updated_at
         });
