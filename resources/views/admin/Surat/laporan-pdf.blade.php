@@ -142,7 +142,7 @@
                 @php
                     $sm = $disposisiSurat->firstWhere('no_surat', $surat->nomor_surat);
                 @endphp
-                @if($sm && $sm->disposisi)
+                @if($sm && $sm->disposisis->count() > 0)
                     <td style="text-align:center;">Ada</td>
                 @else
                     <td style="text-align:center;">Tidak Ada</td>
@@ -221,11 +221,23 @@
                     {{ \Carbon\Carbon::parse($sm->tanggal_terima)->format('d-m-Y') }}
                 </td>
 
-                @if($sm->disposisi)
+                @if($sm->disposisis->count() > 0)
                     <td style="text-align:center;">Ada</td>
-                    <td>{{ $sm->disposisi->dis_bagian }}</td>
-                    <td>{{ $sm->disposisi->catatan }}</td>
-                    <td>{{ $sm->disposisi->instruksi }}</td>
+                    <td>
+                        @foreach($sm->disposisis as $disposisi)
+                            {{ $disposisi->dis_bagian }}@if(!$loop->last), @endif
+                        @endforeach
+                    </td>
+                    <td>
+                        @foreach($sm->disposisis as $disposisi)
+                            {{ $disposisi->pivot->catatan ?? '-' }}@if(!$loop->last), @endif
+                        @endforeach
+                    </td>
+                    <td>
+                        @foreach($sm->disposisis as $disposisi)
+                            {{ $disposisi->pivot->instruksi ?? '-' }}@if(!$loop->last), @endif
+                        @endforeach
+                    </td>
                 @else
                     <td style="text-align:center;">Tidak Ada</td>
                     <td>-</td>

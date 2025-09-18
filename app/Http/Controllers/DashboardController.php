@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Disposisi;
 use App\Models\SuratMasuk;
 use App\Models\SuratKeluar;
 use App\Models\User;
@@ -310,9 +311,17 @@ class DashboardController extends Controller
         $response = file_get_contents($url . '?c=' . urlencode(json_encode($chartConfig)) . '&format=png&width=350&height=350');
         $chartBase64 = base64_encode($response);
 
+        // Ambil data disposisi untuk laporan
+        $disposisiSurat = SuratMasuk::with('disposisis')
+            ->when($startDate, fn($q) => $q->whereDate('tanggal_terima', '>=', $startDate))
+            ->when($endDate, fn($q) => $q->whereDate('tanggal_terima', '<=', $endDate))
+            ->orderBy('tanggal_terima', $sortDirection)
+            ->get();
+            
         // Export PDF
         $pdf = Pdf::loadView('admin.Surat.laporan-pdf', [
             'dataSurat'      => $dataSurat,
+            'disposisiSurat' => $disposisiSurat,
             'tglAwal'        => $startDate,
             'tglAkhir'       => $endDate,
             'chartBase64'    => $chartBase64,

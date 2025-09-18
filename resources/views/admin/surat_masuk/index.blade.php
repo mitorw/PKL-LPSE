@@ -238,7 +238,14 @@
                         <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
                             {{ $surat->keterangan }}</td>
                         <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
-                            {{ $surat->disposisi->dis_bagian ?? '-' }}</td>
+                            @if ($surat->disposisis->isNotEmpty())
+                                @foreach($surat->disposisis as $disposisi)
+                                    {{ $disposisi->dis_bagian }}@if(!$loop->last), @endif
+                                @endforeach
+                            @else
+                                -
+                            @endif
+                        </td>
                         <td>
                             @if ($surat->file_surat)
                                 <button class="my-2 btn btn-sm btn-info" data-bs-toggle="modal"
@@ -358,24 +365,32 @@
                                     <tr>
                                         <th>Disposisi</th>
                                         <td>
-                                            @if ($surat->disposisi)
+                                            @if ($surat->disposisis->isNotEmpty())
                                                 <table class="surat-detail-table">
                                                     <tr>
                                                         <th>Bagian</th>
                                                         <td>
-                                                            {{ $surat->disposisi->dis_bagian }}
+                                                            @foreach($surat->disposisis as $disposisi)
+                                                                {{ $disposisi->dis_bagian }}@if(!$loop->last), @endif
+                                                            @endforeach
                                                         </td>
                                                     </tr>
                                                     <tr>
                                                         <th>Catatan</th>
                                                         <td>
-                                                            {{ $surat->disposisi->catatan }} <br>
+                                                            @foreach($surat->disposisis as $disposisi)
+                                                                <strong>{{ $disposisi->dis_bagian }}:</strong> {{ $disposisi->pivot->catatan ?? '-' }}
+                                                                @if(!$loop->last)<br>@endif
+                                                            @endforeach
                                                         </td>
                                                     </tr>
                                                     <tr>
                                                         <th>Instruksi</th>
                                                         <td>
-                                                            {{ $surat->disposisi->instruksi }}
+                                                            @foreach($surat->disposisis as $disposisi)
+                                                                <strong>{{ $disposisi->dis_bagian }}:</strong> {{ $disposisi->pivot->instruksi ?? '-' }}
+                                                                @if(!$loop->last)<br>@endif
+                                                            @endforeach
                                                         </td>
                                                     </tr>
                                                 </table>

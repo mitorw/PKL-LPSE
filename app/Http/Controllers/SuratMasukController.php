@@ -24,7 +24,7 @@ class SuratMasukController extends Controller
         // BARU: Mengambil semua nama bagian yang unik dari tabel disposisi untuk dikirim ke view
         $daftarBagian = Disposisi::select('dis_bagian')->distinct()->orderBy('dis_bagian')->get();
         // Mulai query builder, jangan langsung eksekusi
-        $query = SuratMasuk::with('disposisi');
+        $query = SuratMasuk::with('disposisis');
 
         // Terapkan filter PENCARIAN jika ada input 'search'
         $query->when($request->filled('search'), function ($q) use ($request) {
@@ -56,27 +56,20 @@ class SuratMasukController extends Controller
         // BARU: Logika filter disposisi yang lebih canggih
         $query->when($request->filled('disposisi_status'), function ($q) use ($request) {
             if ($request->disposisi_status === 'ada') {
-                $q->whereHas('disposisi'); // Hanya tampilkan surat yang punya relasi disposisi
+                $q->whereHas('disposisis'); // Hanya tampilkan surat yang punya relasi disposisi
             } elseif ($request->disposisi_status === 'tidak_ada') {
-                $q->whereDoesntHave('disposisi'); // Hanya tampilkan surat yang TIDAK punya relasi disposisi
+                $q->whereDoesntHave('disposisis'); // Hanya tampilkan surat yang TIDAK punya relasi disposisi
             }
         });
 
         // BARU: Terapkan filter berdasarkan BAGIAN disposisi jika ada
         $query->when($request->filled('dis_bagian'), function ($q) use ($request) {
-            $q->whereHas('disposisi', function ($disposisiQuery) use ($request) {
+            $q->whereHas('disposisis', function ($disposisiQuery) use ($request) {
                 $disposisiQuery->where('dis_bagian', $request->dis_bagian);
             });
         });
 
-        // Terapkan filter STATUS DISPOSISI jika ada
-        $query->when($request->filled('disposisi_status'), function ($q) use ($request) {
-            if ($request->disposisi_status === 'ada') {
-                $q->whereNotNull('id_disposisi');
-            } elseif ($request->disposisi_status === 'tidak_ada') {
-                $q->whereNull('id_disposisi');
-            }
-        });
+        // Filter status disposisi sudah ditangani di atas dengan relasi many-to-many
 
         // Tentukan kolom dan arah SORTING (urutan)
         $sortColumn = $request->input('sort', 'created_at'); // Default sorting
@@ -103,10 +96,10 @@ class SuratMasukController extends Controller
 
     public function create()
     {
-        $disposisi = Disposisi::all();
+        $disposisis = Disposisi::all();
         return view('admin.surat_masuk.create', [
             'pageTitle' => 'Tambah Surat Masuk',
-            'disposisi' => $disposisi
+            'disposisis' => $disposisis
         ]);
     }
 
@@ -144,15 +137,7 @@ class SuratMasukController extends Controller
                 ]);
         }
 
-        $idDisposisi = null;
-        if ($request->filled('dis_bagian')) {
-            $disposisi = Disposisi::create([
-                'dis_bagian' => $request->dis_bagian,
-                'catatan' => $request->catatan,
-                'instruksi' => $request->instruksi
-            ]);
-            $idDisposisi = $disposisi->id_disposisi;
-        }
+        // Tidak perlu membuat disposisi baru, karena kita menggunakan disposisi yang sudah ada
 
         $fileSuratPath = null;
         if ($request->hasFile('file_surat')) {
@@ -206,28 +191,41 @@ class SuratMasukController extends Controller
             }
         }
 
-        SuratMasuk::create([
+        $suratMasuk = SuratMasuk::create([
             'no_surat' => $request->no_surat,
             'asal_surat' => $request->asal_surat,
             'tanggal_terima' => $request->tanggal_terima,
             'perihal' => $request->perihal,
             'keterangan' => $request->keterangan,
             'klasifikasi' => $request->klasifikasi,
-            'id_disposisi' => $idDisposisi,
             'user_id' => Auth::id(),
             'file_surat' => $fileSuratPath,
             'file_surat_original' => $originalPath ?? null,
         ]);
+        
+        // Simpan multiple disposisi jika ada
+        if ($request->disposisi_status === 'ada' && $request->has('disposisi_ids') && !empty($request->disposisi_ids)) {
+            $disposisiData = [];
+            foreach ($request->disposisi_ids as $disposisiId) {
+                $disposisiData[$disposisiId] = [
+                    'catatan' => $request->catatan,
+                    'instruksi' => $request->instruksi
+                ];
+            }
+            $suratMasuk->disposisis()->attach($disposisiData);
+        }
 
         return redirect()->route('surat_masuk.index')->with('success', 'Surat masuk berhasil ditambahkan');
     }
 
     public function edit($id)
     {
-        $surat = SuratMasuk::with('disposisi')->findOrFail($id);
+        $surat = SuratMasuk::with('disposisis')->findOrFail($id);
+        $disposisis = Disposisi::all();
         return view('admin.surat_masuk.edit', [
             'pageTitle' => 'Edit Surat Masuk',
-            'surat' => $surat
+            'surat' => $surat,
+            'disposisis' => $disposisis
         ]);
     }
 
@@ -242,9 +240,6 @@ class SuratMasukController extends Controller
             'klasifikasi' => 'required|in:Rahasia,Penting,Biasa',
             'file_surat' => 'nullable|mimes:pdf,png,jpg,jpeg|max:5120',
             'file_surat_original' => 'nullable|string|max:255',
-            // Tambahkan validasi untuk status disposisi
-            'disposisi_status' => 'required|in:ada,tidak',
-            'dis_bagian' => 'nullable|required_if:disposisi_status,ada|in:Bagian Layanan Pengadaan Secara Elektronik,Bagian Advokasi dan Pembinaan,Bagian Pengelolaan Pengadaan Barang dan Jasa',
         ]);
 
         $noSuratInput = $request->input('no_surat');
@@ -267,34 +262,20 @@ class SuratMasukController extends Controller
                     'redirect_url' => $redirectUrl
                 ]);
         }
-
-
-        $idDisposisi = $surat->id_disposisi;
-
-        // LOGIKA BARU UNTUK MENGELOLA DISPOSISI
-        if ($request->disposisi_status === 'ada') {
-            // JIKA USER INGIN ADA DISPOSISI (CREATE ATAU UPDATE)
-            $disposisiData = [
-                'dis_bagian' => $request->dis_bagian,
-                'catatan' => $request->catatan,
-                'instruksi' => $request->instruksi
-            ];
-
-            if ($idDisposisi) {
-                // Jika sudah ada, update disposisi yang lama
-                Disposisi::find($idDisposisi)->update($disposisiData);
-            } else {
-                // Jika belum ada, buat disposisi baru
-                $disposisi = Disposisi::create($disposisiData);
-                $idDisposisi = $disposisi->id_disposisi; // Dapatkan ID baru
+        
+        // Hapus semua relasi disposisi yang ada
+        $surat->disposisis()->detach();
+        
+        // Tambahkan disposisi baru jika ada
+        if ($request->has('disposisi_ids')) {
+            $disposisiData = [];
+            foreach ($request->disposisi_ids as $disposisiId) {
+                $disposisiData[$disposisiId] = [
+                    'catatan' => $request->catatan,
+                    'instruksi' => $request->instruksi
+                ];
             }
-        } else {
-            // JIKA USER MEMILIH "TIDAK ADA" DISPOSISI (DELETE)
-            if ($idDisposisi) {
-                // Jika surat ini punya disposisi, hapus disposisinya
-                Disposisi::find($idDisposisi)->delete();
-                $idDisposisi = null; // Set ID menjadi null untuk diupdate di tabel surat
-            }
+            $surat->disposisis()->attach($disposisiData);
         }
 
         $fileSuratPath = $surat->file_surat;
@@ -374,7 +355,6 @@ class SuratMasukController extends Controller
             'perihal' => $request->perihal,
             'keterangan' => $request->keterangan,
             'klasifikasi' => $request->klasifikasi,
-            'id_disposisi' => $idDisposisi, // Simpan ID disposisi yang baru (atau null)
             'file_surat' => $fileSuratPath,
             'file_surat_original' => $originalPath,
         ]);
@@ -384,7 +364,7 @@ class SuratMasukController extends Controller
 
     public function show($id)
     {
-        $surat = SuratMasuk::with('disposisi')->findOrFail($id);
+        $surat = SuratMasuk::with('disposisis')->findOrFail($id);
         return view('admin.surat_masuk.show', [
             'pageTitle' => 'Detail Surat Masuk',
             'surat' => $surat

@@ -19,14 +19,15 @@ class SuratMasuk extends Model
         'perihal',
         'keterangan',
         'klasifikasi',
-        'id_disposisi',
         'user_id',
         'file_surat',
         'file_surat_original',
     ];
 
-    public function disposisi()
+    public function disposisis()
     {
-        return $this->belongsTo(Disposisi::class, 'id_disposisi', 'id_disposisi');
+        return $this->belongsToMany(Disposisi::class, 'surat_masuk_disposisi', 'id_surat_masuk', 'id_disposisi')
+                    ->withPivot('catatan', 'instruksi')
+                    ->withTimestamps();
     }
 }

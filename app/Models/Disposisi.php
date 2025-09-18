@@ -18,8 +18,10 @@ class Disposisi extends Model
         'instruksi'
     ];
 
-    public function suratMasuk()
+    public function suratMasuks()
     {
-        return $this->hasMany(SuratMasuk::class, 'id_disposisi', 'id_disposisi');
+        return $this->belongsToMany(SuratMasuk::class, 'surat_masuk_disposisi', 'id_disposisi', 'id_surat_masuk')
+                    ->withPivot('catatan', 'instruksi')
+                    ->withTimestamps();
     }
 }

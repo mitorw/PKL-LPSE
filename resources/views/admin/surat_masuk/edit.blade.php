@@ -31,28 +31,33 @@
             <div class="mb-3">
                 <label class="form-label">Status Disposisi</label>
                 <select id="disposisi_status" name="disposisi_status" class="form-select">
-                    <option value="tidak" {{ old('disposisi_status', $surat->id_disposisi ? 'ada' : 'tidak') == 'tidak' ? 'selected' : '' }}>Tidak Ada</option>
-                    <option value="ada" {{ old('disposisi_status', $surat->id_disposisi ? 'ada' : 'tidak') == 'ada' ? 'selected' : '' }}>Ada</option>
+                    <option value="tidak" {{ old('disposisi_status', $surat->disposisis->isEmpty() ? 'tidak' : 'ada') == 'tidak' ? 'selected' : '' }}>Tidak Ada</option>
+                    <option value="ada" {{ old('disposisi_status', $surat->disposisis->isEmpty() ? 'tidak' : 'ada') == 'ada' ? 'selected' : '' }}>Ada</option>
                 </select>
             </div>
 
             <div id="disposisi_fields">
                 <div class="mb-3">
                     <label class="form-label">Bagian Tujuan</label>
-                    <select name="dis_bagian" class="form-select">
-                        <option value="">-- Pilih Bagian --</option>
-                        <option value="Bagian Layanan Pengadaan Secara Elektronik" {{ old('dis_bagian', $surat->disposisi->dis_bagian ?? '') == 'Bagian Layanan Pengadaan Secara Elektronik' ? 'selected' : '' }}>Bagian Layanan Pengadaan Secara Elektronik</option>
-                        <option value="Bagian Advokasi dan Pembinaan" {{ old('dis_bagian', $surat->disposisi->dis_bagian ?? '') == 'Bagian Advokasi dan Pembinaan' ? 'selected' : '' }}>Bagian Advokasi dan Pembinaan</option>
-                        <option value="Bagian Pengelolaan Pengadaan Barang dan Jasa" {{ old('dis_bagian', $surat->disposisi->dis_bagian ?? '') == 'Bagian Pengelolaan Pengadaan Barang dan Jasa' ? 'selected' : '' }}>Bagian Pengelolaan Pengadaan Barang dan Jasa</option>
-                    </select>
+                    <div class="form-check-list">
+                        @foreach($disposisis as $disposisi)
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="disposisi_ids[]" value="{{ $disposisi->id_disposisi }}" id="disposisi_{{ $disposisi->id_disposisi }}" 
+                                    {{ in_array($disposisi->id_disposisi, old('disposisi_ids', $surat->disposisis->pluck('id_disposisi')->toArray())) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="disposisi_{{ $disposisi->id_disposisi }}">
+                                    {{ $disposisi->dis_bagian }}
+                                </label>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Catatan</label>
-                    <textarea name="catatan" class="form-control">{{ old('catatan', $surat->disposisi->catatan ?? '') }}</textarea>
+                    <textarea name="catatan" class="form-control">{{ old('catatan', $surat->disposisis->first() ? $surat->disposisis->first()->pivot->catatan : '') }}</textarea>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Instruksi</label>
-                    <input type="text" name="instruksi" class="form-control" value="{{ old('instruksi', $surat->disposisi->instruksi ?? '') }}">
+                    <input type="text" name="instruksi" class="form-control" value="{{ old('instruksi', $surat->disposisis->first() ? $surat->disposisis->first()->pivot->instruksi : '') }}">
                 </div>
             </div>
 
