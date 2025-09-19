@@ -113,7 +113,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 For questions or support, please contact the repository owner:
 
-- **GitHub:** [mitorw](https://github.com/mitorw)
+- **GitHub:** [MitoRW](https://github.com/mitorw),  [MSyafiq](https://github.com/masfiq28),  [RNiki](https://github.com/Botakmengkilap)
 - **Email:** (Add email if available)
 
 ---
