@@ -119,6 +119,7 @@
                             <option value="Biasa" {{ request('status') == 'Biasa' ? 'selected' : '' }}>Biasa</option>
                             <option value="Penting" {{ request('status') == 'Penting' ? 'selected' : '' }}>Penting</option>
                             <option value="Rahasia" {{ request('status') == 'Rahasia' ? 'selected' : '' }}>Rahasia</option>
+                            <option value="Segera" {{ request('status') == 'Segera' ? 'selected' : '' }}>Segera</option>
                         </select>
                     </div>
                 </div>

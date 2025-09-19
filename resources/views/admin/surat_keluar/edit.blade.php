@@ -55,6 +55,7 @@
                         <option value="biasa">Biasa</option>
                         <option value="penting">Penting</option>
                         <option value="rahasia">Rahasia</option>
+                        <option value="segera">Segera</option>
                     </select>
                 </div>
                 <!-- File Surat -->

@@ -197,7 +197,7 @@ class LaporanController extends Controller
         if ($request->filled('jenis_surat') && $request->jenis_surat === 'keluar') {
             $disposisiSurat = collect();
         } else {
-            $disposisiSurat = SuratMasuk::with('disposisi')
+            $disposisiSurat = SuratMasuk::with('disposisis')
                 ->when($request->filled('nomor_surat'), fn($q) => $q->where('no_surat', 'like', '%' . $request->nomor_surat . '%'))
                 ->when($startDate, fn($q) => $q->whereDate('tanggal_terima', '>=', $startDate))
                 ->when($endDate, fn($q) => $q->whereDate('tanggal_terima', '<=', $endDate))

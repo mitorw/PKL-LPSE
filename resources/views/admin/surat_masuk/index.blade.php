@@ -92,6 +92,8 @@
                             <option value="">Semua</option>
                             <option value="Rahasia" {{ request('klasifikasi') == 'Rahasia' ? 'selected' : '' }}>Rahasia
                             </option>
+                            <option value="Segera" {{ request('klasifikasi') == 'Segera' ? 'selected' : '' }}>Segera
+                            </option>
                             <option value="Penting" {{ request('klasifikasi') == 'Penting' ? 'selected' : '' }}>Penting
                             </option>
                             <option value="Biasa" {{ request('klasifikasi') == 'Biasa' ? 'selected' : '' }}>Biasa</option>
@@ -228,6 +230,7 @@
                                 $badgeClass = match (strtolower(trim($surat->klasifikasi))) {
                                     'penting' => 'bg-warning text-dark',
                                     'rahasia' => 'bg-danger',
+                                    'segera' => 'bg-primary',
                                     default => 'bg-success',
                                 };
                             @endphp
@@ -238,7 +241,16 @@
                         <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
                             {{ $surat->keterangan }}</td>
                         <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
-                            {{ $surat->disposisi->dis_bagian ?? '-' }}</td>
+                            @if ($surat->disposisis->isNotEmpty())
+                                @foreach ($surat->disposisis as $disposisi)
+                                    {{ $disposisi->dis_bagian }}@if (!$loop->last)
+                                        ,
+                                    @endif
+                                @endforeach
+                            @else
+                                -
+                            @endif
+                        </td>
                         <td>
                             @if ($surat->file_surat)
                                 <button class="my-2 btn btn-sm btn-info" data-bs-toggle="modal"
@@ -358,25 +370,24 @@
                                     <tr>
                                         <th>Disposisi</th>
                                         <td>
-                                            @if ($surat->disposisi)
-                                                <table class="surat-detail-table">
-                                                    <tr>
-                                                        <th>Bagian</th>
-                                                        <td>
-                                                            {{ $surat->disposisi->dis_bagian }}
+                                            @if ($surat->disposisis->isNotEmpty())
+                                                {{-- Menggunakan tabel di dalam agar format tetap rapi --}}
+                                                <table class="surat-detail-table" style="border: none;">
+                                                    <tr style="background-color: transparent;">
+                                                        <th style="width: 25%;">Bagian</th>
+                                                        {{-- Gabungkan semua nama bagian menjadi satu string --}}
+                                                        <td>{{ $surat->disposisis->pluck('dis_bagian')->implode(', ') }}
                                                         </td>
                                                     </tr>
-                                                    <tr>
+                                                    <tr style="background-color: transparent;">
                                                         <th>Catatan</th>
-                                                        <td>
-                                                            {{ $surat->disposisi->catatan }} <br>
-                                                        </td>
+                                                        {{-- Ambil catatan dari disposisi pertama saja --}}
+                                                        <td>{{ $surat->disposisis->first()->pivot->catatan }}</td>
                                                     </tr>
-                                                    <tr>
+                                                    <tr style="background-color: transparent;">
                                                         <th>Instruksi</th>
-                                                        <td>
-                                                            {{ $surat->disposisi->instruksi }}
-                                                        </td>
+                                                        {{-- Ambil instruksi dari disposisi pertama saja --}}
+                                                        <td>{{ $surat->disposisis->first()->pivot->instruksi }}</td>
                                                     </tr>
                                                 </table>
                                             @else

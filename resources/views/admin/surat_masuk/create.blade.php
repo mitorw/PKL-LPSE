@@ -47,6 +47,7 @@
                         <option value="Biasa" {{ old('klasifikasi') == 'Biasa' ? 'selected' : '' }}>Biasa</option>
                         <option value="Penting" {{ old('klasifikasi') == 'Penting' ? 'selected' : '' }}>Penting</option>
                         <option value="Rahasia" {{ old('klasifikasi') == 'Rahasia' ? 'selected' : '' }}>Rahasia</option>
+                        <option value="Segera" {{ old('klasifikasi') == 'Segera' ? 'selected' : '' }}>Segera</option>
                     </select>
                 </div>
 
@@ -66,30 +67,24 @@
                 <div id="disposisi_fields" style="{{ old('disposisi_status') == 'ada' ? '' : 'display: none;' }}">
                     <div class="mb-3">
                         <label>Bagian Tujuan</label>
-                        <select name="dis_bagian" class="form-control">
-                            <option value="">-- Pilih Bagian --</option>
-                            <option value="Bagian Layanan Pengadaan Secara Elektronik"
-                                {{ old('dis_bagian') == 'Bagian Layanan Pengadaan Secara Elektronik' ? 'selected' : '' }}>
-                                Bagian Layanan Pengadaan Secara Elektronik
-                            </option>
-                            <option value="Bagian Advokasi dan Pembinaan"
-                                {{ old('dis_bagian') == 'Bagian Advokasi dan Pembinaan' ? 'selected' : '' }}>
-                                Bagian Advokasi dan Pembinaan
-                            </option>
-                            <option value="Bagian Pengelolaan Pengadaan Barang dan Jasa"
-                                {{ old('dis_bagian') == 'Bagian Pengelolaan Pengadaan Barang dan Jasa' ? 'selected' : '' }}>
-                                Bagian Pengelolaan Pengadaan Barang dan Jasa
-                            </option>
-                        </select>
+                        <div class="form-check-list" style="margin-top: 10px; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+                            @foreach($disposisis as $disposisi)
+                                <div class="form-check" style="margin-bottom: 10px; padding-left: 25px;">
+                                    <input class="form-check-input" type="checkbox" name="disposisi_ids[]" value="{{ $disposisi->id_disposisi }}" id="disposisi_{{ $disposisi->id_disposisi }}" 
+                                        {{ in_array($disposisi->id_disposisi, old('disposisi_ids', [])) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="disposisi_{{ $disposisi->id_disposisi }}" style="font-weight: 500;">
+                                        {{ $disposisi->dis_bagian }}
+                                    </label>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label>Catatan</label>
-                        {{-- Untuk textarea, old() diletakkan di antara tag --}}
                         <textarea name="catatan" class="form-control">{{ old('catatan') }}</textarea>
                     </div>
                     <div class="mb-3">
                         <label>Instruksi</label>
-                        {{-- Untuk input, old() diletakkan di dalam atribut value --}}
                         <input type="text" name="instruksi" class="form-control" value="{{ old('instruksi') }}">
                     </div>
                 </div>
@@ -105,19 +100,6 @@
             </form>
         </div>
 
-        <script>
-            document.getElementById('disposisi_status').addEventListener('change', function() {
-                let fields = document.getElementById('disposisi_fields');
-                if (this.value === 'ada') {
-                    fields.style.display = 'block';
-                } else {
-                    fields.style.display = 'none';
-                    // Kosongkan input jika tidak ada disposisi
-                    fields.querySelectorAll('input, textarea, select').forEach(el => el.value = '');
-                }
-            });
-        </script>
-
         {{-- Script Menyimpan --}}
         <script>
             document.getElementById('form-tambah-surat').addEventListener('submit', function() {
@@ -132,13 +114,24 @@
                 const disposisiStatus = document.getElementById('disposisi_status');
                 const disposisiFields = document.getElementById('disposisi_fields');
 
-                disposisiStatus.addEventListener('change', function() {
-                    if (this.value === 'ada') {
+                // Fungsi untuk menampilkan/menyembunyikan form disposisi
+                function toggleDisposisiFields() {
+                    if (disposisiStatus.value === 'ada') {
                         disposisiFields.style.display = 'block';
                     } else {
                         disposisiFields.style.display = 'none';
+                        // Kosongkan input jika tidak ada disposisi
+                        disposisiFields.querySelectorAll('input[type="text"], textarea').forEach(el => el.value = '');
+                        // Hapus centang pada checkbox
+                        disposisiFields.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
                     }
-                });
+                }
+
+                // Tambahkan event listener
+                disposisiStatus.addEventListener('change', toggleDisposisiFields);
+                
+                // Jalankan fungsi saat halaman dimuat untuk mengatur tampilan awal
+                toggleDisposisiFields();
             });
         </script>
     @endsection

@@ -95,6 +95,8 @@
                             <option value="">Semua</option>
                             <option value="Rahasia" {{ request('klasifikasi') == 'Rahasia' ? 'selected' : '' }}>Rahasia
                             </option>
+                            <option value="Segera" {{ request('klasifikasi') == 'Segera' ? 'selected' : '' }}>Segera
+                            </option>
                             <option value="Penting" {{ request('klasifikasi') == 'Penting' ? 'selected' : '' }}>Penting
                             </option>
                             <option value="Biasa" {{ request('klasifikasi') == 'Biasa' ? 'selected' : '' }}>Biasa</option>
