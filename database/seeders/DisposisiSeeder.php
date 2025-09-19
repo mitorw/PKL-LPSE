@@ -14,15 +14,15 @@ class DisposisiSeeder extends Seeder
     {
         // Tambahkan data bagian disposisi jika belum ada
         $bagian = [
-            'Bagian Advokasi',
-            'Bagian Pengadaan',
-            'Bagian Layanan',
+            'Bagian Advokasi dan Pembinaan',
+            'Bagian Pengelolaan Pengadaan Barang dan Jasa',
+            'Bagian Layanan Pengadaan Secara Elektronik',
         ];
-        
+
         foreach ($bagian as $nama) {
             // Cek apakah bagian sudah ada
             $exists = Disposisi::where('dis_bagian', $nama)->exists();
-            
+
             // Jika belum ada, tambahkan
             if (!$exists) {
                 Disposisi::create(['dis_bagian' => $nama]);

@@ -202,7 +202,7 @@ class SuratMasukController extends Controller
             'file_surat' => $fileSuratPath,
             'file_surat_original' => $originalPath ?? null,
         ]);
-        
+
         // Simpan multiple disposisi jika ada
         if ($request->disposisi_status === 'ada' && $request->has('disposisi_ids') && !empty($request->disposisi_ids)) {
             $disposisiData = [];
@@ -262,21 +262,32 @@ class SuratMasukController extends Controller
                     'redirect_url' => $redirectUrl
                 ]);
         }
-        
-        // Hapus semua relasi disposisi yang ada
-        $surat->disposisis()->detach();
-        
-        // Tambahkan disposisi baru jika ada
-        if ($request->has('disposisi_ids')) {
-            $disposisiData = [];
-            foreach ($request->disposisi_ids as $disposisiId) {
-                $disposisiData[$disposisiId] = [
-                    'catatan' => $request->catatan,
-                    'instruksi' => $request->instruksi
-                ];
+        // --- AWAL BLOK PENGGANTI ---
+
+        // Cek nilai dari dropdown 'Status Disposisi'
+        if ($request->input('disposisi_status') === 'tidak') {
+
+            // JIKA status adalah "Tidak", hapus semua relasi. Logika selesai di sini.
+            $surat->disposisis()->sync([]);
+        } else {
+
+            // JIKA status adalah "Ada", siapkan data untuk sinkronisasi.
+            $disposisiData = []; // Inisialisasi variabel di dalam blok ini
+
+            if ($request->has('disposisi_ids')) {
+                foreach ($request->disposisi_ids as $disposisiId) {
+                    $disposisiData[$disposisiId] = [
+                        'catatan' => $request->catatan,
+                        'instruksi' => $request->instruksi
+                    ];
+                }
             }
-            $surat->disposisis()->attach($disposisiData);
+
+            // Panggil sync di dalam blok 'else' ini juga.
+            $surat->disposisis()->sync($disposisiData);
         }
+
+        // --- AKHIR BLOK PENGGANTI ---
 
         $fileSuratPath = $surat->file_surat;
         $originalPath = $surat->file_surat_original; // original

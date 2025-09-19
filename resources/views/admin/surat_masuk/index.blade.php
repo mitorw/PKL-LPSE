@@ -242,8 +242,10 @@
                             {{ $surat->keterangan }}</td>
                         <td data-bs-toggle="modal" data-bs-target="#detailSuratModal{{ $surat->id_surat_masuk }}">
                             @if ($surat->disposisis->isNotEmpty())
-                                @foreach($surat->disposisis as $disposisi)
-                                    {{ $disposisi->dis_bagian }}@if(!$loop->last), @endif
+                                @foreach ($surat->disposisis as $disposisi)
+                                    {{ $disposisi->dis_bagian }}@if (!$loop->last)
+                                        ,
+                                    @endif
                                 @endforeach
                             @else
                                 -
@@ -369,32 +371,23 @@
                                         <th>Disposisi</th>
                                         <td>
                                             @if ($surat->disposisis->isNotEmpty())
-                                                <table class="surat-detail-table">
-                                                    <tr>
-                                                        <th>Bagian</th>
-                                                        <td>
-                                                            @foreach($surat->disposisis as $disposisi)
-                                                                {{ $disposisi->dis_bagian }}@if(!$loop->last), @endif
-                                                            @endforeach
+                                                {{-- Menggunakan tabel di dalam agar format tetap rapi --}}
+                                                <table class="surat-detail-table" style="border: none;">
+                                                    <tr style="background-color: transparent;">
+                                                        <th style="width: 25%;">Bagian</th>
+                                                        {{-- Gabungkan semua nama bagian menjadi satu string --}}
+                                                        <td>{{ $surat->disposisis->pluck('dis_bagian')->implode(', ') }}
                                                         </td>
                                                     </tr>
-                                                    <tr>
+                                                    <tr style="background-color: transparent;">
                                                         <th>Catatan</th>
-                                                        <td>
-                                                            @foreach($surat->disposisis as $disposisi)
-                                                                <strong>{{ $disposisi->dis_bagian }}:</strong> {{ $disposisi->pivot->catatan ?? '-' }}
-                                                                @if(!$loop->last)<br>@endif
-                                                            @endforeach
-                                                        </td>
+                                                        {{-- Ambil catatan dari disposisi pertama saja --}}
+                                                        <td>{{ $surat->disposisis->first()->pivot->catatan }}</td>
                                                     </tr>
-                                                    <tr>
+                                                    <tr style="background-color: transparent;">
                                                         <th>Instruksi</th>
-                                                        <td>
-                                                            @foreach($surat->disposisis as $disposisi)
-                                                                <strong>{{ $disposisi->dis_bagian }}:</strong> {{ $disposisi->pivot->instruksi ?? '-' }}
-                                                                @if(!$loop->last)<br>@endif
-                                                            @endforeach
-                                                        </td>
+                                                        {{-- Ambil instruksi dari disposisi pertama saja --}}
+                                                        <td>{{ $surat->disposisis->first()->pivot->instruksi }}</td>
                                                     </tr>
                                                 </table>
                                             @else
